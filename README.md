@@ -32,6 +32,11 @@ Most career tools are keyword matchers. Nextnode models skills as a graph — wi
 4. For pivot analysis, the same engine computes transferability-weighted gaps between your current skill set and a target role
 5. Gemini reads the structured output and writes a personalized explanation
 
+## Architecture
+[![Architecture diagram of gargi-09/nextnode](https://gitdiagram.com/gargi-09/nextnode/diagram.png)](https://gitdiagram.com/gargi-09/nextnode?utm_source=readme&utm_medium=picture)
+<img width="6728" height="7156" alt="diagram (3)" src="https://github.com/user-attachments/assets/2d38f599-49f1-4330-b805-033e59262707" />
+
+
 ## Setup
 
 ```bash
