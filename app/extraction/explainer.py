@@ -1,13 +1,7 @@
-import asyncio
-import google.generativeai as genai
-from app.core.config import settings
-from app.extraction.extractor import _semaphore
-
-genai.configure(api_key=settings.gemini_api_key)
-model = genai.GenerativeModel("gemini-2.5-flash")
+from app.extraction.llm import generate_text
 
 EXPLANATION_PROMPT = """
-You are a candid, encouraging career coach for ML engineers. 
+You are a candid, encouraging career coach for ML engineers.
 Given the analysis below, write a concise, personalized career gap report.
 
 Analysis data:
@@ -25,18 +19,18 @@ Roadmap:
 Write your response in this exact structure:
 
 ## Overall fit
-2-3 sentences. Be specific about the fit score and what's driving it. 
+2-3 sentences. Be specific about the fit score and what's driving it.
 Mention the domain alignment bonus if it applied.
 
 ## Your strengths for this role
 Bullet points. Only mention skills with status "met". Be specific.
 
 ## Gaps to close
-For each gap in the roadmap, one bullet. Include priority and the prereq 
+For each gap in the roadmap, one bullet. Include priority and the prereq
 context if prereqs_owned > 0 — tell them why it's achievable.
 
 ## Recommended next steps
-3 concrete, actionable steps ordered by priority. Be specific — 
+3 concrete, actionable steps ordered by priority. Be specific —
 name actual courses, projects, or resources where relevant.
 
 Keep the tone direct and honest. No fluff. Max 300 words.
@@ -67,10 +61,5 @@ async def explain_gap(analysis: dict, user_name: str, job_title: str, company: s
         roadmap_summary=roadmap_summary
     )
 
-    async with _semaphore:
-        response = await asyncio.to_thread(
-            model.generate_content,
-            prompt,
-            generation_config={"temperature": 0.4}
-        )
-        return response.text.strip()
+    # kind="explain": narration is the first thing to stop when the daily budget runs low
+    return await generate_text(prompt, kind="explain", temperature=0.4)

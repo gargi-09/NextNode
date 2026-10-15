@@ -1,55 +1,40 @@
-from fastapi import APIRouter, HTTPException
-from app.models.schemas import JDRequest, ResumeRequest
-from app.extraction.extractor import extract_jd, extract_resume
-from app.graph.writer import write_jd, write_resume
-import uuid
-from app.graph.reasoner import compute_gap
-from app.extraction.explainer import explain_gap
-from app.graph.reasoner import compute_gap
+from fastapi import APIRouter
+from app.api.errors import handle as _handle
+from app.models.analysis import AnalysisResponse
+from app.models.schemas import JDRequest, PivotRequest, ResumeRequest
+from app.services.ingestion import ingest_job_description, ingest_resume
+from app.services.analysis import analyze_gap as analyze_gap_service
+from app.services.pivot import analyze_pivot as analyze_pivot_service
+
 router = APIRouter()
-    
+
+
 @router.post("/extract/jd")
 async def extract_job_description(request: JDRequest):
-    try:
-        job_id = request.job_id or str(uuid.uuid4())
-        extracted = await extract_jd(request.text)
-        write_jd(extracted, job_id)
-        return {"job_id": job_id, "extracted": extracted}
-    except Exception as e:
-        raise HTTPException(status_code=500, detail=str(e))
+    return await _handle(
+        ingest_job_description(request.text, request.job_id),
+        "Job description extraction"
+    )
 
 @router.post("/extract/resume")
 async def extract_resume_endpoint(request: ResumeRequest):
-    try:
-        extracted = await extract_resume(request.text)
-        write_resume(extracted, request.user_id)
-        return {"user_id": request.user_id, "extracted": extracted}
-    except Exception as e:
-        raise HTTPException(status_code=500, detail=str(e))
+    return await _handle(
+        ingest_resume(request.text, request.user_id),
+        "Resume extraction"
+    )
 
-@router.get("/analyze/{user_id}/{job_id}")
+@router.get("/analyze/{user_id}/{job_id}", response_model=AnalysisResponse)
 async def analyze_gap(user_id: str, job_id: str, explain: bool = True):
-    try:
-        analysis = compute_gap(user_id, job_id)
+    """Deterministic gap analysis plus graph payloads for react-force-graph
+    (`graph`) and @xyflow/react (`roadmap_flow`)."""
+    return await _handle(
+        analyze_gap_service(user_id, job_id, explain),
+        "Gap analysis"
+    )
 
-        if explain:
-            # fetch user and job names for the prompt
-            from app.db.neo4j import neo4j_client
-            with neo4j_client.get_session() as session:
-                meta = session.run("""
-                    MATCH (u:User {id: $user_id})
-                    MATCH (j:JobPosting {id: $job_id})
-                    RETURN u.name AS name, j.title AS title, j.company AS company
-                """, user_id=user_id, job_id=job_id).single()
-
-            explanation = await explain_gap(
-                analysis=analysis,
-                user_name=meta["name"],
-                job_title=meta["title"],
-                company=meta["company"]
-            )
-            analysis["explanation"] = explanation
-
-        return analysis
-    except Exception as e:
-        raise HTTPException(status_code=500, detail=str(e))
+@router.post("/pivot")
+async def analyze_pivot(request: PivotRequest):
+    return await _handle(
+        analyze_pivot_service(request.user_id, request.target_role, request.job_id),
+        "Pivot analysis"
+    )

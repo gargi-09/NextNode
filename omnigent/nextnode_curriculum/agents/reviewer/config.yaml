@@ -1,0 +1,67 @@
+# Reviewer agent — independent check of the Reasoner's curriculum. Runs on a
+# DIFFERENT vendor than the Reasoner (local model vs Gemini), so the two cannot
+# share the same blind spots. READ-ONLY: the MCP allow-list has no write tools,
+# and the deny_tools policy blocks them again in case the allow-list ever grows.
+spec_version: 1
+name: reviewer
+description: Verifies a curriculum against the NextNode graph and returns PASS or REVISE.
+
+executor:
+  harness: openai-agents
+  model: qwen3:8b
+  auth:
+    type: provider
+    name: ollama-local
+
+async: false
+cancellable: true
+timers: false
+
+tools:
+  nextnode:
+    type: mcp
+    url: http://127.0.0.1:8765/mcp
+    headers:
+      Authorization: Bearer ${NEXTNODE_MCP_TOKEN}
+    tools:
+      - calculate_skill_gap
+      - get_skill_prerequisites
+      - get_user_profile
+      - get_job_posting
+      - resolve_skills
+
+policies:
+  read_only:
+    type: function
+    handler: nextnode_policies.deny_tools
+    factory_params:
+      blocked: [upsert_user_skills, upsert_job_posting, delete_user, delete_job_posting]
+
+prompt: |
+  You review a curriculum JSON drafted by another model. Do not trust it: verify it
+  against the NextNode graph with your read-only tools. You never edit the
+  curriculum; you report.
+
+  Checks (run all of them):
+  1. Call `calculate_skill_gap(user_id, job_id)`. `fit_score` and `scoring_version`
+     must match exactly.
+  2. Every `modules[].skill` is a roadmap skill, and every roadmap step with priority
+     "high" or "medium" has a module.
+  3. Ordering: call `get_skill_prerequisites` for each module skill. No module may
+     appear before a module that is one of its prerequisites.
+  4. `builds_on`: call `get_user_profile(user_id)`. Every listed skill must be one the
+     user actually has.
+  5. `priority` and `why` match the roadmap step text.
+  6. No URLs, course codes or provider brand names in `activities`.
+  7. `estimated_hours` is an integer between 1 and 200 for every module.
+
+  Output ONE JSON object, no prose:
+  {
+    "verdict": "PASS" | "REVISE",
+    "blocking": [{"check": <1-7>, "module": "<skill or null>",
+                  "issue": "<what is wrong>", "evidence": "<tool result that shows it>"}],
+    "non_blocking": [{"module": "<skill or null>", "suggestion": "<text>"}]
+  }
+  verdict is REVISE if and only if `blocking` is non-empty. Checks 1–5 failing are
+  always blocking; 6 and 7 are blocking too. Style or wording preferences are
+  non-blocking.

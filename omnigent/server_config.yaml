@@ -1,0 +1,37 @@
+# Local Omnigent server config for NextNode (Omnigent v0.18.0).
+#   omnigent server --config omnigent/server_config.yaml
+# Server-wide policies apply to EVERY session, including each sub-agent's session,
+# so the guardrails below cannot be skipped by any agent spec.
+
+# Custom policy module (omnigent/policies/nextnode_policies.py). The startup
+# scripts add omnigent/policies to PYTHONPATH so this import resolves.
+policy_modules:
+  - nextnode_policies
+
+policies:
+  # Free-tier guard. Counts every Gemini call across all sessions on this machine
+  # in a per-day (Pacific) ledger and DENYs once either budget is spent.
+  # Keep max_requests_per_day BELOW your project's RPD from the AI Studio console.
+  # If the NextNode API uses the same Google Cloud project, leave it headroom too,
+  # or better: give Omnigent a key from a separate project.
+  gemini_daily_budget:
+    type: function
+    handler: nextnode_policies.daily_llm_budget
+    factory_params:
+      max_requests_per_day: 150
+      max_tokens_per_day: 1000000
+      model_substrings: [gemini]
+      ledger_name: gemini
+
+  # Runaway-loop guards (builtins).
+  tool_call_cap:
+    type: function
+    handler: omnigent.policies.builtins.safety.max_tool_calls_per_session
+    factory_params:
+      limit: 40
+  loop_guard:
+    type: function
+    handler: omnigent.policies.builtins.safety.detect_loop
+    factory_params:
+      window: 10
+      threshold: 3

@@ -1,35 +1,55 @@
-import asyncio
-import json
-import google.generativeai as genai
+"""Parse unstructured text into typed extractions — cache first, then Gemini.
+
+Each extract_* returns (extraction, source) where source is "cache" or "llm".
+Identical text (ignoring whitespace) never costs a second Gemini request while
+it is cached in this process.
+"""
+from functools import lru_cache
+
 from app.core.config import settings
-from app.models.schemas import ExtractedJD, ExtractedResume
-from app.extraction.prompts import JD_EXTRACTION_PROMPT, RESUME_EXTRACTION_PROMPT
+from app.extraction.llm import generate_model
+from app.extraction.prompts import (
+    JD_EXTRACTION_PROMPT, PIVOT_ROLE_PROMPT, PROMPT_VERSION, RESUME_EXTRACTION_PROMPT
+)
+from app.extraction.quota import LRUCache, content_hash
+from app.graph.ontology import get_ontology
+from app.models.schemas import ExtractedJD, ExtractedPivotRole, ExtractedResume
 
-genai.configure(api_key=settings.gemini_api_key)
-model = genai.GenerativeModel("gemini-2.5-flash")  # or "gemini-2.5-pro" for better quality but higher latency
 
-# Global semaphore — max 8 concurrent Gemini calls (safely under 10 RPM)
-_semaphore = asyncio.Semaphore(8)
+@lru_cache(maxsize=1)
+def get_cache() -> LRUCache:
+    return LRUCache(settings.llm_cache_max_entries)
 
-async def _call_gemini(prompt: str) -> dict:
-    async with _semaphore:
-        response = await asyncio.to_thread(
-            model.generate_content,
-            prompt,
-            generation_config={"temperature": 0.1}  # low temp = consistent structured output
-        )
-        raw = response.text.strip()
-        # strip markdown fences if Gemini adds them anyway
-        if raw.startswith("```"):
-            raw = raw.split("\n", 1)[1].rsplit("```", 1)[0]
-        return json.loads(raw)
 
-async def extract_jd(text: str) -> ExtractedJD:
-    prompt = JD_EXTRACTION_PROMPT.format(text=text)
-    data = await _call_gemini(prompt)
-    return ExtractedJD(**data)
+def extraction_hash(kind: str, text: str) -> str:
+    return content_hash(kind, text, PROMPT_VERSION, settings.gemini_model)
 
-async def extract_resume(text: str) -> ExtractedResume:
-    prompt = RESUME_EXTRACTION_PROMPT.format(text=text)
-    data = await _call_gemini(prompt)
-    return ExtractedResume(**data)
+
+def _vocabulary() -> str:
+    return ", ".join(get_ontology().skill_names)
+
+
+async def _cached_extract(kind: str, text: str, prompt: str, model_cls):
+    key = extraction_hash(kind, text)
+    cache = get_cache()
+    hit = cache.get(key)
+    if hit is not None:
+        return model_cls(**hit), "cache"
+    extracted = await generate_model(prompt, model_cls, kind="parse")
+    cache.set(key, extracted.model_dump())
+    return extracted, "llm"
+
+
+async def extract_jd(text: str) -> tuple[ExtractedJD, str]:
+    prompt = JD_EXTRACTION_PROMPT.format(text=text, skill_vocabulary=_vocabulary())
+    return await _cached_extract("jd", text, prompt, ExtractedJD)
+
+
+async def extract_resume(text: str) -> tuple[ExtractedResume, str]:
+    prompt = RESUME_EXTRACTION_PROMPT.format(text=text, skill_vocabulary=_vocabulary())
+    return await _cached_extract("resume", text, prompt, ExtractedResume)
+
+
+async def extract_pivot_role(role: str) -> tuple[ExtractedPivotRole, str]:
+    prompt = PIVOT_ROLE_PROMPT.format(role=role, skill_vocabulary=_vocabulary())
+    return await _cached_extract("pivot_role", role, prompt, ExtractedPivotRole)
