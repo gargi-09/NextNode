@@ -3,7 +3,7 @@ import asyncio
 from fastapi import APIRouter, Query
 from app.api.errors import handle
 from app.graph import catalog
-from app.graph.ontology import canonical_key, get_ontology
+from app.graph.ontology import get_ontology
 from app.graph.payloads import domain_node_id, skill_node_id
 
 router = APIRouter(prefix="/ontology", tags=["ontology"])
@@ -38,18 +38,8 @@ def resolve_skills(names: str = Query(..., min_length=1, max_length=4000,
                                       description="Comma- or newline-separated skill names")):
     """Show how raw skill names resolve against the ontology (exact name or alias,
     no fuzzy matching). Read-only; touches neither the database nor the LLM."""
-    o = get_ontology()
-    raw = [n.strip() for chunk in names.splitlines() for n in chunk.split(",")]
-    resolved, unmapped = [], []
-    for name in filter(None, raw):
-        skill = o.resolve(name)
-        if skill:
-            resolved.append({"input": name, "canonical": skill.name, "key": skill.key,
-                             "category": skill.category,
-                             "via": "name" if canonical_key(name) == skill.key else "alias"})
-        elif name not in unmapped:
-            unmapped.append(name)
-    return {"resolved": resolved, "unmapped": unmapped}
+    raw = [n for chunk in names.splitlines() for n in chunk.split(",")]
+    return get_ontology().resolve_names(raw)
 
 
 @router.get("/unmapped")

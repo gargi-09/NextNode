@@ -53,7 +53,7 @@
   <h2>Agent simulation</h2>
   <p class="sub">Pick a candidate, adjust their skills, then run the agents. This runs entirely in your browser:
     the scoring is a faithful port of NextNode's Python rules over the real ontology. Parsing is mocked and the
-    activities are templated; in the full system Gemini does those steps.</p>
+    activities are templated; in the full system a self-hosted Qwen3 model on vLLM does those steps.</p>
   <div class="sim">
     <div class="card">
       <label class="f" for="scenario">Scenario</label>
@@ -107,13 +107,13 @@
     NextNode's deterministic graph tools, never computed by a model.</p>
   <div class="flow">
     <div class="step"><div class="n">01 · ORCHESTRATOR</div><h3>Route work</h3>
-      <p>Dispatches each step, enforces a 6-dispatch cap and one revision at most.</p><span class="chip a">Gemini</span></div>
+      <p>Dispatches each step, enforces a 6-dispatch cap and one revision at most.</p><span class="chip a">vLLM · Qwen3-4B</span></div>
     <div class="step"><div class="n">02 · PARSER</div><h3>Text → JSON</h3>
-      <p>Extracts skills with an evidence label mapped to fixed proficiency numbers.</p><span class="chip t">Local model</span></div>
+      <p>Extracts skills with an evidence label mapped to fixed proficiency numbers.</p><span class="chip a">vLLM · Qwen3-4B</span></div>
     <div class="step"><div class="n">03 · REASONER</div><h3>Graph tools</h3>
-      <p>Upserts the data, calls calculate_skill_gap and prerequisite lookups, drafts modules.</p><span class="chip a">Gemini</span></div>
+      <p>Upserts the data, calls calculate_skill_gap and prerequisite lookups, drafts modules.</p><span class="chip a">vLLM · Qwen3-4B</span></div>
     <div class="step"><div class="n">04 · REVIEWER</div><h3>Verify</h3>
-      <p>A different vendor re-runs the graph tools and returns PASS or REVISE with evidence.</p><span class="chip t">Local model</span></div>
+      <p>A different model family re-runs the graph tools and returns PASS or REVISE with evidence.</p><span class="chip t">Ollama · Llama 3.1</span></div>
     <div class="step"><div class="n">05 · OUTPUT</div><h3>Curriculum</h3>
       <p>Ordered modules, activities, hours and mastery evidence, plus unmapped skills.</p><span class="chip v">Reviewed</span></div>
   </div>
@@ -123,8 +123,8 @@
     <div class="card"><h3>LLM gate</h3><p>Rate limiter, content-hash cache, Gemini JSON mode, 429 with Retry-After.</p></div>
     <div class="card"><h3>Guardrails</h3><p>Daily token/request ledger, loop guard, dispatch cap, read-only reviewer.</p></div>
   </div>
-  <p class="note">Status: the graph engine, API and web app are live. The agent configs and guardrail policies are built and tested;
-    running them end to end waits on the NextNode MCP server.</p>
+  <p class="note">Status: the graph engine, API and web app are live. The NextNode MCP server (7 graph tools) is built and
+    verified against the live graph; agent configs and guardrails are tested. Next: a first full agent run on a local model.</p>
 </div></section>
 
 <section id="features"><div class="wrap">
@@ -190,7 +190,7 @@ function analyze(sc, proficiencies) {
   return { ...a, unmapped, resolutions };
 }
 
-/* ── Reasoner draft (templated here; written by Gemini in the real workflow) ── */
+/* ── Reasoner draft (templated here; written by the vLLM-hosted Reasoner in the real workflow) ── */
 const ACTIVITY = {
   language: s => `Rebuild a small service you know in ${s}, with tests and a README`,
   ml_framework: s => `Re-implement a reference model in ${s} and match its published metrics`,
@@ -268,10 +268,10 @@ function renderScenario() {
 }
 
 const AGENTS = [
-  ["orch", "Orchestrator", "routes the work", "Gemini", "a"],
-  ["parser", "Parser", "text → JSON", "local model", "t"],
-  ["reasoner", "Reasoner", "graph tools", "Gemini", "a"],
-  ["reviewer", "Reviewer", "verifies", "local model", "t"],
+  ["orch", "Orchestrator", "routes the work", "vLLM · Qwen3-4B", "a"],
+  ["parser", "Parser", "text → JSON", "vLLM · Qwen3-4B", "a"],
+  ["reasoner", "Reasoner", "graph tools", "vLLM · Qwen3-4B", "a"],
+  ["reviewer", "Reviewer", "verifies", "Ollama · Llama 3.1", "t"],
 ];
 function renderPipeline() {
   $("pipeline").replaceChildren(...AGENTS.map(([id, name, what, model, c]) =>

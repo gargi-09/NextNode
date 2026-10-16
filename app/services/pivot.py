@@ -1,5 +1,6 @@
 import asyncio
 
+from app.core.errors import UnprocessableError
 from app.extraction.extractor import extract_pivot_role
 from app.graph.ontology import get_ontology
 from app.graph.pivot import fetch_pivot_inputs
@@ -26,6 +27,10 @@ async def analyze_pivot(user_id: str, target_role: str, job_id: str | None = Non
     user_skills, jd_skills = await asyncio.to_thread(fetch_pivot_inputs, user_id, job_id)
     extracted, source = await extract_pivot_role(target_role)
     extracted = extracted.model_copy(deep=True)  # never mutate the cached copy
+    if not (extracted.core_skills or extracted.preferred_skills):
+        # nothing to compare against: scoring would report a perfect 1.0
+        raise UnprocessableError(
+            f"Couldn't identify any skills for the role '{target_role}'. Try a more specific job title.")
     unmapped = _canonicalize_role(extracted)
     result = score_pivot(user_id, extracted, user_skills, jd_skills)
     result["extraction_source"] = source

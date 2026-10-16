@@ -1,0 +1,9 @@
+# kubectl apply -k deploy/k8s/vllm
+# The vllm-auth Secret is NOT here on purpose: scripts/vllm_tunnel.* creates it with a random key.
+apiVersion: kustomize.config.k8s.io/v1beta1
+kind: Kustomization
+resources:
+  - namespace.yaml
+  - pvc.yaml
+  - deployment.yaml
+  - service.yaml

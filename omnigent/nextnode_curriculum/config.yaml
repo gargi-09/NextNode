@@ -1,7 +1,8 @@
 # NextNode curriculum orchestrator — Omnigent agent spec (spec_version 1, Omnigent v0.18.0).
 #
-# Parser (local, Ollama) → Reasoner (Gemini, NextNode MCP tools) → Reviewer (local,
-# a different vendor than the Reasoner, read-only NextNode tools).
+# Parser + Reasoner run on the self-hosted vLLM server (Qwen3-4B, reached through a
+# kubectl port-forward on localhost:8000). The Reasoner calls the NextNode MCP tools.
+# The Reviewer runs a DIFFERENT model family (Llama 3.1 on local Ollama), read-only.
 # The orchestrator itself has NO NextNode tools: it only routes work and assembles
 # the result, so every graph read/write is attributable to one sub-agent.
 #
@@ -16,10 +17,10 @@ description: >-
 
 executor:
   harness: openai-agents
-  model: gemini-2.5-flash
+  model: qwen3-4b               # --served-model-name in deploy/k8s/vllm/deployment.yaml
   auth:
     type: provider
-    name: gemini-free          # gateway credential added with `omnigent setup`
+    name: vllm-gpu             # gateway credential: base URL http://localhost:8000/v1 (kubectl port-forward)
 
 # No spawn: the three declared sub-agents are the whole team.
 spawn: false
@@ -33,11 +34,11 @@ prompt: |
   invent skills, or edit a curriculum.
 
   Sub-agents (dispatch with `sys_session_send`):
-  - `parser`   — turns raw resume or job-description text into strict JSON. Local model.
+  - `parser`   — turns raw resume or job-description text into strict JSON.
   - `reasoner` — writes the parsed data into the NextNode graph, runs the
                  deterministic skill-gap analysis, and drafts the curriculum JSON.
   - `reviewer` — independently re-checks the draft against the graph and returns
-                 PASS or REVISE with evidence. Different vendor from the reasoner.
+                 PASS or REVISE with evidence. Different model family from the reasoner.
 
   Inputs you will receive: a `user_id`, a `job_id`, and resume text and/or job
   description text. If the user and job already exist in NextNode and no text is

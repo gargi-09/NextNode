@@ -1,6 +1,6 @@
-# Reviewer agent — independent check of the Reasoner's curriculum. Runs on a
-# DIFFERENT vendor than the Reasoner (local model vs Gemini), so the two cannot
-# share the same blind spots. READ-ONLY: the MCP allow-list has no write tools,
+# Reviewer agent — independent check of the Reasoner's curriculum. Runs a
+# DIFFERENT model family than the Reasoner (Llama 3.1 on Ollama vs Qwen3 on vLLM),
+# so the two cannot share the same blind spots. READ-ONLY: the MCP allow-list has no write tools,
 # and the deny_tools policy blocks them again in case the allow-list ever grows.
 spec_version: 1
 name: reviewer
@@ -8,7 +8,7 @@ description: Verifies a curriculum against the NextNode graph and returns PASS o
 
 executor:
   harness: openai-agents
-  model: qwen3:8b
+  model: llama3.1:8b          # must stay a different family from the Reasoner's qwen3-4b
   auth:
     type: provider
     name: ollama-local

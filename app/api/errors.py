@@ -1,7 +1,7 @@
 import logging
 
 from fastapi import HTTPException
-from app.core.errors import ConflictError, NotFoundError
+from app.core.errors import ConflictError, NotFoundError, UnprocessableError
 from app.db.neo4j import GraphUnavailableError
 from app.extraction.quota import LLMBadOutput, LLMUnavailable, QuotaExceeded
 
@@ -22,6 +22,8 @@ async def handle(coro, action: str):
         raise HTTPException(status_code=404, detail=str(e))
     except ConflictError as e:
         raise HTTPException(status_code=409, detail=str(e))
+    except UnprocessableError as e:
+        raise HTTPException(status_code=422, detail=str(e))
     except QuotaExceeded as e:
         raise HTTPException(
             status_code=429,

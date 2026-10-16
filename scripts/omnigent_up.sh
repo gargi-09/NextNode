@@ -4,14 +4,16 @@
 #   scripts/omnigent_up.sh                                   # start both servers
 #   scripts/omnigent_up.sh run u1 j1 cv.txt jd.txt           # ...and run the workflow once
 #
-# One-time setup first (see omnigent/README.md). Never reads or writes .env.
+# One-time setup first (see omnigent/README.md), and open the vLLM tunnel in another
+# terminal: scripts/vllm_tunnel.sh. Never reads or writes .env.
 set -eu
 
 ROOT=$(cd "$(dirname "$0")/.." && pwd)
 PYTHON="$ROOT/venv/bin/python"
 LOGS="$ROOT/.omnigent-logs"
 MCP_PORT="${MCP_PORT:-8765}"
-LOCAL_MODEL="${LOCAL_MODEL:-qwen3:8b}"
+VLLM_PORT="${VLLM_PORT:-8000}"
+LOCAL_MODEL="${LOCAL_MODEL:-llama3.1:8b}"
 mkdir -p "$LOGS"
 
 fail() { echo "ERROR: $1" >&2; exit 1; }
@@ -20,6 +22,7 @@ fail() { echo "ERROR: $1" >&2; exit 1; }
 command -v omnigent >/dev/null 2>&1 || fail "omnigent not on PATH: uv tool install omnigent (Python 3.12+)"
 [ -x "$PYTHON" ] || fail "NextNode venv not found at $PYTHON"
 [ -f "$ROOT/app/mcp_server.py" ] || fail "app/mcp_server.py does not exist yet; build the NextNode MCP server first (TDD-phase3 section 3)"
+curl -sf "http://127.0.0.1:$VLLM_PORT/health" >/dev/null || fail "vLLM not reachable on 127.0.0.1:$VLLM_PORT; open the tunnel: scripts/vllm_tunnel.sh"
 curl -sf http://localhost:11434/api/tags >/dev/null || fail "Ollama is not running; start it, then: ollama pull $LOCAL_MODEL"
 curl -sf http://localhost:11434/api/tags | grep -q "\"$LOCAL_MODEL\"" || fail "Run: ollama pull $LOCAL_MODEL"
 

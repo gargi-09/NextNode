@@ -1658,15 +1658,40 @@ window.NEXTNODE = {
    "status": "designed",
    "llm": true,
    "writes": true,
-   "summary": "An orchestrator coordinates a local Parser, a Gemini Reasoner that uses NextNode's graph tools, and a local Reviewer from a different vendor that verifies the curriculum against the graph.",
+   "summary": "An orchestrator coordinates a Parser and a Reasoner running on a self-hosted Qwen3-4B model (vLLM), where the Reasoner uses NextNode's graph tools, and a Reviewer from a different model family (Llama 3.1 on Ollama) that verifies the curriculum against the graph.",
    "how": [
-    "Agent configs, startup scripts and the design doc are written.",
-    "Blocked on the NextNode MCP server, plus installing Omnigent and Ollama."
+    "Agent configs, startup scripts and the design docs are written.",
+    "No Gemini calls: the agents reach vLLM through a kubectl port-forward on localhost:8000/v1.",
+    "Next: install Omnigent and Ollama and do a first run on a local model, then deploy vLLM."
    ],
    "files": [
     "omnigent/nextnode_curriculum/",
     "scripts/omnigent_up.ps1",
-    "docs/TDD-phase3-omnigent.md"
+    "docs/TDD-phase3-omnigent.md",
+    "docs/TDD-phase4-vllm.md"
+   ],
+   "endpoints": []
+  },
+  {
+   "id": "vllm-inference",
+   "title": "Self-hosted inference (vLLM on Kubernetes)",
+   "category": "Multi-agent",
+   "status": "built",
+   "llm": false,
+   "writes": false,
+   "summary": "Kubernetes manifests and tunnel scripts that run an open-weight model (Qwen3-4B) on a GPU cluster behind vLLM's OpenAI-compatible API, so the agents have no rate limit and cost only cloud credits. Written and statically tested, not deployed yet.",
+   "how": [
+    "kubectl apply -k deploy/k8s/vllm: one GPU pod, ClusterIP service only, model cache on a volume, tool calling on (hermes parser).",
+    "scripts/vllm_tunnel.ps1 -Deploy creates a random API key Secret, waits for the model, then opens a loopback-only port-forward to localhost:8000/v1.",
+    "Scale to zero when idle: kubectl -n nextnode-inference scale deploy/vllm --replicas=0.",
+    "tests/test_vllm_deploy.py checks the manifests agree with the agent configs."
+   ],
+   "files": [
+    "deploy/k8s/vllm/",
+    "scripts/vllm_tunnel.ps1",
+    "scripts/vllm_tunnel.sh",
+    "docs/TDD-phase4-vllm.md",
+    "tests/test_vllm_deploy.py"
    ],
    "endpoints": []
   },
@@ -1674,14 +1699,23 @@ window.NEXTNODE = {
    "id": "mcp-server",
    "title": "NextNode MCP server",
    "category": "Multi-agent",
-   "status": "planned",
+   "status": "built",
    "llm": false,
    "writes": true,
-   "summary": "Exposes NextNode's graph operations as standard Model Context Protocol tools so any agent or MCP client can use them. The tool contract is specified; the server isn't built yet.",
+   "summary": "Exposes NextNode's graph operations as 7 standard Model Context Protocol tools (5 read, 2 write, no deletes, no LLM calls), so the Omnigent agents or any MCP client can use them. Verified live against Aura; runs as its own process, started by the Omnigent scripts.",
    "how": [
-    "See docs/TDD-phase3-omnigent.md §3 for the 7 tools and their security model."
+    "Tools: resolve_skills, get_user_profile, get_job_posting, calculate_skill_gap, get_skill_prerequisites, upsert_user_skills, upsert_job_posting. Each wraps the same service the REST API uses.",
+    "HTTP mode listens on 127.0.0.1:8765/mcp only and needs a bearer token from NEXTNODE_MCP_TOKEN; GET /health is open for startup checks.",
+    "Errors come back as JSON codes (NOT_FOUND, CONFLICT, GRAPH_UNAVAILABLE with retry_after, INTERNAL).",
+    "calculate_skill_gap never requests the Gemini explanation and drops the UI graph payloads to save tokens.",
+    "Run: python -m app.mcp_server --transport http --port 8765 (or stdio for desktop MCP clients)."
    ],
    "files": [
+    "app/mcp_server.py",
+    "app/services/users.py",
+    "app/services/jobs.py",
+    "app/graph/catalog.py",
+    "tests/test_mcp_server.py",
     "docs/TDD-phase3-omnigent.md"
    ],
    "endpoints": []
@@ -2047,6 +2081,29 @@ window.NEXTNODE = {
    "task": "Sandbox visual explorer: sample dataset, career graph, roadmap flowchart and full ontology view (no LLM)",
    "features": [
     "sandbox"
+   ]
+  },
+  {
+   "date": "2026-10-16",
+   "task": "Phase 4: vLLM on Kubernetes (Qwen3-4B), agents switched from Gemini to the self-hosted endpoint, Reviewer moved to Llama 3.1, tunnel scripts",
+   "features": [
+    "vllm-inference",
+    "omnigent-workflow"
+   ]
+  },
+  {
+   "date": "2026-10-16",
+   "task": "Live QA pass: a pivot role with no recognizable skills now returns 422 instead of a perfect 1.0 score; label and README fixes",
+   "features": [
+    "pivot"
+   ]
+  },
+  {
+   "date": "2026-10-16",
+   "task": "NextNode MCP server: 7 graph tools over Streamable HTTP with bearer auth, verified live against Aura",
+   "features": [
+    "mcp-server",
+    "omnigent-workflow"
    ]
   }
  ],

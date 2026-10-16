@@ -70,6 +70,22 @@ class Ontology:
     def skill_names(self) -> list[str]:
         return sorted(s.name for s in self.skills.values())
 
+    def resolve_names(self, names: list[str]) -> dict:
+        """Resolution report for raw names: `{resolved: [...], unmapped: [...]}`.
+        Shared by GET /ontology/resolve and the MCP `resolve_skills` tool."""
+        resolved, unmapped = [], []
+        for name in (n.strip() for n in names):
+            if not name:
+                continue
+            skill = self.resolve(name)
+            if skill:
+                resolved.append({"input": name, "canonical": skill.name, "key": skill.key,
+                                 "category": skill.category,
+                                 "via": "name" if canonical_key(name) == skill.key else "alias"})
+            elif name not in unmapped:
+                unmapped.append(name)
+        return {"resolved": resolved, "unmapped": unmapped}
+
 
 def load_ontology(path: Path = ONTOLOGY_PATH) -> Ontology:
     raw = json.loads(path.read_text(encoding="utf-8"))

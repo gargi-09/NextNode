@@ -14,8 +14,7 @@ def _to_extracted(skills: list[RequiredSkillInput]) -> list[ExtractedSkill]:
     ]
 
 
-async def create_job(request: JobCreate) -> dict:
-    """Structured job — no LLM call. Unknown skills land in unmapped_skills."""
+async def _write_structured_job(request: JobCreate, create_only: bool) -> dict:
     job_id = request.id or str(uuid.uuid4())
     extracted = ExtractedJD(
         title=request.title,
@@ -24,11 +23,24 @@ async def create_job(request: JobCreate) -> dict:
         nice_to_have_skills=_to_extracted(request.nice_to_have_skills),
     )
     rows, unmapped = required_skill_rows(extracted)
-    domains, _ = resolve_domains(request.domains)
+    domains, unmapped_domains = resolve_domains(request.domains)
     meta = {"title": request.title, "company": request.company, "seniority": request.seniority}
 
-    await asyncio.to_thread(writer.write_job, job_id, meta, rows, domains, unmapped, None, True)
-    return await asyncio.to_thread(catalog.get_job, job_id)
+    created = await asyncio.to_thread(
+        writer.write_job, job_id, meta, rows, domains, unmapped, None, create_only)
+    return {"job_id": job_id, "created": created, "skills_written": [r["name"] for r in rows],
+            "unmapped_skills": unmapped, "unmapped_domains": unmapped_domains}
+
+
+async def create_job(request: JobCreate) -> dict:
+    """Structured job — no LLM call. Unknown skills land in unmapped_skills."""
+    result = await _write_structured_job(request, create_only=True)
+    return await asyncio.to_thread(catalog.get_job, result["job_id"])
+
+
+async def upsert_job(request: JobCreate) -> dict:
+    """Create or fully replace a structured job (used by the MCP server)."""
+    return await _write_structured_job(request, create_only=False)
 
 
 async def create_job_from_description(text: str, job_id: str | None = None) -> dict:

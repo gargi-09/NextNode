@@ -126,3 +126,24 @@ def _unmapped_terms_tx(tx, limit: int) -> list[dict]:
         LIMIT $limit
     """, limit=limit)
     return [dict(r) for r in result]
+
+
+def skill_prerequisites(skill_name: str, max_depth: int = 3) -> list[dict]:
+    """Skills that lead to `skill_name` through PREREQUISITE_OF chains (1..3 hops).
+    `strength` is the product of edge strengths along the strongest shortest path."""
+    return neo4j_client.read(_skill_prerequisites_tx, skill_name, max_depth)
+
+
+def _skill_prerequisites_tx(tx, skill_name: str, max_depth: int) -> list[dict]:
+    # max_depth is an int we control (bounded below), never user input in the query text
+    depth = max(1, min(int(max_depth), 3))
+    result = tx.run(f"""
+        MATCH p = (pre:Skill)-[:PREREQUISITE_OF*1..{depth}]->(:Skill {{name: $name}})
+        WITH pre, length(p) AS depth,
+             reduce(s = 1.0, r IN relationships(p) | s * coalesce(r.strength, 1.0)) AS strength
+        ORDER BY depth, strength DESC
+        WITH pre, collect({{depth: depth, strength: strength}})[0] AS best
+        RETURN pre.name AS skill, best.depth AS depth, round(best.strength, 3) AS strength
+        ORDER BY depth, strength DESC, skill
+    """, name=skill_name)
+    return [dict(r) for r in result]

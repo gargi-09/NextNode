@@ -2,7 +2,7 @@
 
 | | |
 |---|---|
-| Status | Proposed. Configs and policies written; **MCP server (§3) not yet built**; end-to-end run not yet validated |
+| Status | Proposed. Configs and policies written; MCP server (§3) built and verified against Aura (2026-10-16); end-to-end run not yet validated |
 | Scope | `omnigent/` directory, NextNode MCP tool contract, guardrails, local startup |
 | Target | Omnigent **v0.18.0** (released 2026-10-13, Apache-2.0, alpha), checked against its source |
 | Last reviewed | 2026-10-15 |
@@ -69,21 +69,21 @@ omnigent/
         └── reviewer/config.yaml
 scripts/omnigent_up.ps1 / .sh       start MCP server + Omnigent server, optional run
 tests/test_omnigent_config.py       policy unit tests + config consistency checks
-app/mcp_server.py                   (P3.0, to build) NextNode MCP server
+app/mcp_server.py                   NextNode MCP server (P3.0, built)
 ```
 
 **Naming hazard avoided.** The policy module is imported as `nextnode_policies`, with `omnigent/policies` on `PYTHONPATH`, never as `omnigent.policies…`. Putting the repo root on Omnigent's path would make this repo's `omnigent/` folder compete with the real `omnigent` package.
 
 ---
 
-## 3. NextNode MCP tool contract (P3.0 — to build)
+## 3. NextNode MCP tool contract (P3.0 — built)
 
 **Transport and security**
 - MCP Streamable HTTP on `127.0.0.1:8765/mcp`, bound to loopback only.
 - Requires `Authorization: Bearer $NEXTNODE_MCP_TOKEN`. The startup script generates a per-run token and keeps it in memory only.
 - `GET /health` for the startup probe.
 
-**Implementation:** `app/mcp_server.py`, using the official `mcp` Python SDK (FastMCP). Each tool is a thin wrapper over `app/services/*`, so tool behavior is exactly the REST behavior: strict ontology resolution, single-transaction writes, circuit breaker, 404/409/503 semantics.
+**Implementation:** `app/mcp_server.py`, using the official `mcp` Python SDK (FastMCP, pinned 1.30.0), stateless Streamable HTTP with JSON responses, Host/Origin checks against DNS rebinding, and refusal to bind a non-loopback host or start without a 16+ character token. Each tool is a thin wrapper over `app/services/*`, so tool behavior is exactly the REST behavior: strict ontology resolution, single-transaction writes, circuit breaker, 404/409/503 semantics.
 
 | Tool | R/W | Wraps | Input | Output |
 |---|---|---|---|---|
@@ -95,7 +95,7 @@ app/mcp_server.py                   (P3.0, to build) NextNode MCP server
 | `upsert_user_skills` | W | create-if-missing + `users.replace_skills` | `user_id, name?, skills: [{name, proficiency}]` | `{skills_written, unmapped_skills}` |
 | `upsert_job_posting` | W | `writer.write_job` (upsert) | `job_id, title, company?, seniority?, core/preferred/nice_to_have_skills: [{name, weight}], domains` | `{skills_written, unmapped_skills}` |
 
-**Errors** are returned as MCP tool errors carrying NextNode's machine codes: `NOT_FOUND`, `CONFLICT`, `GRAPH_UNAVAILABLE` with `retry_after` and hint. Agent prompts treat any tool error as terminal for that step.
+**Errors** are returned as MCP tool errors whose text is JSON with NextNode's machine codes: `NOT_FOUND`, `CONFLICT`, `UNPROCESSABLE`, `GRAPH_UNAVAILABLE` (with `retry_after` and hint) or `INTERNAL` (details stay in the server log). Schema violations (e.g. proficiency > 1) are rejected by the SDK before the tool runs, as a plain validation message. `get_skill_prerequisites` returns `{skill, prerequisites: [{skill, depth, strength}]}`, where strength is the product of edge strengths along the path. Agent prompts treat any tool error as terminal for that step.
 
 **Deliberately not exposed:** delete tools, and the LLM-backed `/extract`, `/pivot` and explanation paths. The orchestrator must never spend the API's Gemini budget, and an agent must never delete data.
 
@@ -179,7 +179,7 @@ That's roughly **15–25 Gemini requests per run, so 150/day ≈ 6–10 runs**. 
 
 | Step | Deliverable | Done when |
 |---|---|---|
-| P3.0 | `app/mcp_server.py` per §3, plus the `mcp` dependency | Tool tests pass with fake services; `/health` responds; bearer auth enforced |
+| P3.0 ✅ | `app/mcp_server.py` per §3, plus the `mcp` dependency | Tool tests pass with fake services; `/health` responds; bearer auth enforced (`tests/test_mcp_server.py`; live run against Aura matched the REST fit score) |
 | P3.1 | This directory (done) | `pytest tests/test_omnigent_config.py` passes |
 | P3.2 | Validate R1 with a single-agent hello run per agent | Each of the 4 agents answers |
 | P3.3 | First end-to-end run on test data (`u_test` / `j_test`) | Curriculum returned; reviewer PASS or a justified REVISE; ledger shows request counts |

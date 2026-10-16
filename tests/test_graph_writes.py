@@ -161,3 +161,20 @@ def test_pivot_unknown_job_raises_not_found():
     tx = FakeTx([[{"user_exists": True, "job_exists": False}]])
     with pytest.raises(NotFoundError):
         pivot._fetch_pivot_inputs_tx(tx, "u", "missing_job")
+
+
+def test_pivot_role_without_skills_is_rejected_not_scored_perfect(monkeypatch):
+    import asyncio
+    from app.core.errors import UnprocessableError
+    from app.models.schemas import ExtractedPivotRole
+    from app.services import pivot as pivot_service
+
+    empty = ExtractedPivotRole(role_title="Underwater Basket Weaver", core_skills=[], preferred_skills=[], domains=[])
+
+    async def fake_extract(role):
+        return empty, "llm"
+
+    monkeypatch.setattr(pivot_service, "fetch_pivot_inputs", lambda u, j: ({"Python": 0.9}, {}))
+    monkeypatch.setattr(pivot_service, "extract_pivot_role", fake_extract)
+    with pytest.raises(UnprocessableError):
+        asyncio.run(pivot_service.analyze_pivot("u", "underwater basket weaver"))

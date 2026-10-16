@@ -57,10 +57,6 @@ NEO4J_PASSWORD=your_password
 GEMINI_API_KEY=your_key
 ```
 
-<<<<<<< HEAD
-Run the backend:
-
-=======
 Initialize the graph (Neo4j Browser / Aura console, in order — all scripts are safe to re-run):
 1. `cypher/constraints.cypher` — uniqueness constraints and indexes
 2. `cypher/seed.cypher` — the canonical skill ontology (generated, see below)
@@ -96,59 +92,20 @@ retrying for 30 s after 3 failures. `GET /health/graph` shows graph status, size
 today's Gemini usage.
 
 Run locally:
->>>>>>> b6140a1 (Graph correctness, strict ontology, free-tier resilience, real frontend)
 ```bash
 uvicorn app.main:app --reload
 ```
 
-<<<<<<< HEAD
-Run the frontend:
+Run the frontend (http://localhost:5173):
 
 ```bash
-cd frontend
-npm install
-npm run dev
+npm --prefix frontend install
+npm --prefix frontend run dev
 ```
 
-Open `http://localhost:5173`
+No-install demo: `docs/index.html` and `docs/sandbox.html` (GitHub Pages), also served by
+the API at http://localhost:8000/demo/.
 
-## Project structure
-
-```
-nextnode/
-├── app/
-│   ├── api/          # FastAPI routes
-│   ├── core/         # config, settings
-│   ├── db/           # Neo4j driver
-│   ├── extraction/   # Gemini prompts + extractor + explainer
-│   ├── graph/        # reasoner + pivot analyzer + Neo4j writer
-│   └── models/       # Pydantic schemas
-├── frontend/
-│   └── src/
-│       ├── api/        # Axios client
-│       ├── components/ # FitScore, SkillGraph, Roadmap, PivotAnalysis, etc.
-│       └── pages/      # Home, Results
-├── .env
-├── requirements.txt
-└── Dockerfile
-```
-
-## Neo4j schema
-
-Nodes: `Skill`, `User`, `JobPosting`, `Domain`, `SkillCluster`
-
-Key relationships: `HAS_SKILL` (with proficiency), `REQUIRES_SKILL` (with importance + weight), `PREREQUISITE_OF` (with strength), `BELONGS_TO`, `TARGETS`
-
-## API endpoints
-
-| Method | Endpoint | Description |
-|--------|----------|-------------|
-| POST | `/api/v1/extract/jd` | Extract skills from job description |
-| POST | `/api/v1/extract/resume` | Extract skills from resume |
-| GET | `/api/v1/analyze/{user_id}/{job_id}` | Run gap analysis + explanation |
-| POST | `/api/v1/pivot` | Career pivot analysis |
-| GET | `/health` | Health check |
-=======
 Interactive API docs: http://localhost:8000/docs
 
 ### API overview (`/api/v1`)
@@ -166,6 +123,7 @@ Interactive API docs: http://localhost:8000/docs
 | DELETE | `/jobs/{id}` | – | Delete the job and its edges |
 | GET | `/analyze/{user_id}/{job_id}?explain=false` | optional | Fit score, breakdown, roadmap, plus `graph` (react-force-graph) and `roadmap_flow` (@xyflow/react) |
 | GET | `/ontology/graph` | – | Full ontology as react-force-graph data (served from the JSON file) |
+| GET | `/ontology/resolve?names=a,b` | – | Resolve names to canonical skills (no writes) |
 | GET | `/ontology/unmapped` | – | Unresolved skill terms, most frequent first |
 | POST | `/pivot` | ✓ | Career pivot analysis |
 
@@ -185,6 +143,34 @@ pip install -r requirements-dev.txt
 python -m pytest
 ```
 
+## Project structure
+
+```
+nextnode/
+├── app/
+│   ├── api/          # FastAPI routes + error mapping
+│   ├── core/         # settings, errors
+│   ├── db/           # Neo4j client (managed transactions, circuit breaker)
+│   ├── extraction/   # Gemini client, rate limiter, cache, prompts
+│   ├── graph/        # ontology, writer, reasoner, pivot, scoring, payloads
+│   ├── models/       # Pydantic schemas
+│   └── services/     # use cases called by the routes
+├── cypher/           # constraints, generated seed, migrations
+├── ontology/         # skills.json: the canonical skill vocabulary
+├── frontend/         # React 19 + Vite UI
+├── docs/             # GitHub Pages demo + sandbox, design docs (TDDs)
+├── omnigent/         # multi-agent workflow configs and policies
+├── deploy/k8s/vllm/  # self-hosted model server manifests (Phase 4)
+├── scripts/          # seed builder, migrations, page generator, startup scripts
+└── tests/
+```
+
+## Neo4j schema
+
+Nodes: `Skill`, `User`, `JobPosting`, `Domain`
+
+Key relationships: `HAS_SKILL` (proficiency), `REQUIRES_SKILL` (importance + weight),
+`PREREQUISITE_OF` (strength), `BELONGS_TO` (skill → domain), `TARGETS`, `IN_DOMAIN`
+
 ## Status
 Work in progress.
->>>>>>> b6140a1 (Graph correctness, strict ontology, free-tier resilience, real frontend)

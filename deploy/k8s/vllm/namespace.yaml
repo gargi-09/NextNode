@@ -1,0 +1,7 @@
+# Isolated namespace for the self-hosted inference server (Phase 4, docs/TDD-phase4-vllm.md).
+apiVersion: v1
+kind: Namespace
+metadata:
+  name: nextnode-inference
+  labels:
+    app.kubernetes.io/part-of: nextnode

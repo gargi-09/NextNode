@@ -1,0 +1,19 @@
+# Cluster-internal only. The local Omnigent runner reaches it through
+#   kubectl port-forward --address 127.0.0.1 -n nextnode-inference svc/vllm 8000:8000
+# Never change this to LoadBalancer/NodePort: the model would be on the public internet.
+apiVersion: v1
+kind: Service
+metadata:
+  name: vllm
+  namespace: nextnode-inference
+  labels:
+    app.kubernetes.io/name: vllm
+    app.kubernetes.io/part-of: nextnode
+spec:
+  type: ClusterIP
+  selector:
+    app.kubernetes.io/name: vllm
+  ports:
+    - name: http
+      port: 8000
+      targetPort: http

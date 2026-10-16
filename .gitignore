@@ -10,3 +10,5 @@ __pycache__/
 .DS_Store
 .omnigent-logs/
 .claude/
+# Local Claude Code instructions (kept on this machine only)
+CLAUDE.md

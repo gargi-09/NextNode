@@ -9,6 +9,8 @@ policy_modules:
   - nextnode_policies
 
 policies:
+  # Since Phase 4 no agent uses Gemini (vLLM + Ollama), so this never fires; it stays
+  # as a backstop in case an agent is switched back to the `gemini-free` gateway.
   # Free-tier guard. Counts every Gemini call across all sessions on this machine
   # in a per-day (Pacific) ledger and DENYs once either budget is spent.
   # Keep max_requests_per_day BELOW your project's RPD from the AI Studio console.

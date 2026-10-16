@@ -178,8 +178,9 @@ def test_every_declared_subagent_has_a_spec():
 
 
 def test_cross_vendor_review():
-    assert AGENTS["reviewer"]["executor"]["model"].split(":")[0] != \
-           AGENTS["reasoner"]["executor"]["model"].split("-")[0]
+    family = lambda m: re.match(r"[a-z]+", m.lower()).group(0)   # qwen3-4b → qwen
+    assert family(AGENTS["reviewer"]["executor"]["model"]) != \
+           family(AGENTS["reasoner"]["executor"]["model"])
     assert AGENTS["reviewer"]["executor"]["auth"]["name"] != \
            AGENTS["reasoner"]["executor"]["auth"]["name"]
 

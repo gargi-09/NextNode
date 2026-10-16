@@ -1,16 +1,19 @@
 # Reasoner agent — the only agent that writes to NextNode. All scoring and
 # prerequisite logic happens inside NextNode's deterministic tools; this agent
 # orders the results into a curriculum and must not invent numbers or skills.
+#
+# Model: Qwen3-4B on vLLM, started with --enable-auto-tool-choice --tool-call-parser=hermes,
+# so OpenAI-style tool calls from this agent reach the NextNode MCP server below.
 spec_version: 1
 name: reasoner
 description: Writes parsed data into NextNode, runs the gap analysis, and drafts the curriculum.
 
 executor:
   harness: openai-agents
-  model: gemini-2.5-flash
+  model: qwen3-4b               # --served-model-name in deploy/k8s/vllm/deployment.yaml
   auth:
     type: provider
-    name: gemini-free
+    name: vllm-gpu             # gateway credential: base URL http://localhost:8000/v1 (kubectl port-forward)
 
 async: false
 cancellable: true
@@ -35,6 +38,13 @@ prompt: |
   You turn parsed resume/job JSON into a curriculum grounded in the NextNode graph.
   You receive a `user_id`, a `job_id`, and parser JSON (either may be absent when the
   user or job already exists in NextNode).
+
+  Tool use (you are a small model: follow this exactly):
+  - Every number and skill you output comes from a tool result in THIS conversation.
+    If you have not called the tool yet, call it; never guess its result.
+  - Call tools with exactly the argument names in their schema. Make one call at a
+    time and read the result before the next call.
+  - Never write a tool call as text in your answer; use the tool-calling interface.
 
   Steps:
   1. If resume JSON is present: call `upsert_user_skills` with user_id, name and the

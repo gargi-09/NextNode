@@ -8,3 +8,5 @@ neo4j==6.1.0
 google-genai==1.70.0
 # IANA time zones for the Pacific-midnight quota reset (Windows has no system tz database)
 tzdata==2026.5
+# NextNode MCP server (app/mcp_server.py) for the Omnigent agents
+mcp==1.30.0

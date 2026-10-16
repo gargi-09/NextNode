@@ -1,0 +1,114 @@
+# vLLM OpenAI-compatible inference server for the NextNode Omnigent agents.
+#
+# Serves Qwen3-4B-Instruct-2507 (Apache-2.0, ungated: no Hugging Face token needed) as
+# `qwen3-4b` on port 8000, with tool calling enabled so the Reasoner can call the
+# NextNode MCP tools. Needs ONE NVIDIA GPU with >= 16 GB (L4 24 GB recommended; T4 works,
+# see --dtype below). Reached only through `kubectl port-forward` (scripts/vllm_tunnel.*):
+# the Service is ClusterIP and there is no Ingress.
+#
+# Swap the model: change --model and --served-model-name, and the `model:` in the
+# Omnigent agent configs. Llama-3.1-8B-Instruct is gated: create a `hf-token` Secret
+# (key `token`) and use --tool-call-parser llama3_json.
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: vllm
+  namespace: nextnode-inference
+  labels:
+    app.kubernetes.io/name: vllm
+    app.kubernetes.io/part-of: nextnode
+spec:
+  replicas: 1                 # scale to 0 when idle to save credits: kubectl scale deploy/vllm --replicas=0
+  strategy:
+    type: Recreate            # one GPU + a ReadWriteOnce cache: never run two pods at once
+  selector:
+    matchLabels:
+      app.kubernetes.io/name: vllm
+  template:
+    metadata:
+      labels:
+        app.kubernetes.io/name: vllm
+        app.kubernetes.io/part-of: nextnode
+    spec:
+      automountServiceAccountToken: false
+      # GKE example; other clouds label GPU nodes differently (or drop this and rely on the toleration).
+      # nodeSelector:
+      #   cloud.google.com/gke-accelerator: nvidia-l4
+      tolerations:
+        - key: nvidia.com/gpu
+          operator: Exists
+          effect: NoSchedule
+      containers:
+        - name: vllm
+          image: vllm/vllm-openai:v0.11.0      # pinned; bump deliberately
+          args:
+            - --model=Qwen/Qwen3-4B-Instruct-2507
+            - --served-model-name=qwen3-4b     # the `model:` the Omnigent agents ask for
+            - --host=0.0.0.0
+            - --port=8000
+            - --dtype=auto                     # T4 has no bfloat16: use --dtype=half there
+            - --max-model-len=16384            # agent prompts + MCP tool schemas fit; keeps KV cache small
+            - --gpu-memory-utilization=0.90
+            - --max-num-seqs=16                # 4 agents, low concurrency
+            - --enable-auto-tool-choice        # required for OpenAI-style tool calls
+            - --tool-call-parser=hermes        # Qwen3's tool-call format
+            # Request logging is off by default since v0.10.2; never add --enable-log-requests:
+            # prompts contain resume text.
+          env:
+            - name: HF_HOME
+              value: /models/hf
+            # Bearer key the OpenAI-compatible API requires. Created by
+            # `scripts/vllm_tunnel.ps1 -Deploy` (random, never written to disk or the repo).
+            - name: VLLM_API_KEY
+              valueFrom:
+                secretKeyRef:
+                  name: vllm-auth
+                  key: api-key
+            # Only for gated models (Llama); absent Secret is fine.
+            - name: HF_TOKEN
+              valueFrom:
+                secretKeyRef:
+                  name: hf-token
+                  key: token
+                  optional: true
+          ports:
+            - name: http
+              containerPort: 8000
+          resources:
+            requests:
+              cpu: "4"
+              memory: 16Gi
+              nvidia.com/gpu: "1"
+            limits:
+              memory: 24Gi
+              nvidia.com/gpu: "1"
+          securityContext:
+            allowPrivilegeEscalation: false
+            capabilities:
+              drop: [ALL]
+          # /health needs no API key. First start downloads the weights: allow up to 15 min.
+          startupProbe:
+            httpGet: { path: /health, port: http }
+            periodSeconds: 10
+            failureThreshold: 90
+          readinessProbe:
+            httpGet: { path: /health, port: http }
+            periodSeconds: 10
+            failureThreshold: 3
+          livenessProbe:
+            httpGet: { path: /health, port: http }
+            periodSeconds: 30
+            failureThreshold: 3
+          volumeMounts:
+            - name: model-cache
+              mountPath: /models
+            - name: dshm
+              mountPath: /dev/shm
+      volumes:
+        - name: model-cache
+          persistentVolumeClaim:
+            claimName: vllm-model-cache
+        - name: dshm                           # PyTorch shared memory; the default 64 MB is too small
+          emptyDir:
+            medium: Memory
+            sizeLimit: 2Gi

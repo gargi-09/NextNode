@@ -135,3 +135,9 @@ def test_mock_api_matches_the_python_engine(tmp_path):
     assert set(out["resume"][2]) == {"Python", "PyTorch", "Docker"}
     assert 0 <= out["pivot"] <= 1
     assert out["unrouted"] == [], f"add these routes to docs/assets/mock-api.js: {out['unrouted']}"
+
+
+def test_no_merge_conflict_markers_in_docs():
+    marker = __import__("re").compile(r"^(<<<<<<<|>>>>>>>) ", __import__("re").M)
+    for path in [ROOT / "README.md", *DOCS.glob("*.md"), *DOCS.glob("*.html")]:
+        assert not marker.search(path.read_text(encoding="utf-8")), path

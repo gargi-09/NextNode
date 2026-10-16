@@ -1,0 +1,15 @@
+# Hugging Face cache for model weights, so a pod restart (or scaling 0 → 1)
+# does not re-download ~8 GB. Uses the cluster's default StorageClass.
+apiVersion: v1
+kind: PersistentVolumeClaim
+metadata:
+  name: vllm-model-cache
+  namespace: nextnode-inference
+  labels:
+    app.kubernetes.io/name: vllm
+    app.kubernetes.io/part-of: nextnode
+spec:
+  accessModes: [ReadWriteOnce]
+  resources:
+    requests:
+      storage: 30Gi

@@ -1,15 +1,15 @@
-# Parser agent — raw resume / job text → strict JSON. Runs on a LOCAL model ($0,
-# no free-tier quota used). No tools, no file or shell access: pure text in, JSON out.
+# Parser agent — raw resume / job text → strict JSON. Runs on the self-hosted vLLM
+# server (no per-call cost or rate limit). No tools, no file or shell access: pure text in, JSON out.
 spec_version: 1
 name: parser
 description: Converts raw resume or job-description text into NextNode's input JSON.
 
 executor:
   harness: openai-agents
-  model: qwen3:8b
+  model: qwen3-4b               # --served-model-name in deploy/k8s/vllm/deployment.yaml
   auth:
     type: provider
-    name: ollama-local         # gateway credential: base URL http://localhost:11434/v1
+    name: vllm-gpu             # gateway credential: base URL http://localhost:8000/v1 (kubectl port-forward)
 
 async: false
 cancellable: true

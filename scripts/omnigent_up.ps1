@@ -4,7 +4,8 @@
 #   .\scripts\omnigent_up.ps1 -Run -UserId u1 -JobId j1 -ResumeFile cv.txt -JobFile jd.txt
 #
 # One-time setup first (see omnigent/README.md): install Omnigent and Ollama, pull the
-# local model, and add the two gateway credentials with `omnigent setup`.
+# Reviewer's model, add the two gateway credentials with `omnigent setup`, and open the
+# vLLM tunnel in another terminal: .\scripts\vllm_tunnel.ps1
 # This script never reads or writes .env; NextNode loads its own settings itself.
 param(
     [switch]$Run,
@@ -13,7 +14,8 @@ param(
     [string]$ResumeFile,
     [string]$JobFile,
     [int]$McpPort = 8765,
-    [string]$LocalModel = "qwen3:8b"
+    [int]$VllmPort = 8000,
+    [string]$LocalModel = "llama3.1:8b"
 )
 
 $ErrorActionPreference = "Stop"
@@ -32,6 +34,8 @@ if (-not (Test-Path $Python)) { Fail "NextNode venv not found at $Python" }
 if (-not (Test-Path (Join-Path $Root "app\mcp_server.py"))) {
     Fail "app/mcp_server.py does not exist yet. Build the NextNode MCP server (TDD-phase3 section 3) first."
 }
+try { Invoke-WebRequest "http://127.0.0.1:$VllmPort/health" -UseBasicParsing -TimeoutSec 3 | Out-Null }
+catch { Fail "vLLM is not reachable on 127.0.0.1:$VllmPort. Open the tunnel first: .\scripts\vllm_tunnel.ps1" }
 try { Invoke-RestMethod "http://localhost:11434/api/tags" -TimeoutSec 3 | Out-Null }
 catch { Fail "Ollama is not running on localhost:11434. Start it, then: ollama pull $LocalModel" }
 $tags = (Invoke-RestMethod "http://localhost:11434/api/tags").models.name

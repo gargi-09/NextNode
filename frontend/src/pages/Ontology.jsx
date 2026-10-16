@@ -34,7 +34,7 @@ export default function Ontology() {
             <div className="flex flex-wrap gap-4 mt-3 text-xs text-gray-500 dark:text-gray-400">
               {Object.entries(CATEGORY_COLORS).map(([cat, color]) => (
                 <span key={cat} className="flex items-center gap-1.5">
-                  <span className="w-2.5 h-2.5 rounded-full" style={{ background: color }} />{cat.replace("_", " ")}
+                  <span className="w-2.5 h-2.5 rounded-full" style={{ background: color }} />{cat.replaceAll("_", " ")}
                 </span>
               ))}
               <span className="flex items-center gap-1.5"><span className="w-2.5 h-2.5 rounded-full bg-yellow-400" />search match</span>
