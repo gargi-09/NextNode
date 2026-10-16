@@ -1,9 +1,11 @@
 import asyncio
 from contextlib import asynccontextmanager
+from pathlib import Path
 
 from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
 from fastapi.responses import JSONResponse
+from fastapi.staticfiles import StaticFiles
 
 from app.api import jobs, ontology, users
 from app.api.routes import router
@@ -22,6 +24,12 @@ app.include_router(router, prefix="/api/v1")
 app.include_router(users.router, prefix="/api/v1")
 app.include_router(jobs.router, prefix="/api/v1")
 app.include_router(ontology.router, prefix="/api/v1")
+
+# The static demo pages (also published with GitHub Pages). Served here too so the
+# sandbox's "Live API" mode can call this API from the same origin.
+DOCS_DIR = Path(__file__).resolve().parents[1] / "docs"
+if DOCS_DIR.is_dir():
+    app.mount("/demo", StaticFiles(directory=DOCS_DIR, html=True), name="demo")
 
 app.add_middleware(
     CORSMiddleware,

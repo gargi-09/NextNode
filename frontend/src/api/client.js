@@ -2,8 +2,13 @@ import axios from "axios";
 
 // Relative URLs go through the Vite dev proxy (vite.config.js) → FastAPI on :8000,
 // so there is no CORS setup and no hard-coded host.
+const API_BASE = import.meta.env.VITE_API_URL || "/api/v1";
+
+/** Server root (no /api/v1), for raw requests such as the Features page testers. */
+export const API_ROOT = API_BASE.replace(/\/api\/v1\/?$/, "");
+
 const api = axios.create({
-  baseURL: import.meta.env.VITE_API_URL || "/api/v1",
+  baseURL: API_BASE,
   timeout: 120000, // LLM-backed calls can take a while
 });
 

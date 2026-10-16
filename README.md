@@ -1,5 +1,7 @@
 # Nextnode
 
+**[▶ Live interactive demo](https://gargi-09.github.io/NextNode/)** · **[🧪 Feature sandbox](https://gargi-09.github.io/NextNode/sandbox.html)**: run the agent simulation, explore the career graph, and try every API feature in your browser, with nothing to install. Running the backend locally? The same pages are at `http://localhost:8000/demo/`, where the sandbox's Live mode calls your API.
+
 AI-powered career intelligence tool that thinks in graphs. Paste your resume and a job description, get back a personalized fit score, skill gap breakdown, learning roadmap, and career pivot analysis — all powered by a neurosymbolic reasoning engine built on a knowledge graph.
 
 ## What makes it different

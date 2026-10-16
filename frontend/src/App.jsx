@@ -8,6 +8,7 @@ const Users = lazy(() => import("./pages/Users"));
 const Jobs = lazy(() => import("./pages/Jobs"));
 const Ontology = lazy(() => import("./pages/Ontology"));
 const System = lazy(() => import("./pages/System"));
+const Features = lazy(() => import("./pages/Features"));
 
 const NAV = [
   ["/", "Analyze"],
@@ -15,6 +16,7 @@ const NAV = [
   ["/jobs", "Jobs"],
   ["/ontology", "Ontology"],
   ["/system", "System"],
+  ["/features", "Features"],
 ];
 
 export default function App() {
@@ -61,6 +63,7 @@ export default function App() {
             <Route path="/jobs" element={<Jobs />} />
             <Route path="/ontology" element={<Ontology />} />
             <Route path="/system" element={<System />} />
+            <Route path="/features" element={<Features />} />
           </Routes>
           </Suspense>
         </main>

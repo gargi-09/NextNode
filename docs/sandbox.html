@@ -1,0 +1,389 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>NextNode — Feature Sandbox</title>
+<meta name="description" content="Try every NextNode API feature in your browser: an in-browser sandbox of the API, or your own running backend.">
+<link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'><circle cx='9' cy='16' r='5' fill='%237C3AED'/><circle cx='23' cy='8' r='4' fill='%230D9488'/><circle cx='23' cy='24' r='4' fill='%23F59E0B'/><path d='M13 14 L19 9 M13 18 L19 23' stroke='%239CA3AF' stroke-width='2'/></svg>">
+<link rel="stylesheet" href="assets/site.css">
+</head>
+<body>
+
+<nav class="top"><div class="wrap">
+  <a class="brand" href="index.html" style="text-decoration:none;color:var(--text)">next<b>node</b></a>
+  <a class="link" href="index.html">Demo</a>
+  <a class="link" href="index.html#changelog">Changelog</a>
+  <span class="spacer"></span>
+  <a class="btn" href="https://github.com/gargi-09/NextNode">GitHub</a>
+</div></nav>
+
+<section><div class="wrap">
+  <h2>Feature sandbox</h2>
+  <p class="sub">Every NextNode feature with a plain-English explanation and a live tester. Nothing to install:
+    in <b>Sandbox</b> mode the API runs inside this page, using the real ontology and scoring logic, and your data stays
+    in this browser. Switch to <b>Live API</b> to call your own running backend.</p>
+
+  <div class="card">
+    <div class="mode-row">
+      <div class="seg" role="radiogroup" aria-label="API mode">
+        <button id="mode-sandbox" role="radio">Sandbox (in-browser)</button>
+        <button id="mode-live" role="radio">Live API</button>
+      </div>
+      <div id="live-controls" class="live-controls">
+        <input type="text" id="api-url" aria-label="API base URL" spellcheck="false">
+        <button class="btn" id="check">Check</button>
+      </div>
+      <span class="chip" id="health">…</span>
+    </div>
+    <div id="sandbox-controls" class="mode-row" style="margin-top:12px">
+      <button class="btn" id="sample">Load sample data</button>
+      <button class="btn" id="reset">Reset sandbox data</button>
+      <span class="note" id="counts" style="margin:0"></span>
+    </div>
+    <p class="note" id="mode-note"></p>
+  </div>
+
+  <div class="card" id="explorer" style="margin-top:16px">
+    <div class="mode-row">
+      <h3 style="margin:0;font-size:17px">Visual explorer</h3>
+      <span class="note" style="margin:0">Pick a candidate and a job to see the career graph and roadmap the API returns. No LLM involved.</span>
+    </div>
+    <div class="mode-row" style="margin-top:12px">
+      <select id="x-user" aria-label="Candidate" style="max-width:260px"></select>
+      <select id="x-job" aria-label="Job" style="max-width:260px"></select>
+      <button class="btn primary" id="x-run">Analyze</button>
+      <button class="btn" id="x-samples">Load sample dataset</button>
+    </div>
+    <div id="x-summary" class="chips" style="margin-top:14px"></div>
+    <div class="seg" role="tablist" style="margin-top:14px">
+      <button role="tab" data-tab="graph" class="on">Career graph</button>
+      <button role="tab" data-tab="flow">Roadmap</button>
+      <button role="tab" data-tab="onto">Full ontology</button>
+    </div>
+    <div class="x-pane" data-pane="graph">
+      <svg id="x-graph" class="viz" role="img" aria-label="Career graph for the selected candidate and job"></svg>
+      <div class="legend">
+        <span><i style="background:var(--violet)"></i>Candidate</span><span><i style="background:var(--blue)"></i>Job</span>
+        <span><i style="background:var(--green)"></i>Met</span><span><i style="background:var(--amber)"></i>Partial</span>
+        <span><i style="background:var(--red)"></i>Missing</span><span><i style="background:var(--teal)"></i>Owned prerequisite</span>
+        <span><i style="background:var(--slate)"></i>Intermediate step</span><span>dashed = PREREQUISITE_OF · drag nodes, scroll to zoom</span>
+      </div>
+    </div>
+    <div class="x-pane" data-pane="flow" hidden><div id="x-flow" class="flow-wrap"></div>
+      <p class="note">Teal cards are skills the candidate already has; dashed links show which roadmap steps they unlock.</p></div>
+    <div class="x-pane" data-pane="onto" hidden>
+      <input type="text" id="x-search" placeholder="Highlight a skill…" aria-label="Highlight a skill" style="max-width:260px;margin:12px 0 0">
+      <svg id="x-onto" class="viz" role="img" aria-label="Full skill ontology graph"></svg>
+      <div class="legend">
+        <span><i style="background:var(--violet)"></i>language</span><span><i style="background:var(--blue)"></i>ml framework</span>
+        <span><i style="background:var(--teal)"></i>platform</span><span><i style="background:var(--amber)"></i>concept</span>
+        <span><i style="background:var(--red)"></i>tool</span><span><i style="background:var(--faint)"></i>domain</span><span>dashed = prerequisite</span>
+      </div>
+    </div>
+  </div>
+
+  <div class="chips" id="stats" style="margin:20px 0 12px"></div>
+  <div class="mode-row" style="margin-bottom:16px">
+    <div class="filters" id="filters" style="margin:0"></div>
+    <input type="text" id="search" placeholder="Search features…" aria-label="Search features" style="max-width:240px;margin-left:auto">
+  </div>
+  <div class="grid" id="features"></div>
+</div></section>
+
+<footer><div class="wrap">
+  Generated from the project's feature registry by <code>scripts/build_pages.py</code>.
+  Sandbox differences: text is parsed by a keyword matcher instead of Gemini, pivot uses built-in role templates,
+  and explanations are templated. Scores, resolution and the graph payloads use the same rules as the API.
+</div></footer>
+
+<script src="assets/data.js"></script>
+<script src="assets/nextnode-core.js"></script>
+<script src="assets/mock-api.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/d3/7.9.0/d3.min.js" integrity="sha512-vc58qvvBdrDR4etbxMdlTt4GBQk1qjvyORR2nrsPsFPyrs+/u5c3+1Ct6upOgdZoIl7eq6k3a1UPDSNAQi/32A==" crossorigin="anonymous" referrerpolicy="no-referrer"></script>
+<script src="assets/viz.js"></script>
+<script>
+"use strict";
+const D = window.NEXTNODE;
+const $ = id => document.getElementById(id);
+const el = (tag, attrs = {}, ...kids) => {
+  const n = document.createElement(tag);
+  for (const [k, v] of Object.entries(attrs)) {
+    if (k === "class") n.className = v; else if (k === "text") n.textContent = v; else n.setAttribute(k, v);
+  }
+  for (const k of kids) if (k != null) n.append(k);
+  return n;
+};
+const storage = {
+  get(k, d) { try { return localStorage.getItem(k) ?? d; } catch { return d; } },
+  set(k, v) { try { localStorage.setItem(k, v); } catch { /* ignore */ } },
+};
+
+/* ── mode ── */
+const servedByApi = location.protocol.startsWith("http") && location.pathname.startsWith("/demo");
+let mode = storage.get("nn-mode", servedByApi ? "live" : "sandbox");
+$("api-url").value = storage.get("nn-api", servedByApi ? location.origin : "http://localhost:8000");
+
+function setMode(m) {
+  mode = m; storage.set("nn-mode", m);
+  $("mode-sandbox").classList.toggle("on", m === "sandbox"); $("mode-sandbox").setAttribute("aria-checked", m === "sandbox");
+  $("mode-live").classList.toggle("on", m === "live"); $("mode-live").setAttribute("aria-checked", m === "live");
+  $("live-controls").hidden = m !== "live";
+  $("sandbox-controls").hidden = m !== "sandbox";
+  $("mode-note").textContent = m === "sandbox"
+    ? "Sandbox: requests are answered inside this page. Start with “Load sample data”, or run the testers in order: create user → set skills → create job → analyze."
+    : (servedByApi ? "Live: requests go to the API serving this page." :
+       "Live: requests go to your backend. Browsers block cross-origin calls, so for live mode open this page from the API itself: http://localhost:8000/demo/sandbox.html");
+  refreshCounts(); checkHealth();
+  if (explorerReady) { lastAnalysis = null; ontologyCache = null; refreshPickers().then(runExplorer); }
+}
+$("mode-sandbox").addEventListener("click", () => setMode("sandbox"));
+$("mode-live").addEventListener("click", () => setMode("live"));
+$("api-url").addEventListener("change", () => { storage.set("nn-api", $("api-url").value.trim()); checkHealth(); });
+$("check").addEventListener("click", checkHealth);
+$("sample").addEventListener("click", async () => { if (await loadSampleSet()) { await refreshPickers(); await runExplorer(); } });
+$("reset").addEventListener("click", () => { if (confirm("Delete all sandbox users and jobs stored in this browser?")) { NNMock.reset(); refreshCounts(); lastAnalysis = null; $("x-summary").replaceChildren(); refreshPickers(); drawTab(); } });
+
+function refreshCounts() {
+  const c = NNMock.counts();
+  $("counts").textContent = `${c.users} user(s), ${c.jobs} job(s) in this browser`;
+}
+
+/* ── transport ── */
+async function call(method, path, params, body) {
+  const started = performance.now();
+  if (mode === "sandbox") {
+    const r = await NNMock.request(method, path, { query: params, body });
+    return { ...r, ms: Math.round(performance.now() - started), retryAfter: r.headers["retry-after"] };
+  }
+  const base = $("api-url").value.trim().replace(/\/$/, "");
+  const qs = new URLSearchParams(Object.entries(params).map(([k, v]) => [k, String(v)])).toString();
+  try {
+    const resp = await fetch(`${base}${path}${qs ? `?${qs}` : ""}`, {
+      method, headers: body ? { "Content-Type": "application/json" } : {},
+      body: body ? JSON.stringify(body) : undefined,
+    });
+    const text = await resp.text();
+    let data = text; try { data = text ? JSON.parse(text) : ""; } catch { /* plain text */ }
+    return { status: resp.status, data, ms: Math.round(performance.now() - started), retryAfter: resp.headers.get("retry-after") };
+  } catch (e) {
+    return { status: 0, ms: Math.round(performance.now() - started),
+      data: { error: "Could not reach the API (not running, or blocked as a cross-origin request).",
+              hint: "Start uvicorn and open http://localhost:8000/demo/sandbox.html for live mode.", detail: String(e) } };
+  }
+}
+
+async function checkHealth() {
+  const h = $("health");
+  if (mode === "sandbox") { h.className = "chip g"; h.textContent = "sandbox ready"; return; }
+  h.className = "chip"; h.textContent = "checking…";
+  const r = await call("GET", "/health", {}, undefined);
+  h.className = r.status === 200 ? "chip g" : "chip r";
+  h.textContent = r.status === 200 ? "API reachable" : "API unreachable";
+}
+
+/* ── request building (same rules as frontend/src/features/request.js) ── */
+function typed(input, raw) {
+  if (input.type === "json") { try { return JSON.parse(raw); } catch { throw new Error(`"${input.label}" is not valid JSON`); } }
+  if (input.type === "number") return raw === "" ? null : Number(raw);
+  if (input.type === "checkbox") return Boolean(raw);
+  const t = String(raw).trim(); return t === "" ? null : t;
+}
+function fill(tpl, v) {
+  if (typeof tpl === "string") { const w = tpl.match(/^\{\{(\w+)\}\}$/); return w ? v[w[1]] : tpl.replace(/\{\{(\w+)\}\}/g, (_, k) => v[k] ?? ""); }
+  if (Array.isArray(tpl)) return tpl.map(t => fill(t, v));
+  if (tpl && typeof tpl === "object") return Object.fromEntries(Object.entries(tpl).map(([k, x]) => [k, fill(x, v)]));
+  return tpl;
+}
+function buildRequest(spec, raw) {
+  const v = {}; for (const i of spec.inputs) v[i.name] = typed(i, raw[i.name]);
+  let path = spec.path; const params = {};
+  for (const i of spec.inputs) {
+    if (i.in === "path") { if (v[i.name] == null) throw new Error(`"${i.label}" is required`); path = path.replace(`{${i.name}}`, encodeURIComponent(v[i.name])); }
+    else if (i.in === "query" && v[i.name] != null) params[i.name] = v[i.name];
+  }
+  return { method: spec.method, path, params, body: spec.body ? fill(spec.body, v) : undefined };
+}
+
+/* ── feature cards ── */
+const STATUS = { live: ["g", "live"], built: ["b", "built, not running"], designed: ["a", "designed"], planned: ["", "planned"] };
+let filter = "All";
+
+function card(f) {
+  const [cls, label] = STATUS[f.status] || STATUS.planned;
+  const node = el("div", { class: "card" },
+    el("div", { class: "chips", style: "margin-bottom:6px" },
+      el("span", { class: `chip ${cls}`, text: label }), el("span", { class: "chip", text: f.category }),
+      f.llm ? el("span", { class: "chip a", text: "uses Gemini (live)" }) : null,
+      f.writes ? el("span", { class: f.destructive ? "chip r" : "chip b", text: f.destructive ? "deletes data" : "writes data" }) : null),
+    el("h3", { text: f.title, style: "font-size:16px;margin:4px 0" }),
+    el("p", { text: f.summary, style: "margin:0;color:var(--muted);font-size:14px" }),
+    el("details", { style: "margin-top:10px" },
+      el("summary", { text: "How it works", style: "cursor:pointer;color:var(--violet);font-size:13px;font-weight:600" }),
+      el("ol", { style: "font-size:13px;color:var(--muted);margin:8px 0;padding-left:20px" }, ...f.how.map(s => el("li", { text: s }))),
+      el("div", { class: "chips" }, ...f.files.map(x => el("code", { text: x })), ...f.endpoints.map(x => el("code", { text: x, style: "color:var(--violet)" })))));
+  node.append(f.tryIt ? tester(f) : el("p", { class: "note", text: f.status === "live" ? "Not an HTTP feature: see How it works." : "Not runnable yet." }));
+  return node;
+}
+
+function tester(f) {
+  const spec = f.tryIt, values = Object.fromEntries(spec.inputs.map(i => [i.name, i.default ?? ""]));
+  const out = el("pre", { class: "tester-out", hidden: "" });
+  const status = el("span", { class: "note", style: "margin:0" });
+  const fields = spec.inputs.map(i => {
+    const wide = i.type === "textarea" || i.type === "json";
+    let input;
+    if (i.type === "checkbox") {
+      input = el("input", { type: "checkbox" }); input.checked = Boolean(values[i.name]);
+      input.addEventListener("change", () => { values[i.name] = input.checked; });
+    } else if (wide) {
+      input = el("textarea", { rows: "3", spellcheck: "false" }); input.value = values[i.name];
+      if (i.type === "json") input.style.fontFamily = "var(--mono)";
+      input.addEventListener("input", () => { values[i.name] = input.value; });
+    } else {
+      input = el("input", { type: i.type === "number" ? "number" : "text" }); input.value = values[i.name];
+      input.addEventListener("input", () => { values[i.name] = input.value; });
+    }
+    return el("label", { class: wide ? "fld wide" : "fld" }, el("span", { class: "f", text: `${i.label} (${i.in})` }), input);
+  });
+  const run = el("button", { class: "btn primary", text: "Run" });
+  run.addEventListener("click", async () => {
+    let req;
+    try { req = buildRequest(spec, values); } catch (e) { status.textContent = e.message; return; }
+    if (mode === "live") {
+      const usesGemini = f.llm || values.explain === true;
+      const warn = [f.destructive && "This DELETES data in your Neo4j graph.", f.writes && !f.destructive && "This writes to your Neo4j graph.",
+                    usesGemini && "This uses Gemini requests from your daily budget."].filter(Boolean);
+      if (warn.length && !confirm(`${warn.join("\n")}\n\nRun ${req.method} ${req.path}?`)) return;
+    }
+    run.disabled = true; status.textContent = "running…";
+    const r = await call(req.method, req.path, req.params, req.body);
+    run.disabled = false;
+    const ok = r.status >= 200 && r.status < 300;
+    status.textContent = `${r.status || "network error"} · ${r.ms} ms${r.retryAfter ? ` · Retry-After ${r.retryAfter}s` : ""}${mode === "sandbox" ? " · sandbox" : ""}`;
+    status.style.color = ok ? "var(--green)" : "var(--red)";
+    out.textContent = r.data === "" ? "(empty body)" : JSON.stringify(r.data, null, 2);
+    out.hidden = false;
+    if (mode === "sandbox") refreshCounts();
+  });
+  return el("div", { class: "tester" },
+    el("div", { class: "chips", style: "align-items:center" }, el("span", { class: "method", text: spec.method }), el("code", { text: spec.path })),
+    el("div", { class: "fields" }, ...fields),
+    el("div", { class: "mode-row" }, run, status), out);
+}
+
+function render() {
+  const q = $("search").value.trim().toLowerCase();
+  const cats = ["All", ...new Set(D.features.map(f => f.category))];
+  $("filters").replaceChildren(...cats.map(c => {
+    const b = el("button", { class: `chip ${c === filter ? "on" : ""}`, text: c });
+    b.addEventListener("click", () => { filter = c; render(); });
+    return b;
+  }));
+  $("features").replaceChildren(...D.features
+    .filter(f => (filter === "All" || f.category === filter) && (!q || `${f.title} ${f.summary}`.toLowerCase().includes(q)))
+    .map(card));
+}
+$("search").addEventListener("input", render);
+
+const count = s => D.features.filter(f => f.status === s).length;
+$("stats").replaceChildren(
+  el("span", { class: "chip g", text: `${count("live")} live` }), el("span", { class: "chip b", text: `${count("built")} built` }),
+  el("span", { class: "chip a", text: `${count("designed")} designed` }), el("span", { class: "chip", text: `${count("planned")} planned` }),
+  el("span", { class: "chip v", text: `${D.features.filter(f => f.tryIt).length} runnable testers` }),
+  el("span", { class: "chip", text: `updated ${D.updated}` }));
+
+/* ── visual explorer ── */
+let lastAnalysis = null, ontologyCache = null, activeTab = "graph", explorerReady = false;
+
+/** Sample candidates and jobs (the demo scenarios), loaded through the normal API calls. */
+async function loadSampleSet() {
+  if (mode === "live" && !confirm("Write the sample candidates and jobs to your Neo4j graph through the live API?")) return false;
+  if (mode === "sandbox") await NNMock.loadSample();
+  const toRows = rows => rows.map(([name, weight]) => ({ name, weight }));
+  for (const sc of D.scenarios) {
+    const uid = `u-${sc.id}`, jid = `j-${sc.id}`;
+    await call("POST", "/api/v1/users", {}, { id: uid, name: sc.candidate.name, target_domain: sc.candidate.target_domain });
+    await call("PUT", `/api/v1/users/${uid}/skills`, {}, { skills: sc.candidate.skills.map(([name, proficiency]) => ({ name, proficiency })) });
+    await call("POST", "/api/v1/jobs", {}, { id: jid, title: sc.job.title, company: sc.job.company, domains: sc.job.domains,
+      core_skills: toRows(sc.job.core), preferred_skills: toRows(sc.job.preferred), nice_to_have_skills: toRows(sc.job.nice) });
+  }
+  refreshCounts();
+  return true;
+}
+
+async function refreshPickers(prefUser, prefJob) {
+  const [u, j] = await Promise.all([call("GET", "/api/v1/users", { limit: 200 }), call("GET", "/api/v1/jobs", { limit: 200 })]);
+  const fillSel = (sel, list, label, pref) => {
+    const keep = pref || sel.value;
+    sel.replaceChildren(...(Array.isArray(list) && list.length ? list.map(x => el("option", { value: x.id, text: label(x) }))
+      : [el("option", { value: "", text: "No data: load the sample dataset" })]));
+    if ([...sel.options].some(o => o.value === keep)) sel.value = keep;
+  };
+  fillSel($("x-user"), u.data, x => `${x.name || x.id} · ${x.skill_count} skills`, prefUser);
+  fillSel($("x-job"), j.data, x => `${x.title}${x.company ? " · " + x.company : ""}`, prefJob);
+}
+
+async function runExplorer() {
+  const userId = $("x-user").value, jobId = $("x-job").value;
+  if (!userId || !jobId) { $("x-summary").replaceChildren(el("span", { class: "chip a", text: "Load the sample dataset first" })); return; }
+  $("x-run").disabled = true;
+  const r = await call("GET", `/api/v1/analyze/${encodeURIComponent(userId)}/${encodeURIComponent(jobId)}`, { explain: false });
+  $("x-run").disabled = false;
+  if (r.status !== 200) {
+    const d = r.data?.detail;
+    $("x-summary").replaceChildren(el("span", { class: "chip r",
+      text: `${r.status || "network error"}: ${typeof d === "string" ? d : d?.code || r.data?.error || "request failed"}` }));
+    return;
+  }
+  const a = lastAnalysis = r.data;
+  const gaps = a.skill_breakdown.filter(s => s.status !== "met").length;
+  const tone = a.fit_score >= 0.8 ? "g" : a.fit_score >= 0.6 ? "a" : "r";
+  $("x-summary").replaceChildren(
+    el("span", { class: `chip ${tone}`, style: "font-size:15px;padding:6px 14px", text: `Fit ${NN.pct(a.fit_score)}` }),
+    el("span", { class: "chip", text: `gap score ${a.gap_score}` }),
+    el("span", { class: "chip v", text: `+${NN.pct(a.domain_bonus)} domain bonus` }),
+    el("span", { class: "chip", text: `${gaps} of ${a.skill_breakdown.length} skills to close` }),
+    el("span", { class: "chip", text: `${a.graph.nodes.length} nodes · ${a.graph.links.length} edges` }),
+    el("span", { class: mode === "sandbox" ? "chip b" : "chip g", text: mode === "sandbox" ? "in-browser API" : "live API" }));
+  drawTab();
+}
+
+async function drawTab() {
+  document.querySelectorAll(".x-pane").forEach(p => { p.hidden = p.dataset.pane !== activeTab; });
+  document.querySelectorAll("[role=tab]").forEach(b => b.classList.toggle("on", b.dataset.tab === activeTab));
+  if (activeTab === "onto") {
+    if (!ontologyCache) { const r = await call("GET", "/api/v1/ontology/graph", {}); if (r.status === 200) ontologyCache = r.data; }
+    if (ontologyCache) NNViz.ontologyGraph($("x-onto"), ontologyCache, $("x-search").value);
+  } else if (lastAnalysis) {
+    if (activeTab === "graph") NNViz.careerGraph($("x-graph"), lastAnalysis.graph);
+    else NNViz.roadmapFlow($("x-flow"), lastAnalysis.roadmap_flow);
+  } else {
+    $("x-graph").innerHTML = ""; $("x-flow").innerHTML = "";
+  }
+}
+document.querySelectorAll("[role=tab]").forEach(b => b.addEventListener("click", () => { activeTab = b.dataset.tab; drawTab(); }));
+$("x-search").addEventListener("input", () => { if (ontologyCache) NNViz.ontologyGraph($("x-onto"), ontologyCache, $("x-search").value); });
+$("x-run").addEventListener("click", runExplorer);
+$("x-samples").addEventListener("click", async () => {
+  if (await loadSampleSet()) { await refreshPickers(`u-${D.scenarios[0].id}`, `j-${D.scenarios[0].id}`); await runExplorer(); }
+});
+
+async function initExplorer() {
+  // first visit in sandbox mode: seed the sample dataset so there is a graph to look at right away
+  if (mode === "sandbox" && NNMock.counts().users === 0 && storage.get("nn-seeded", "") !== "1") {
+    await loadSampleSet();
+    storage.set("nn-seeded", "1");
+  }
+  await refreshPickers(`u-${D.scenarios[0].id}`, `j-${D.scenarios[0].id}`);
+  explorerReady = true;
+  if ($("x-user").value && $("x-job").value) await runExplorer();
+}
+
+render();
+setMode(mode);
+initExplorer();
+
+</script>
+</body>
+</html>

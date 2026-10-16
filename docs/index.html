@@ -1,0 +1,489 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>NextNode — Skills Graph Demo</title>
+<meta name="description" content="Interactive demo of NextNode: a neuro-symbolic skills-gap engine with a multi-agent curriculum workflow, simulated client-side.">
+<link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'><circle cx='9' cy='16' r='5' fill='%237C3AED'/><circle cx='23' cy='8' r='4' fill='%230D9488'/><circle cx='23' cy='24' r='4' fill='%23F59E0B'/><path d='M13 14 L19 9 M13 18 L19 23' stroke='%239CA3AF' stroke-width='2'/></svg>">
+<link rel="stylesheet" href="assets/site.css">
+</head>
+<body>
+
+<nav class="top"><div class="wrap">
+  <span class="brand">next<b>node</b></span>
+  <a class="link" href="#simulate">Simulation</a>
+  <a class="link" href="#workflow">Workflow</a>
+  <a class="link" href="#features">Features</a>
+  <a class="link" href="#changelog">Changelog</a>
+  <a class="link" href="sandbox.html">Sandbox</a>
+  <span class="spacer"></span>
+  <a class="btn" href="https://github.com/gargi-09/NextNode">GitHub</a>
+</div></nav>
+
+<header><section><div class="wrap">
+  <div class="chips" style="margin-bottom:16px">
+    <span class="chip v">Neuro-symbolic</span><span class="chip t">Knowledge graph</span>
+    <span class="chip a">Multi-agent</span><span class="chip g">$0 free-tier stack</span>
+  </div>
+  <h1>Career intelligence that reasons over a skills graph.</h1>
+  <p class="lead">NextNode parses resumes and job descriptions with an LLM, maps every skill onto a curated
+    ontology in Neo4j, and computes deterministic, explainable skill gaps and prerequisite-aware learning
+    roadmaps. A team of agents turns that into a reviewed curriculum.</p>
+  <div class="hero-cta">
+    <a class="btn primary" href="#simulate">▶ Run the agents</a>
+    <a class="btn" href="sandbox.html">Try every feature →</a>
+    <a class="btn" href="#workflow">How it works</a>
+  </div>
+  <div class="chips" id="stats"></div>
+  <div class="grid g3" style="margin-top:30px">
+    <div class="card pillar"><div class="icon" style="background:var(--teal-soft);color:var(--teal)">◆</div>
+      <h3>Deterministic scoring</h3><p>The LLM only reads text. Fit scores come from graph queries and fixed,
+      versioned rules, so the same input always gives the same, explainable answer.</p></div>
+    <div class="card pillar"><div class="icon" style="background:var(--violet-soft);color:var(--violet)">⬢</div>
+      <h3>Strict skill ontology</h3><p>Every name resolves to a canonical skill or alias ("k8s" → Kubernetes) or is
+      held for review. The LLM can never invent graph nodes.</p></div>
+    <div class="card pillar"><div class="icon" style="background:var(--amber-soft);color:var(--amber)">⚡</div>
+      <h3>Built for free tiers</h3><p>A global Gemini rate limiter, content-hash caching and a Neo4j circuit breaker
+      keep it running on permanent free tiers.</p></div>
+  </div>
+</div></section></header>
+
+<section id="simulate"><div class="wrap">
+  <h2>Agent simulation</h2>
+  <p class="sub">Pick a candidate, adjust their skills, then run the agents. This runs entirely in your browser:
+    the scoring is a faithful port of NextNode's Python rules over the real ontology. Parsing is mocked and the
+    activities are templated; in the full system Gemini does those steps.</p>
+  <div class="sim">
+    <div class="card">
+      <label class="f" for="scenario">Scenario</label>
+      <select id="scenario"></select>
+      <h3 style="margin-top:16px" id="cand-name"></h3>
+      <p class="resume" id="resume"></p>
+      <label class="f">Extracted skills (as the Parser would return them, before resolution)</label>
+      <table class="skills" id="skill-table"></table>
+      <div style="margin-top:14px"><label class="f">Target job</label><div id="job"></div></div>
+      <div style="display:flex;gap:10px;margin-top:18px;flex-wrap:wrap">
+        <button class="btn primary" id="run">▶ Run agents</button>
+        <button class="btn" id="selftest">Run self-test</button>
+      </div>
+      <div id="selftest-out"></div>
+    </div>
+    <div>
+      <div class="card">
+        <div class="pipeline" id="pipeline"></div>
+        <div class="console" id="console" aria-live="polite"></div>
+      </div>
+      <div class="results" id="results" hidden>
+        <div class="card ring" id="ring"></div>
+        <div class="card"><h3>Roadmap (deterministic)</h3><ol class="road" id="roadmap"></ol></div>
+      </div>
+      <div class="card" id="graph-card" style="margin-top:16px" hidden>
+        <h3>Career graph</h3>
+        <svg id="graph" role="img" aria-label="Career graph: the candidate, the job, required skills and prerequisite paths"></svg>
+        <div class="legend">
+          <span><i style="background:var(--violet)"></i>Candidate</span><span><i style="background:var(--blue)"></i>Job</span>
+          <span><i style="background:var(--green)"></i>Met</span><span><i style="background:var(--amber)"></i>Partial</span>
+          <span><i style="background:var(--red)"></i>Missing</span><span><i style="background:var(--teal)"></i>Owned prerequisite</span>
+          <span><i style="background:var(--slate)"></i>Intermediate step</span><span>dashed = PREREQUISITE_OF</span>
+        </div>
+      </div>
+      <div class="grid g2" id="review-row" style="margin-top:16px" hidden>
+        <div class="card"><h3>Reviewer checks</h3><ul class="checks" id="checks"></ul></div>
+        <div class="card"><h3>Unmapped terms</h3><div class="chips" id="unmapped"></div>
+          <p class="note">Unknown names are stored as a list for review, never as graph nodes.</p></div>
+      </div>
+      <div class="card" id="curriculum-card" style="margin-top:16px" hidden>
+        <h3>Curriculum (Reasoner draft, approved by Reviewer)</h3>
+        <div class="modules" id="modules"></div>
+      </div>
+    </div>
+  </div>
+</div></section>
+
+<section id="workflow"><div class="wrap">
+  <h2>Multi-agent workflow</h2>
+  <p class="sub">An orchestrator coordinates three agents. Every score and priority in the output is copied from
+    NextNode's deterministic graph tools, never computed by a model.</p>
+  <div class="flow">
+    <div class="step"><div class="n">01 · ORCHESTRATOR</div><h3>Route work</h3>
+      <p>Dispatches each step, enforces a 6-dispatch cap and one revision at most.</p><span class="chip a">Gemini</span></div>
+    <div class="step"><div class="n">02 · PARSER</div><h3>Text → JSON</h3>
+      <p>Extracts skills with an evidence label mapped to fixed proficiency numbers.</p><span class="chip t">Local model</span></div>
+    <div class="step"><div class="n">03 · REASONER</div><h3>Graph tools</h3>
+      <p>Upserts the data, calls calculate_skill_gap and prerequisite lookups, drafts modules.</p><span class="chip a">Gemini</span></div>
+    <div class="step"><div class="n">04 · REVIEWER</div><h3>Verify</h3>
+      <p>A different vendor re-runs the graph tools and returns PASS or REVISE with evidence.</p><span class="chip t">Local model</span></div>
+    <div class="step"><div class="n">05 · OUTPUT</div><h3>Curriculum</h3>
+      <p>Ordered modules, activities, hours and mastery evidence, plus unmapped skills.</p><span class="chip v">Reviewed</span></div>
+  </div>
+  <div class="layer">
+    <div class="card"><h3>Ontology</h3><p>Version-controlled JSON: skills, aliases, domains, prerequisite chains.</p></div>
+    <div class="card"><h3>Neo4j graph</h3><p>Users, jobs and skills; scoring traverses up to 3 prerequisite hops.</p></div>
+    <div class="card"><h3>LLM gate</h3><p>Rate limiter, content-hash cache, Gemini JSON mode, 429 with Retry-After.</p></div>
+    <div class="card"><h3>Guardrails</h3><p>Daily token/request ledger, loop guard, dispatch cap, read-only reviewer.</p></div>
+  </div>
+  <p class="note">Status: the graph engine, API and web app are live. The agent configs and guardrail policies are built and tested;
+    running them end to end waits on the NextNode MCP server.</p>
+</div></section>
+
+<section id="features"><div class="wrap">
+  <h2>Features</h2>
+  <p class="sub" id="features-sub"></p>
+  <div class="filters" id="filters"></div>
+  <div class="fgrid" id="fgrid"></div>
+</div></section>
+
+<section id="changelog"><div class="wrap">
+  <h2>Changelog</h2>
+  <p class="sub" id="changelog-sub"></p>
+  <ol class="timeline" id="timeline"></ol>
+</div></section>
+
+<footer><div class="wrap">
+  Run it locally: <code>uvicorn app.main:app --reload</code> and <code>npm --prefix frontend run dev</code>.
+  This page is generated by <code>scripts/build_pages.py</code> from the project's feature registry and ontology.
+</div></footer>
+
+<script src="assets/data.js"></script>
+<script src="assets/nextnode-core.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/d3/7.9.0/d3.min.js" integrity="sha512-vc58qvvBdrDR4etbxMdlTt4GBQk1qjvyORR2nrsPsFPyrs+/u5c3+1Ct6upOgdZoIl7eq6k3a1UPDSNAQi/32A==" crossorigin="anonymous" referrerpolicy="no-referrer"></script>
+<script>
+"use strict";
+const D = window.NEXTNODE;
+const $ = id => document.getElementById(id);
+const el = (tag, attrs = {}, ...kids) => {
+  const n = document.createElement(tag);
+  for (const [k, v] of Object.entries(attrs)) {
+    if (k === "class") n.className = v; else if (k === "text") n.textContent = v; else n.setAttribute(k, v);
+  }
+  for (const k of kids) n.append(k);
+  return n;
+};
+const reduced = window.matchMedia("(prefers-reduced-motion: reduce)").matches;
+const sleep = ms => new Promise(r => setTimeout(r, reduced ? 0 : ms));
+const pct = x => `${Math.round(x * 100)}%`;
+
+/* ── graph logic comes from assets/nextnode-core.js (a port of the Python engine) ── */
+const { BY_NAME, PREV } = NN;
+const resolve = NN.resolve, shortestPath = NN.shortestPath, scoreGap = NN.scoreGap;
+
+/* ── one full analysis for a scenario + edited proficiencies ── */
+function analyze(sc, proficiencies) {
+  const owned = {}, unmapped = [], resolutions = [];
+  sc.candidate.skills.forEach(([name], i) => {
+    const r = resolve(name), p = proficiencies[i];
+    resolutions.push({ input: name, canonical: r ? r.skill.name : null, via: r ? r.via : null });
+    if (r) owned[r.skill.name] = Math.max(p, owned[r.skill.name] || 0);
+    else if (!unmapped.includes(name)) unmapped.push(name);
+  });
+  const reqs = [], seen = new Set();
+  for (const [tier, key] of [["core", "core"], ["preferred", "preferred"], ["nice_to_have", "nice"]]) {
+    for (const [name, w] of sc.job[key]) {
+      const r = resolve(name);
+      if (!r || seen.has(r.skill.name)) continue;
+      seen.add(r.skill.name);
+      reqs.push({ skill: r.skill.name, importance: tier, weight: w });
+    }
+  }
+  const a = NN.analyzeProfile(owned, reqs, NN.resolveDomain(sc.candidate.target_domain), sc.job.domains);
+  return { ...a, unmapped, resolutions };
+}
+
+/* ── Reasoner draft (templated here; written by Gemini in the real workflow) ── */
+const ACTIVITY = {
+  language: s => `Rebuild a small service you know in ${s}, with tests and a README`,
+  ml_framework: s => `Re-implement a reference model in ${s} and match its published metrics`,
+  platform: s => `Deploy a toy pipeline on ${s} end to end and write a runbook`,
+  concept: s => `Ship a mini-project that needs ${s} and write up the trade-offs`,
+  tool: s => `Automate one real workflow with ${s} and measure the time saved`,
+};
+const HOURS = { foundational: 10, intermediate: 20, advanced: 35 };
+function draftCurriculum(a) {
+  const steps = a.result.roadmap;
+  const inPlan = new Set(steps.map(s => s.skill));
+  const ordered = [], placed = new Set();
+  const place = skill => { // prerequisites that are also modules go first
+    if (placed.has(skill)) return;
+    placed.add(skill);
+    for (const p of PREV[skill] || []) if (inPlan.has(p)) place(p);
+    ordered.push(skill);
+  };
+  steps.forEach(s => place(s.skill));
+  return ordered.map((skill, i) => {
+    const step = steps.find(s => s.skill === skill), sk = BY_NAME[skill];
+    const discount = 1 - Math.min(step.prereqs_owned * 0.15, 0.4);
+    const hours = Math.max(4, Math.round(HOURS[sk.level] * discount * (step.status === "partial" ? 0.5 : 1)));
+    return {
+      order: i + 1, skill, priority: step.priority, why: step.reason,
+      builds_on: a.unlocks[skill] || [],
+      learn_first: (PREV[skill] || []).filter(p => !(p in a.owned) && !inPlan.has(p)),
+      activity: ACTIVITY[sk.category](skill), estimated_hours: hours,
+      evidence: `A demo or write-up that uses ${skill} at the ${step.status === "partial" ? "expected" : "required"} level`,
+    };
+  });
+}
+
+/* ── Reviewer: re-derives facts instead of trusting the draft ── */
+function review(a, modules) {
+  const again = scoreGap(a.rows, a.result.domain_bonus > 0 ? 1 : 0,
+    Object.fromEntries(Object.entries(a.unlocks).map(([k, v]) => [k, v.length])));
+  const roadSkills = new Set(a.result.roadmap.map(r => r.skill));
+  const must = a.result.roadmap.filter(r => r.priority !== "low").map(r => r.skill);
+  const pos = Object.fromEntries(modules.map(m => [m.skill, m.order]));
+  const orderOk = modules.every(m => (PREV[m.skill] || []).every(p => !(p in pos) || pos[p] < m.order));
+  return [
+    ["Fit score matches a fresh calculate_skill_gap", again.fit_score === a.result.fit_score],
+    ["Every module is a roadmap skill", modules.every(m => roadSkills.has(m.skill))],
+    ["All high/medium-priority gaps are covered", must.every(s => s in pos)],
+    ["Modules respect PREREQUISITE_OF order", orderOk],
+    ["builds_on lists only skills the candidate has", modules.every(m => m.builds_on.every(s => s in a.owned))],
+    ["Estimated hours within 1–200", modules.every(m => m.estimated_hours >= 1 && m.estimated_hours <= 200)],
+  ];
+}
+
+/* ── UI: scenario panel ── */
+let current = null, proficiencies = [];
+function renderScenario() {
+  current = D.scenarios.find(s => s.id === $("scenario").value);
+  proficiencies = current.candidate.skills.map(([, p]) => p);
+  $("cand-name").textContent = current.candidate.name;
+  $("resume").textContent = `“${current.candidate.resume}”`;
+  const t = $("skill-table"); t.replaceChildren();
+  current.candidate.skills.forEach(([name], i) => {
+    const r = resolve(name);
+    const out = el("td", { class: "pct", text: pct(proficiencies[i]) });
+    const range = el("input", { type: "range", min: "0", max: "1", step: "0.05", value: String(proficiencies[i]), "aria-label": `${name} proficiency` });
+    range.addEventListener("input", () => { proficiencies[i] = Number(range.value); out.textContent = pct(proficiencies[i]); });
+    const tag = r ? el("span", { class: `chip ${r.via === "alias" ? "b" : "g"}`, text: r.via === "alias" ? `→ ${r.skill.name}` : "canonical" })
+                  : el("span", { class: "chip r", text: "unmapped" });
+    t.append(el("tr", {}, el("td", { text: name }), el("td", {}, tag), el("td", {}, range), out));
+  });
+  const job = $("job"); job.replaceChildren(el("div", { text: `${current.job.title} · ${current.job.company}` }));
+  for (const [key, label, cls] of [["core", "Core", "v"], ["preferred", "Preferred", "b"], ["nice", "Nice to have", ""]]) {
+    job.append(el("div", { class: "req-tier" }, el("label", { class: "f", text: label }),
+      el("div", { class: "chips" }, ...current.job[key].map(([n, w]) => el("span", { class: `chip ${cls}`, text: `${n} · ${pct(w)}` })))));
+  }
+  resetRun();
+}
+
+const AGENTS = [
+  ["orch", "Orchestrator", "routes the work", "Gemini", "a"],
+  ["parser", "Parser", "text → JSON", "local model", "t"],
+  ["reasoner", "Reasoner", "graph tools", "Gemini", "a"],
+  ["reviewer", "Reviewer", "verifies", "local model", "t"],
+];
+function renderPipeline() {
+  $("pipeline").replaceChildren(...AGENTS.map(([id, name, what, model, c]) =>
+    el("div", { class: "agent", id: `agent-${id}` },
+      el("span", { class: "state", text: "idle" }), el("div", { class: "name", text: name }),
+      el("div", { class: "what", text: what }), el("div", { class: `chip ${c} model`, text: model }))));
+}
+function setAgent(id, state) {
+  const n = $(`agent-${id}`); n.className = `agent ${state}`;
+  n.querySelector(".state").textContent = state === "running" ? "running" : state === "done" ? "done" : "idle";
+}
+function log(cls, tag, text) {
+  const c = $("console");
+  c.append(el("div", { class: "ln" }, el("span", { class: `tag ${cls}`, text: `[${tag}] ` }), text));
+  c.scrollTop = c.scrollHeight;
+}
+function resetRun() {
+  renderPipeline();
+  $("console").replaceChildren(el("div", { class: "ln m", text: "Ready. Click ▶ Run agents." }));
+  for (const id of ["results", "graph-card", "review-row", "curriculum-card"]) $(id).hidden = true;
+}
+
+/* ── the simulated run ── */
+async function runAgents() {
+  const btn = $("run"); btn.disabled = true;
+  resetRun(); $("console").replaceChildren();
+  const a = analyze(current, proficiencies);
+
+  setAgent("orch", "running");
+  log("o", "orchestrator", `Task: ${current.candidate.name} → ${current.job.title}. Dispatching parser (1/6).`);
+  await sleep(550); setAgent("orch", "done");
+
+  setAgent("parser", "running");
+  log("p", "parser", `Read ${current.candidate.resume.split(/\s+/).length} words; extracted ${current.candidate.skills.length} skill mentions.`);
+  await sleep(450);
+  for (const r of a.resolutions) {
+    log("p", "resolve", r.canonical ? `"${r.input}" → ${r.canonical}${r.via === "alias" ? " (alias)" : ""}` : `"${r.input}" → unmapped (kept as a list, no node)`);
+    await sleep(140);
+  }
+  setAgent("parser", "done");
+
+  setAgent("reasoner", "running");
+  log("r", "reasoner", `upsert_user_skills(${Object.keys(a.owned).length} canonical skills)`); await sleep(300);
+  log("r", "reasoner", `upsert_job_posting(${a.rows.length} requirements, ${current.job.domains.join(", ")})`); await sleep(300);
+  const met = a.rows.filter(r => r.status === "met").length;
+  log("r", "reasoner", `calculate_skill_gap → fit ${pct(a.result.fit_score)}, ${met}/${a.rows.length} met, domain bonus +${pct(a.result.domain_bonus)}`); await sleep(400);
+  for (const [skill, by] of Object.entries(a.unlocks)) {
+    if (by.length) { log("r", "reasoner", `get_skill_prerequisites(${skill}) → you own ${by.join(", ")}`); await sleep(160); }
+  }
+  const modules = draftCurriculum(a);
+  log("r", "reasoner", `Drafted ${modules.length} modules in prerequisite order.`);
+  setAgent("reasoner", "done");
+  showResults(a);
+
+  setAgent("reviewer", "running");
+  log("v", "reviewer", "Re-running the graph tools independently…"); await sleep(400);
+  const checks = review(a, modules);
+  for (const [name, ok] of checks) { log(ok ? "v" : "x", "reviewer", `${ok ? "✓" : "✗"} ${name}`); await sleep(150); }
+  const pass = checks.every(([, ok]) => ok);
+  log(pass ? "v" : "x", "reviewer", pass ? "Verdict: PASS" : "Verdict: REVISE");
+  setAgent("reviewer", "done");
+  log("o", "orchestrator", `Done: ${modules.length} modules, reviewer ${pass ? "PASS" : "REVISE"}, ${a.unmapped.length} unmapped term(s).`);
+  showReview(a, checks, modules);
+  btn.disabled = false;
+}
+
+function showResults(a) {
+  const r = a.result, color = r.fit_score >= 0.8 ? "var(--green)" : r.fit_score >= 0.6 ? "var(--amber)" : "var(--red)";
+  const C = 2 * Math.PI * 52, dash = r.fit_score * C;
+  $("ring").innerHTML = `<svg width="140" height="140" viewBox="0 0 140 140" aria-hidden="true"><circle cx="70" cy="70" r="52" fill="none" stroke="var(--line)" stroke-width="12"/><circle cx="70" cy="70" r="52" fill="none" stroke="${color}" stroke-width="12" stroke-linecap="round" stroke-dasharray="${dash} ${C}" transform="rotate(-90 70 70)"/></svg>`;
+  $("ring").append(el("div", { class: "big", text: pct(r.fit_score) }), el("div", { class: "note", text: "fit score" }),
+    el("div", { style: "width:100%;margin-top:10px" },
+      el("div", { class: "kv" }, el("span", { text: "Gap score" }), el("span", { text: String(r.gap_score) })),
+      el("div", { class: "kv" }, el("span", { text: "Domain bonus" }), el("span", { text: `+${pct(r.domain_bonus)}` })),
+      el("div", { class: "kv" }, el("span", { text: "Scoring" }), el("span", { text: `v${D.scoringVersion}` }))));
+  $("roadmap").replaceChildren(...(r.roadmap.length ? r.roadmap.map(s => el("li", { class: s.priority },
+    el("span", { class: "rank", text: String(s.rank) }),
+    el("div", {}, el("div", { text: s.skill }), el("div", { class: "why", text: s.reason })),
+    el("span", { class: `chip ${s.status === "partial" ? "a" : "r"}`, text: s.priority }))) : [el("li", { text: "No gaps: every requirement is met." })]));
+  $("results").hidden = false;
+  $("graph-card").hidden = false;
+  drawGraph(a);
+}
+
+function showReview(a, checks, modules) {
+  $("checks").replaceChildren(...checks.map(([n, ok]) => el("li", { class: ok ? "" : "fail", text: n })));
+  $("unmapped").replaceChildren(...(a.unmapped.length ? a.unmapped.map(u => el("span", { class: "chip r", text: u })) : [el("span", { class: "note", text: "None" })]));
+  $("modules").replaceChildren(...modules.map(m => el("div", { class: "module" },
+    el("div", { class: "h" }, el("span", { text: `${m.order}. ${m.skill}` }), el("span", { class: `chip ${m.priority === "high" ? "r" : m.priority === "medium" ? "a" : ""}`, text: `${m.estimated_hours} h` })),
+    el("div", { class: "note", style: "margin:0", text: m.why }),
+    el("ul", {}, el("li", { text: m.activity }),
+      ...(m.builds_on.length ? [el("li", { text: `Builds on: ${m.builds_on.join(", ")}` })] : []),
+      ...(m.learn_first.length ? [el("li", { text: `Learn first: ${m.learn_first.join(", ")}` })] : []),
+      el("li", { text: `Mastery: ${m.evidence}` })))));
+  $("review-row").hidden = false;
+  $("curriculum-card").hidden = false;
+}
+
+/* ── career graph (d3-force); mirrors app/graph/payloads.py ── */
+function drawGraph(a) {
+  const svg = $("graph");
+  if (!window.d3) { svg.outerHTML = '<p class="empty" id="graph">The graph needs d3 from cdnjs; check your connection.</p>'; return; }
+  const nodes = new Map(), links = [];
+  const add = (id, label, kind) => { if (!nodes.has(id)) nodes.set(id, { id, label, kind }); };
+  add("user", current.candidate.name.split(" (")[0], "user");
+  add("job", current.job.title, "job");
+  for (const r of a.rows) {
+    add(r.skill, r.skill, r.status);
+    links.push({ source: "job", target: r.skill, kind: "req" });
+    if (r.status !== "missing") links.push({ source: "user", target: r.skill, kind: "has" });
+  }
+  for (const [target, owners] of Object.entries(a.unlocks)) for (const o of owners) {
+    const path = shortestPath(o, target); if (!path) continue;
+    if (!nodes.has(o)) { add(o, o, "owned"); links.push({ source: "user", target: o, kind: "has" }); }
+    for (let i = 0; i < path.length - 1; i++) {
+      add(path[i + 1], path[i + 1], path[i + 1] in a.owned ? "owned" : "step");
+      if (!links.some(l => l.source === path[i] && l.target === path[i + 1])) links.push({ source: path[i], target: path[i + 1], kind: "pre" });
+    }
+  }
+  const COLOR = { user: "var(--violet)", job: "var(--blue)", met: "var(--green)", partial: "var(--amber)", missing: "var(--red)", owned: "var(--teal)", step: "var(--slate)" };
+  const R = { user: 13, job: 13 };
+  const g = d3.select(svg); g.selectAll("*").remove();
+  const { width, height } = svg.getBoundingClientRect();
+  g.attr("viewBox", `0 0 ${width} ${height}`);
+  g.append("defs").append("marker").attr("id", "arr").attr("viewBox", "0 0 10 10").attr("refX", 18).attr("refY", 5)
+    .attr("markerWidth", 6).attr("markerHeight", 6).attr("orient", "auto")
+    .append("path").attr("d", "M0 0 L10 5 L0 10 z").attr("fill", "var(--amber)");
+  const data = [...nodes.values()];
+  const link = g.append("g").selectAll("line").data(links).join("line")
+    .attr("stroke", d => d.kind === "pre" ? "var(--amber)" : d.kind === "has" ? "var(--teal)" : "var(--blue)")
+    .attr("stroke-opacity", .7).attr("stroke-width", d => d.kind === "pre" ? 1.6 : 1.1)
+    .attr("stroke-dasharray", d => d.kind === "pre" ? "5 4" : null).attr("marker-end", d => d.kind === "pre" ? "url(#arr)" : null);
+  const node = g.append("g").selectAll("g").data(data).join("g").style("cursor", "grab");
+  node.append("circle").attr("r", d => R[d.kind] || 8).attr("fill", d => COLOR[d.kind]).attr("stroke", "var(--panel)").attr("stroke-width", 2);
+  node.append("text").attr("dy", d => (R[d.kind] || 8) + 13).attr("text-anchor", "middle").text(d => d.label);
+  node.append("title").text(d => `${d.label} · ${d.kind}`);
+  const sim = d3.forceSimulation(data)
+    .force("link", d3.forceLink(links).id(d => d.id).distance(d => d.kind === "pre" ? 55 : 95))
+    .force("charge", d3.forceManyBody().strength(-260))
+    .force("center", d3.forceCenter(width / 2, height / 2))
+    .force("collide", d3.forceCollide(26))
+    .force("x", d3.forceX(d => d.kind === "user" ? width * .18 : d.kind === "job" ? width * .82 : width / 2).strength(d => d.kind === "user" || d.kind === "job" ? .3 : .02))
+    .on("tick", () => {
+      data.forEach(d => { d.x = Math.max(20, Math.min(width - 20, d.x)); d.y = Math.max(20, Math.min(height - 30, d.y)); });
+      link.attr("x1", d => d.source.x).attr("y1", d => d.source.y).attr("x2", d => d.target.x).attr("y2", d => d.target.y);
+      node.attr("transform", d => `translate(${d.x},${d.y})`);
+    });
+  node.call(d3.drag()
+    .on("start", (e, d) => { if (!e.active) sim.alphaTarget(.3).restart(); d.fx = d.x; d.fy = d.y; })
+    .on("drag", (e, d) => { d.fx = e.x; d.fy = e.y; })
+    .on("end", (e, d) => { if (!e.active) sim.alphaTarget(0); d.fx = null; d.fy = null; }));
+}
+
+/* ── self-test: JS port vs results computed by the real Python code ── */
+function selfTest() {
+  const rows = D.scenarios.map(sc => {
+    const got = analyze(sc, sc.candidate.skills.map(([, p]) => p)).result, exp = sc.expected;
+    const ok = Math.abs(got.fit_score - exp.fit_score) < 0.0015 && Math.abs(got.gap_score - exp.gap_score) < 0.0015
+      && got.domain_bonus === exp.domain_bonus && got.roadmap.map(r => r.skill).join("|") === exp.roadmap.join("|");
+    return { sc, got, exp, ok };
+  });
+  const allOk = rows.every(r => r.ok);
+  const table = el("table", { class: "selftest" }, el("tr", {}, ...["Scenario", "Python", "Browser", ""].map(h => el("th", { text: h }))),
+    ...rows.map(r => el("tr", {}, el("td", { text: r.sc.label }), el("td", { text: pct(r.exp.fit_score) + ` (${r.exp.fit_score})` }),
+      el("td", { text: pct(r.got.fit_score) + ` (${r.got.fit_score})` }), el("td", { class: r.ok ? "" : "fail", text: r.ok ? "✓" : "✗" }))));
+  $("selftest-out").replaceChildren(el("p", { class: "note", text: allOk
+    ? "✓ The in-browser scoring matches the Python engine on every scenario (fit, gap, bonus and roadmap order)."
+    : "✗ Mismatch between the browser port and the Python engine." }), table);
+}
+
+/* ── features + changelog ── */
+const STATUS = { live: ["g", "live"], built: ["b", "built"], designed: ["a", "designed"], planned: ["", "planned"] };
+let filter = "All";
+function renderFeatures() {
+  const cats = ["All", ...new Set(D.features.map(f => f.category))];
+  $("filters").replaceChildren(...cats.map(c => {
+    const b = el("button", { class: `chip ${c === filter ? "on" : ""}`, text: c });
+    b.addEventListener("click", () => { filter = c; renderFeatures(); });
+    return b;
+  }));
+  $("fgrid").replaceChildren(...D.features.filter(f => filter === "All" || f.category === filter).map(f => {
+    const [cls, label] = STATUS[f.status] || STATUS.planned;
+    return el("div", { class: "card feat" }, el("h3", { text: f.title }),
+      el("div", { class: "chips" }, el("span", { class: `chip ${cls}`, text: label }), el("span", { class: "chip", text: f.category }),
+        ...(f.llm ? [el("span", { class: "chip a", text: "uses Gemini" })] : [])),
+      el("p", { text: f.summary }));
+  }));
+}
+function renderChangelog() {
+  $("changelog-sub").textContent = `Updated ${D.updated}. Generated from the project's feature registry on every completed task.`;
+  const byId = Object.fromEntries(D.features.map(f => [f.id, f.title]));
+  $("timeline").replaceChildren(...[...D.changelog].reverse().map(e => el("li", {},
+    el("div", { class: "date", text: e.date }), el("div", { class: "task", text: e.task }),
+    el("div", { class: "chips" }, ...e.features.map(id => el("span", { class: "chip", text: byId[id] || id }))))));
+}
+function renderStats() {
+  const count = s => D.features.filter(f => f.status === s).length;
+  $("features-sub").textContent = `${count("live")} live · ${count("built")} built · ${count("designed")} designed · ${count("planned")} planned`;
+  $("stats").replaceChildren(
+    el("span", { class: "chip g", text: `${count("live")} live features` }),
+    el("span", { class: "chip v", text: `${D.ontology.skills.length} canonical skills` }),
+    el("span", { class: "chip b", text: `${Object.keys(D.ontology.aliases).length} aliases` }),
+    el("span", { class: "chip a", text: `${D.ontology.prerequisites.length} prerequisite edges` }),
+    el("span", { class: "chip", text: `updated ${D.updated}` }));
+}
+
+/* ── boot ── */
+$("scenario").replaceChildren(...D.scenarios.map(s => el("option", { value: s.id, text: s.label })));
+$("scenario").addEventListener("change", renderScenario);
+$("run").addEventListener("click", runAgents);
+$("selftest").addEventListener("click", selfTest);
+renderStats(); renderFeatures(); renderChangelog(); renderScenario();
+</script>
+</body>
+</html>
