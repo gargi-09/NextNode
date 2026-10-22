@@ -19,6 +19,7 @@ metadata:
     app.kubernetes.io/part-of: nextnode
 spec:
   replicas: 1                 # scale to 0 when idle to save credits: kubectl scale deploy/vllm --replicas=0
+  progressDeadlineSeconds: 1800   # first start downloads the weights; the 10 min default is too short
   strategy:
     type: Recreate            # one GPU + a ReadWriteOnce cache: never run two pods at once
   selector:
@@ -31,9 +32,13 @@ spec:
         app.kubernetes.io/part-of: nextnode
     spec:
       automountServiceAccountToken: false
-      # GKE example; other clouds label GPU nodes differently (or drop this and rely on the toleration).
-      # nodeSelector:
-      #   cloud.google.com/gke-accelerator: nvidia-l4
+      # Without this, Kubernetes injects VLLM_PORT=tcp://<ip>:8000 for the `vllm` Service, which
+      # vLLM reads as its own VLLM_PORT setting and crashes at startup ("Engine core initialization failed").
+      enableServiceLinks: false
+      # Pin to GPU nodes when the cluster also has CPU nodes. EKS (deploy/aws/eksctl-cluster.yaml)
+      # has only the GPU node group, so no selector is needed there.
+      #   EKS: nodeSelector: {nextnode/role: gpu}
+      #   GKE: nodeSelector: {cloud.google.com/gke-accelerator: nvidia-l4}
       tolerations:
         - key: nvidia.com/gpu
           operator: Exists
@@ -74,13 +79,16 @@ spec:
           ports:
             - name: http
               containerPort: 8000
+          # Sized to fit a g6.xlarge (4 vCPU, 16 GiB, ~3.9 CPU / ~14.5 GiB allocatable) next to
+          # the system pods. The model itself lives in GPU memory; host RAM covers loading,
+          # the Python process and /dev/shm.
           resources:
             requests:
-              cpu: "4"
-              memory: 16Gi
+              cpu: "2"
+              memory: 8Gi
               nvidia.com/gpu: "1"
             limits:
-              memory: 24Gi
+              memory: 13Gi
               nvidia.com/gpu: "1"
           securityContext:
             allowPrivilegeEscalation: false

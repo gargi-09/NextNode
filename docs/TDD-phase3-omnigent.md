@@ -4,7 +4,7 @@
 |---|---|
 | Status | Proposed. Configs and policies written; MCP server (§3) built and verified against Aura (2026-10-16); end-to-end run not yet validated |
 | Scope | `omnigent/` directory, NextNode MCP tool contract, guardrails, local startup |
-| Target | Omnigent **v0.18.0** (released 2026-10-13, Apache-2.0, alpha), checked against its source |
+| Target | Omnigent **v0.19.1** (was v0.18.0; 0.19 moved `executor.harness` to `executor.config.harness` and agent `policies:` under `guardrails:`), validated by its own parser in `tests/test_omnigent_config.py` |
 | Last reviewed | 2026-10-15 |
 
 ---
@@ -170,7 +170,7 @@ That's roughly **15–25 Gemini requests per run, so 150/day ≈ 6–10 runs**. 
 | R1 | `openai-agents` + Gemini's OpenAI-compatible endpoint is not a combination Omnigent documents (its examples use Databricks, OpenRouter and Ollama gateways). If the harness needs an API Gemini doesn't implement, Gemini agents won't start. | First validation step: `omnigent run omnigent/nextnode_curriculum/agents/reasoner -p "Say hello"`. Fallback: `harness: antigravity` with `auth: {type: api_key, api_key: ${GEMINI_API_KEY}}`, which is Gemini-native and documented. |
 | R2 | `qwen3:8b` may be too weak a reviewer for 7 tool-verified checks | Each check is a tool call plus comparison. If quality is poor, use a larger local model (`qwen3:14b`) and keep the vendor different from the Reasoner. |
 | R3 | `llm_request` phase emission varies by harness | The policy falls back to per-turn counting; confirm with the ledger after one run. |
-| R4 | Omnigent is alpha, and its spec changes between releases | Pin the version (`uv tool install omnigent==0.18.0`). Re-validate on upgrade; `tests/test_omnigent_config.py` checks the configs' internal consistency. |
+| R4 | Omnigent is alpha, and its spec changes between releases | Pin the version (`uv tool install omnigent==0.19.1`). Re-validate on upgrade; `tests/test_omnigent_config.py` checks the configs' internal consistency. |
 | R5 | `tools:` allow-list support on URL-based MCP servers is only documented for the stdio form | Belt and braces: `deny_tools` on the reviewer blocks write tools regardless. |
 | R6 | Windows runs Omnigent in reduced mode | The workflow uses no terminals, `os_env` or sandboxes, so nothing it needs is disabled. |
 | O1 | Should the orchestrator run locally, halving Gemini use? | Decide after measuring R3 and §6.3. |

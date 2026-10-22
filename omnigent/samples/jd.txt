@@ -1,0 +1,11 @@
+Machine Learning Engineer (mid-level) - Northwind Labs
+
+We build NLP features for customer support. You will train and ship transformer models.
+
+Requirements:
+- Strong Python and PyTorch
+- Experience with Hugging Face Transformers
+- Docker and deploying models behind an API
+
+Strongly preferred: Kubernetes, MLflow.
+Bonus: experience with vector databases or RAG.

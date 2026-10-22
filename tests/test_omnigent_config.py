@@ -6,7 +6,10 @@ and check the configs agree with each other and with the TDD tool contract.
 """
 import importlib.util
 import json
+import os
 import re
+import shutil
+import subprocess
 from datetime import datetime
 from pathlib import Path
 
@@ -173,7 +176,7 @@ def test_every_declared_subagent_has_a_spec():
     for name, spec in AGENTS.items():
         assert spec["spec_version"] == 1
         assert spec["name"] == name
-        assert spec["executor"]["harness"]
+        assert spec["executor"]["config"]["harness"]
         assert spec["prompt"].strip()
 
 
@@ -194,7 +197,7 @@ def test_tool_access_matches_the_contract():
     assert reasoner_tools <= READ_TOOLS | WRITE_TOOLS
     assert WRITE_TOOLS <= reasoner_tools
     assert reviewer_tools <= READ_TOOLS
-    blocked = set(AGENTS["reviewer"]["policies"]["read_only"]["factory_params"]["blocked"])
+    blocked = set(AGENTS["reviewer"]["guardrails"]["policies"]["read_only"]["factory_params"]["blocked"])
     assert WRITE_TOOLS <= blocked
 
 
@@ -208,9 +211,8 @@ def test_mcp_endpoint_is_loopback_with_token_from_env():
 
 def _all_policy_entries():
     yield from SERVER["policies"].values()
-    yield from (ORCH.get("policies") or {}).values()
-    for spec in AGENTS.values():
-        yield from (spec.get("policies") or {}).values()
+    for spec in (ORCH, *AGENTS.values()):
+        yield from ((spec.get("guardrails") or {}).get("policies") or {}).values()
 
 
 def test_every_custom_policy_handler_exists_with_valid_params():
@@ -236,3 +238,67 @@ def test_no_secrets_in_configs():
     pattern = re.compile(r"(AIza[0-9A-Za-z_\-]{20,}|sk-[A-Za-z0-9]{20,}|password\s*:)", re.I)
     for path in OMNI.rglob("*.yaml"):
         assert not pattern.search(path.read_text(encoding="utf-8")), path
+
+
+def test_specs_use_the_omnigent_0_19_layout():
+    """Omnigent 0.19 silently ignores a top-level `policies:` in an agent spec and rejects a
+    bare `executor.harness`, so a stale layout would drop the guardrails without an error."""
+    for name, spec in {"orchestrator": ORCH, **AGENTS}.items():
+        assert "policies" not in spec, name
+        assert "harness" not in spec["executor"], name
+        assert spec["executor"]["config"]["harness"] == "openai-agents", name
+    assert set(ORCH["guardrails"]["policies"]) == {"dispatch_budget", "spawn_bounds"}
+    assert set(AGENTS["reviewer"]["guardrails"]["policies"]) == {"read_only"}
+
+
+def _omnigent_python():
+    uv = shutil.which("uv")
+    if not uv:
+        return None
+    out = subprocess.run([uv, "tool", "dir"], capture_output=True, text=True, timeout=30)
+    base = Path(out.stdout.strip()) / "omnigent"
+    for candidate in (base / "Scripts" / "python.exe", base / "bin" / "python"):
+        if candidate.exists():
+            return candidate
+    return None
+
+
+VALIDATE = """
+from pathlib import Path
+from omnigent.spec.parser import parse, parse_default_policies
+from omnigent.spec.validator import validate
+import yaml
+spec = parse(Path("omnigent/nextnode_curriculum"))
+errors = validate(spec).errors
+assert not errors, errors
+names = lambda s: sorted(p.name for p in (s.guardrails.policies or [])) if s.guardrails else []
+assert names(spec) == ["dispatch_budget", "spawn_bounds"], names(spec)
+reviewer = next(s for s in spec.sub_agents if s.name == "reviewer")
+assert names(reviewer) == ["read_only"]
+server = yaml.safe_load(open("omnigent/server_config.yaml", encoding="utf-8"))
+assert len(parse_default_policies(server["policies"])) == 3
+print("ok")
+"""
+
+
+def test_bundle_passes_the_installed_omnigent_validator():
+    python = _omnigent_python()
+    if python is None:
+        pytest.skip("Omnigent is not installed (uv tool install omnigent)")
+    env = {**os.environ, "NEXTNODE_MCP_TOKEN": "x" * 16,
+           "PYTHONPATH": str(OMNI / "policies")}
+    out = subprocess.run([str(python), "-c", VALIDATE], cwd=ROOT, env=env,
+                         capture_output=True, text=True, timeout=120)
+    assert out.returncode == 0 and "ok" in out.stdout, out.stderr[-2000:]
+
+
+def test_example_providers_cover_every_agent_and_hold_no_secret():
+    providers = _load(OMNI / "providers.example.yaml")["providers"]
+    for name, spec in {"orchestrator": ORCH, **AGENTS}.items():
+        assert spec["executor"]["auth"]["name"] in providers, name
+    vllm = providers["vllm-gpu"]["openai"]
+    assert vllm["api_key_ref"] == "keychain:vllm-gpu" and "api_key" not in vllm   # runners never see env vars
+    assert vllm["base_url"] == "http://localhost:8000/v1" and vllm["models"]["default"] == "qwen3-4b"
+    for entry in providers.values():
+        assert entry["openai"]["wire_api"] == "chat"          # Ollama has no Responses API
+        assert entry["openai"].get("api_key") in (None, "ollama")

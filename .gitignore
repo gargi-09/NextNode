@@ -12,3 +12,6 @@ __pycache__/
 .claude/
 # Local Claude Code instructions (kept on this machine only)
 CLAUDE.md
+# Omnigent: project-level config (`omnigent config set` in the repo) and --profiling output
+.omnigent/
+*.prof

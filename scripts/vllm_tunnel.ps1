@@ -3,10 +3,11 @@
 #   .\scripts\vllm_tunnel.ps1 -Deploy        # first time: apply manifests, create the API-key Secret, then tunnel
 #   .\scripts\vllm_tunnel.ps1                # later: just open the tunnel (Ctrl+C closes it)
 #   .\scripts\vllm_tunnel.ps1 -LocalPort 8001  # if the NextNode API already uses 8000
+#   .\scripts\vllm_tunnel.ps1 -Deploy -Local # rehearsal on Docker Desktop Kubernetes: CPU image, tiny model
 #
 # Exact commands this script runs (namespace nextnode-inference):
-#   kubectl apply -k deploy/k8s/vllm
-#   kubectl -n nextnode-inference rollout status deployment/vllm --timeout=20m
+#   kubectl apply -k deploy/k8s/vllm            (-Local: deploy/k8s/vllm-local)
+#   kubectl -n nextnode-inference rollout status deployment/vllm --timeout=30m
 #   kubectl -n nextnode-inference port-forward --address 127.0.0.1 svc/vllm 8000:8000
 # --address 127.0.0.1 keeps the tunnel on loopback: nothing else on your network can reach it.
 #
@@ -15,6 +16,7 @@
 #   kubectl -n nextnode-inference get secret vllm-auth -o jsonpath="{.data.api-key}"   (base64; decode it)
 param(
     [switch]$Deploy,
+    [switch]$Local,
     [int]$LocalPort = 8000,
     [string]$Namespace = "nextnode-inference",
     [string]$Context
@@ -30,11 +32,16 @@ function Quiet([scriptblock]$cmd) { $old = $ErrorActionPreference; $ErrorActionP
 if (-not (Get-Command kubectl -ErrorAction SilentlyContinue)) { Fail "kubectl is not on PATH." }
 $kc = @(); if ($Context) { $kc = @("--context", $Context) }
 $current = if ($Context) { $Context } else { Quiet { kubectl config current-context } }
-if (-not $current) { Fail "No kubectl context. Get cluster credentials first (e.g. gcloud container clusters get-credentials ...)." }
+if (-not $current) { Fail "No kubectl context. Create the cluster first: .\scripts\aws_gpu.ps1 up" }
 Write-Host "Cluster context: $current"
+# -Local only on a laptop cluster, and the GPU manifests never there (the pod would stay Pending).
+$isLocal = $current -match '^(docker-desktop|kind-.+|minikube|rancher-desktop|orbstack)$'
+if ($Deploy -and $Local -and -not $isLocal) { Fail "-Local is for a laptop cluster, but the context is '$current'. Switch: kubectl config use-context docker-desktop" }
+if ($Deploy -and -not $Local -and $isLocal) { Fail "'$current' has no GPU. Rehearse with -Deploy -Local, or switch to the cloud cluster's context." }
+$manifests = if ($Local) { "deploy\k8s\vllm-local" } else { "deploy\k8s\vllm" }
 
 if ($Deploy) {
-    kubectl @kc apply -k (Join-Path $Root "deploy\k8s\vllm")
+    kubectl @kc apply -k (Join-Path $Root $manifests)
     if ($LASTEXITCODE -ne 0) { Fail "kubectl apply failed." }
 
     Quiet { kubectl @kc -n $Namespace get secret vllm-auth } | Out-Null
@@ -53,8 +60,9 @@ if ($Deploy) {
         kubectl @kc -n $Namespace rollout restart deployment/vllm | Out-Null   # pod was waiting for the Secret
     }
 
-    Write-Host "Waiting for vLLM to load the model (first start downloads ~8 GB) ..."
-    kubectl @kc -n $Namespace rollout status deployment/vllm --timeout=20m
+    if ($Local) { Write-Host "Waiting for vLLM (first start pulls a multi-GB CPU image plus a 1.5 GB model) ..." }
+    else { Write-Host "Waiting for vLLM to load the model (first start downloads ~8 GB) ..." }
+    kubectl @kc -n $Namespace rollout status deployment/vllm --timeout=30m
     if ($LASTEXITCODE -ne 0) { Fail "vLLM is not ready. Check: kubectl -n $Namespace logs deploy/vllm" }
 }
 
@@ -74,7 +82,7 @@ try {
     }
     if (-not $ready) { Fail "Tunnel did not come up. Is the pod ready? kubectl -n $Namespace get pods" }
     Write-Host "vLLM reachable at http://localhost:$LocalPort/v1 (model qwen3-4b). Ctrl+C closes the tunnel." -ForegroundColor Green
-    Write-Host "Next, in another terminal: .\scripts\omnigent_up.ps1 -VllmPort $LocalPort"
+    Write-Host "Next, in another terminal: venv\Scripts\python scripts\vllm_smoke.py --port $LocalPort --key-from-cluster"
     Wait-Process -Id $pf.Id
 } finally {
     if (-not $pf.HasExited) { Stop-Process -Id $pf.Id -Force }

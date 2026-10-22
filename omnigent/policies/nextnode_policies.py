@@ -3,7 +3,7 @@
 Loaded by the local Omnigent server via `policy_modules: [nextnode_policies]`
 (see omnigent/server_config.yaml); the startup scripts put this directory on
 PYTHONPATH. Deliberately dependency-free — events and responses are the plain
-dicts of Omnigent's policy contract (omnigent.policies.schema, v0.18.0):
+dicts of Omnigent's policy contract (omnigent.policies.schema, v0.18.0; unchanged in v0.19.1):
 
     event    = {"type": "request" | "llm_request" | "tool_call" | ...,
                 "data": ..., "context": {"model": str, "usage": {...}},

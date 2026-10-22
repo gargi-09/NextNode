@@ -1,0 +1,25 @@
+# The two model providers the NextNode agents use (`executor.auth.name` in each agent's
+# config.yaml). Copy the entries under `providers:` in ~/.omnigent/config.yaml; keep any
+# provider Omnigent created itself (e.g. `ollama`). Configure no paid providers.
+#
+# No secret lives here or in ~/.omnigent/config.yaml: vllm-gpu reads its key from Omnigent's
+# secret store (OS keychain), which scripts/omnigent_up.* fill on each run (from the cluster
+# Secret with -KeyFromCluster, or a placeholder for the Ollama stand-in). Omnigent's runners get
+# a filtered environment, so an env: reference would not reach them.
+providers:
+  vllm-gpu:                     # Orchestrator, Parser, Reasoner: vLLM tunnel or the Ollama stand-in
+    kind: gateway
+    openai:
+      base_url: http://localhost:8000/v1
+      api_key_ref: keychain:vllm-gpu   # filled by scripts/omnigent_up.* on each run
+      wire_api: chat            # Chat Completions: vLLM and Ollama both serve it
+      models:
+        default: qwen3-4b
+  ollama-local:                 # Reviewer: a different model family, on the normal Ollama
+    kind: local
+    openai:
+      base_url: http://localhost:11434/v1
+      api_key: ollama           # placeholder: Ollama ignores keys
+      wire_api: chat
+      models:
+        default: llama3.1:8b

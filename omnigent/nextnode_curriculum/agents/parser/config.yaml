@@ -5,7 +5,8 @@ name: parser
 description: Converts raw resume or job-description text into NextNode's input JSON.
 
 executor:
-  harness: openai-agents
+  config:
+    harness: openai-agents     # Omnigent 0.19+: the harness lives under executor.config
   model: qwen3-4b               # --served-model-name in deploy/k8s/vllm/deployment.yaml
   auth:
     type: provider

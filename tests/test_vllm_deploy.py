@@ -66,6 +66,8 @@ def test_api_key_comes_from_a_secret_never_a_literal():
     assert "value" not in env["VLLM_API_KEY"]
     assert not any("api-key" in str(a) for a in VLLM["args"])
     assert POD["automountServiceAccountToken"] is False
+    # The Service is named `vllm`: service links would set VLLM_PORT=tcp://... and crash vLLM.
+    assert POD["enableServiceLinks"] is False
     assert VLLM["securityContext"]["allowPrivilegeEscalation"] is False
 
 
@@ -97,3 +99,53 @@ def test_tunnel_scripts_bind_loopback_and_match_the_service():
         assert "svc/vllm" in text and NS in text, script
         assert "0.0.0.0" not in text, script
         assert "\x0b" not in text, script
+
+
+# ─────────────────────────── AWS EKS (deploy/aws) ───────────────────────────
+
+AWS = ROOT / "deploy" / "aws"
+EKS = _load(AWS / "eksctl-cluster.yaml")
+NODEGROUP = EKS["managedNodeGroups"][0]
+# g6.xlarge: 4 vCPU / 16 GiB, of which roughly 3.9 CPU / 14.5 GiB is allocatable to pods
+G6_ALLOCATABLE = {"cpu": 3.9, "memory_gib": 14.5}
+
+
+def _gib(q: str) -> float:
+    return float(q[:-2]) if q.endswith("Gi") else float(q) / 2**30
+
+
+def test_eks_cluster_is_one_pausable_gpu_node_without_nat():
+    assert EKS["metadata"]["region"] == "us-east-1"
+    assert len(EKS["managedNodeGroups"]) == 1                     # no idle CPU nodes to pay for
+    assert NODEGROUP["instanceType"] == "g6.xlarge"               # 4 vCPU = the approved quota
+    assert NODEGROUP["minSize"] == 0 and NODEGROUP["maxSize"] == 1
+    assert EKS["vpc"]["nat"]["gateway"] == "Disable"              # NAT is ~$32/month
+    assert NODEGROUP["privateNetworking"] is False                # so nodes need public subnets
+    assert set(NODEGROUP["availabilityZones"]) <= set(EKS["availabilityZones"])
+
+
+def test_eks_can_provision_the_model_cache_volume():
+    addons = {a["name"]: a for a in EKS["addons"]}
+    assert addons["aws-ebs-csi-driver"]["wellKnownPolicies"]["ebsCSIController"] is True
+    assert EKS["iam"]["withOIDC"] is True
+    sc = _load(AWS / "storageclass-gp3.yaml")
+    assert sc["metadata"]["annotations"]["storageclass.kubernetes.io/is-default-class"] == "true"
+    assert sc["provisioner"] == "ebs.csi.aws.com" and sc["reclaimPolicy"] == "Delete"
+    assert sc["volumeBindingMode"] == "WaitForFirstConsumer"
+    assert "storageClassName" not in _load(K8S / "pvc.yaml")["spec"]   # uses the default
+
+
+def test_vllm_pod_fits_on_the_gpu_node():
+    req, lim = VLLM["resources"]["requests"], VLLM["resources"]["limits"]
+    assert float(req["cpu"]) <= G6_ALLOCATABLE["cpu"] - 1         # leave room for system pods
+    assert _gib(req["memory"]) <= _gib(lim["memory"]) <= G6_ALLOCATABLE["memory_gib"]
+
+
+def test_aws_gpu_scripts_cover_the_lifecycle_safely():
+    for script in ("aws_gpu.ps1", "aws_gpu.sh"):
+        text = (ROOT / "scripts" / script).read_text(encoding="utf-8")
+        for word in ("status", "up", "pause", "down", "eksctl-cluster.yaml", "storageclass-gp3.yaml",
+                     "L-DB2E81BA", "delete namespace", "describe-volumes"):
+            assert word in text, (script, word)
+        assert "delete" in text and ("Force" in text or "--force" in text), script   # down asks first
+        assert "\x0b" not in text and ".env" not in text.replace("Never reads or writes .env", ""), script

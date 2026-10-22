@@ -1,4 +1,4 @@
-# Local Omnigent server config for NextNode (Omnigent v0.18.0).
+# Local Omnigent server config for NextNode (Omnigent v0.19.1).
 #   omnigent server --config omnigent/server_config.yaml
 # Server-wide policies apply to EVERY session, including each sub-agent's session,
 # so the guardrails below cannot be skipped by any agent spec.

@@ -1,4 +1,4 @@
-# NextNode curriculum orchestrator — Omnigent agent spec (spec_version 1, Omnigent v0.18.0).
+# NextNode curriculum orchestrator — Omnigent agent spec (spec_version 1, Omnigent v0.19.1).
 #
 # Parser + Reasoner run on the self-hosted vLLM server (Qwen3-4B, reached through a
 # kubectl port-forward on localhost:8000). The Reasoner calls the NextNode MCP tools.
@@ -16,7 +16,8 @@ description: >-
   the curriculum against the graph before it is returned.
 
 executor:
-  harness: openai-agents
+  config:
+    harness: openai-agents     # Omnigent 0.19+: the harness lives under executor.config
   model: qwen3-4b               # --served-model-name in deploy/k8s/vllm/deployment.yaml
   auth:
     type: provider
@@ -48,7 +49,14 @@ prompt: |
   1. Parse. For each text given, dispatch `parser` with title `parse-resume-<user_id>`
      or `parse-job-<job_id>`. The message starts with `MODE: RESUME` or `MODE: JOB`
      followed by the raw text, unchanged. Dispatch both in the same turn, then end
-     your turn; the inbox wakes you.
+     your turn. Each finished sub-agent arrives as a new message containing its result.
+     Every time you are woken, do exactly this:
+       a. Look at ALL messages in this conversation, not only the newest one.
+       b. If you now have every parser result you dispatched, go to step 2 NOW, in this
+          same turn: call `sys_session_send` for `reasoner`. Do not read the inbox first.
+       c. Otherwise end your turn without calling any tool and without writing a plan.
+     Steps 3 and 4 work the same way: when the result you are waiting for is in the
+     conversation, make the next dispatch in that same turn.
   2. Reason. Dispatch `reasoner` (title `reason-<user_id>-<job_id>`) with the ids and
      the parser JSON exactly as returned. Do not edit the JSON.
   3. Review. Dispatch `reviewer` (title `review-<user_id>-<job_id>`) with the ids and
@@ -67,8 +75,8 @@ prompt: |
     workflow: report what finished, what didn't, and the denial reason. Do not retry.
   - If a sub-agent fails or returns invalid JSON, retry it once with the error
     message, then stop and report.
-  - Act in the same turn you announce an action. When dispatched sub-agents are still
-    running and your inbox is empty, end your turn; never poll.
+  - Never write "I will now ..." and then stop: either call the tool in this turn or end
+    the turn silently. Never poll or re-read the inbox; results come to you as messages.
 
 tools:
   agents:
@@ -76,17 +84,18 @@ tools:
     - reasoner
     - reviewer
 
-policies:
-  # Whole-session cap: parse x2 + reason + review + one revision + one re-review.
-  dispatch_budget:
-    type: function
-    handler: nextnode_policies.dispatch_budget
-    factory_params:
-      limit: 6
-  # Per-turn fan-out cap (builtin).
-  spawn_bounds:
-    type: function
-    handler: omnigent.policies.builtins.orchestration.spawn_bounds
-    factory_params:
-      max_dispatches_per_turn: 2
-      dispatch_tools: [sys_session_send, sys_session_create]
+guardrails:                    # Omnigent 0.19+: agent policies live under guardrails
+  policies:
+    # Whole-session cap: parse x2 + reason + review + one revision + one re-review.
+    dispatch_budget:
+      type: function
+      handler: nextnode_policies.dispatch_budget
+      factory_params:
+        limit: 6
+    # Per-turn fan-out cap (builtin).
+    spawn_bounds:
+      type: function
+      handler: omnigent.policies.builtins.orchestration.spawn_bounds
+      factory_params:
+        max_dispatches_per_turn: 2
+        dispatch_tools: [sys_session_send, sys_session_create]

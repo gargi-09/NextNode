@@ -1,0 +1,8 @@
+Alex Rivera
+Data Analyst, Brightline Retail (2022-present)
+- Built weekly sales dashboards in Python (pandas) and SQL on a Postgres warehouse.
+- Automated data cleaning pipelines with Airflow; maintain 12 production DAGs.
+- Trained a demand-forecasting model with scikit-learn as a side project.
+
+Education: B.S. Statistics. Coursework: linear algebra, NumPy, machine learning.
+Familiar with Docker and Git.

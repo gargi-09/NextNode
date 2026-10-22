@@ -1,0 +1,58 @@
+# EKS cluster for the vLLM inference server (Phase 4, docs/TDD-phase4-vllm.md).
+#
+#   scripts/aws_gpu.ps1 up      creates this cluster (15-20 min), or scales the GPU node back up
+#   scripts/aws_gpu.ps1 pause   scales the GPU node to 0 (the EKS fee, ~$0.10/h, keeps running)
+#   scripts/aws_gpu.ps1 down    deletes everything ($0/h)
+#
+# Built to be cheap for one developer:
+# - ONE managed node group with one g6.xlarge (NVIDIA L4 24 GB, 4 vCPU, 16 GiB): exactly the
+#   4-vCPU "Running On-Demand G and VT instances" quota. min 0 so it can be paused.
+# - No NAT gateway (~$32/month): nodes sit in public subnets but accept no inbound traffic
+#   except from the EKS control plane; vLLM is only reachable through kubectl port-forward.
+# - No CPU node group: system pods share the GPU node, so pausing it stops all compute.
+apiVersion: eksctl.io/v1alpha5
+kind: ClusterConfig
+
+metadata:
+  name: nextnode
+  region: us-east-1
+  tags:
+    project: nextnode
+
+# zones that offer g6.xlarge (checked with `aws ec2 describe-instance-type-offerings`)
+availabilityZones: [us-east-1a, us-east-1b]
+
+vpc:
+  nat:
+    gateway: Disable
+  clusterEndpoints:
+    publicAccess: true      # kubectl from your laptop
+    privateAccess: true
+
+iam:
+  withOIDC: true            # lets the EBS CSI driver get its own IAM role
+
+addons:
+  - name: vpc-cni
+  - name: coredns
+  - name: kube-proxy
+  # Creates EBS volumes for the model-cache PersistentVolumeClaim.
+  - name: aws-ebs-csi-driver
+    wellKnownPolicies:
+      ebsCSIController: true
+
+managedNodeGroups:
+  - name: gpu
+    instanceType: g6.xlarge
+    amiFamily: AmazonLinux2023      # eksctl picks the NVIDIA-accelerated AMI for GPU types
+    minSize: 0
+    maxSize: 1
+    desiredCapacity: 1
+    volumeSize: 100                 # vLLM image (~10 GB) + container layers; weights live on the PVC
+    volumeType: gp3
+    privateNetworking: false        # public subnets, because there is no NAT gateway
+    availabilityZones: [us-east-1a, us-east-1b]
+    labels:
+      nextnode/role: gpu
+    tags:
+      project: nextnode

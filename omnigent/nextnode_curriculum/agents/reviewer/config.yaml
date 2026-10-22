@@ -7,7 +7,8 @@ name: reviewer
 description: Verifies a curriculum against the NextNode graph and returns PASS or REVISE.
 
 executor:
-  harness: openai-agents
+  config:
+    harness: openai-agents     # Omnigent 0.19+: the harness lives under executor.config
   model: llama3.1:8b          # must stay a different family from the Reasoner's qwen3-4b
   auth:
     type: provider
@@ -30,12 +31,13 @@ tools:
       - get_job_posting
       - resolve_skills
 
-policies:
-  read_only:
-    type: function
-    handler: nextnode_policies.deny_tools
-    factory_params:
-      blocked: [upsert_user_skills, upsert_job_posting, delete_user, delete_job_posting]
+guardrails:                    # Omnigent 0.19+: agent policies live under guardrails
+  policies:
+    read_only:
+      type: function
+      handler: nextnode_policies.deny_tools
+      factory_params:
+        blocked: [upsert_user_skills, upsert_job_posting, delete_user, delete_job_posting]
 
 prompt: |
   You review a curriculum JSON drafted by another model. Do not trust it: verify it
@@ -50,7 +52,7 @@ prompt: |
   3. Ordering: call `get_skill_prerequisites` for each module skill. No module may
      appear before a module that is one of its prerequisites.
   4. `builds_on`: call `get_user_profile(user_id)`. Every listed skill must be one the
-     user actually has.
+     user actually has, or the skill of an EARLIER module (learned by then).
   5. `priority` and `why` match the roadmap step text.
   6. No URLs, course codes or provider brand names in `activities`.
   7. `estimated_hours` is an integer between 1 and 200 for every module.

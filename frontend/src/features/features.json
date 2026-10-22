@@ -1,5 +1,5 @@
 {
-  "updated": "2026-10-16",
+  "updated": "2026-10-22",
   "categories": [
     "Ontology",
     "Users",
@@ -826,20 +826,25 @@
       "id": "omnigent-workflow",
       "title": "Omnigent curriculum workflow (Parser → Reasoner → Reviewer)",
       "category": "Multi-agent",
-      "status": "designed",
+      "status": "built",
       "llm": true,
       "writes": true,
-      "summary": "An orchestrator coordinates a Parser and a Reasoner running on a self-hosted Qwen3-4B model (vLLM), where the Reasoner uses NextNode's graph tools, and a Reviewer from a different model family (Llama 3.1 on Ollama) that verifies the curriculum against the graph.",
+      "summary": "A Parser and a Reasoner on a self-hosted Qwen3-4B model, where the Reasoner uses NextNode's graph tools, and a Reviewer from a different model family (Llama 3.1) that verifies the curriculum against the graph. Runs as a fixed script on small models, or under an Omnigent orchestrator on stronger ones.",
       "how": [
-        "Agent configs, startup scripts and the design docs are written.",
-        "No Gemini calls: the agents reach vLLM through a kubectl port-forward on localhost:8000/v1.",
-        "Next: install Omnigent and Ollama and do a first run on a local model, then deploy vLLM."
+        "scripts/curriculum_run.py runs the steps in a fixed order: parse resume and job, reason with the graph tools, review with read-only tools, at most one revision. Prompts, models and tool allow-lists come from the Omnigent bundle.",
+        "Guardrails in code: each agent only gets its allow-listed tools, the reviewer never gets a write tool, tool calls are capped.",
+        "The verdict comes from the reviewer's seven checks done in code against the graph (fit score, roadmap coverage, prerequisite order, builds_on owned, copied priority and reason, no URLs, hours). The Llama 3.1 reviewer's findings are kept as advisory notes: on the first local run it reported a failure for all seven checks on a curriculum the graph confirmed correct.",
+        "The Omnigent orchestrator (omnigent/nextnode_curriculum, v0.19.1) is kept for stronger models: on Qwen3-4B it stalled after dispatching the parsers, which is why the scripted runner exists.",
+        "No Gemini calls: the agents reach vLLM (or the Ollama stand-in) on localhost:8000/v1."
       ],
       "files": [
         "omnigent/nextnode_curriculum/",
         "scripts/omnigent_up.ps1",
         "docs/TDD-phase3-omnigent.md",
-        "docs/TDD-phase4-vllm.md"
+        "docs/TDD-phase4-vllm.md",
+        "scripts/curriculum_run.py",
+        "omnigent/providers.example.yaml",
+        "tests/test_curriculum_run.py"
       ],
       "endpoints": []
     },
@@ -850,19 +855,26 @@
       "status": "built",
       "llm": false,
       "writes": false,
-      "summary": "Kubernetes manifests and tunnel scripts that run an open-weight model (Qwen3-4B) on a GPU cluster behind vLLM's OpenAI-compatible API, so the agents have no rate limit and cost only cloud credits. Written and statically tested, not deployed yet.",
+      "summary": "Kubernetes manifests, an AWS EKS cluster config and scripts that run an open-weight model (Qwen3-4B) on one cloud GPU behind vLLM's OpenAI-compatible API, so the agents have no rate limit. A $0 local rehearsal tests everything except the GPU first. GPU quota approved; not yet deployed.",
       "how": [
-        "kubectl apply -k deploy/k8s/vllm: one GPU pod, ClusterIP service only, model cache on a volume, tool calling on (hermes parser).",
+        "scripts/aws_gpu.ps1 up creates an EKS cluster with one g6.xlarge (NVIDIA L4) and no NAT gateway, or resumes it; pause scales the GPU node to 0; down deletes everything. status prints the current hourly cost.",
+        "kubectl apply -k deploy/k8s/vllm: one GPU pod, cluster-internal service only, model cache on an encrypted gp3 volume, tool calling on (hermes parser).",
         "scripts/vllm_tunnel.ps1 -Deploy creates a random API key Secret, waits for the model, then opens a loopback-only port-forward to localhost:8000/v1.",
-        "Scale to zero when idle: kubectl -n nextnode-inference scale deploy/vllm --replicas=0.",
-        "tests/test_vllm_deploy.py checks the manifests agree with the agent configs."
+        "Roughly $0.90/hour while running; tests check the manifests, the cluster config and that the pod fits the node.",
+        "Before AWS: vllm_tunnel.ps1 -Deploy -Local runs the same manifests on Docker Desktop Kubernetes (vLLM CPU image, a 0.6B model); vllm_standin.ps1 serves the real Qwen3-4B on Ollama at the same address so the agents run unchanged.",
+        "scripts/vllm_smoke.py checks any of them: API key enforced, model name, chat, structured tool calls, and (--mcp) the model calling the real MCP tools until it reports the graph's fit score."
       ],
       "files": [
         "deploy/k8s/vllm/",
+        "deploy/aws/",
+        "scripts/aws_gpu.ps1",
         "scripts/vllm_tunnel.ps1",
-        "scripts/vllm_tunnel.sh",
         "docs/TDD-phase4-vllm.md",
-        "tests/test_vllm_deploy.py"
+        "tests/test_vllm_deploy.py",
+        "deploy/k8s/vllm-local/",
+        "scripts/vllm_standin.ps1",
+        "scripts/vllm_smoke.py",
+        "tests/test_vllm_local.py"
       ],
       "endpoints": []
     },
@@ -1043,6 +1055,64 @@
       "task": "NextNode MCP server: 7 graph tools over Streamable HTTP with bearer auth, verified live against Aura",
       "features": [
         "mcp-server",
+        "omnigent-workflow"
+      ]
+    },
+    {
+      "date": "2026-10-17",
+      "task": "AWS EKS setup for vLLM: eksctl cluster (one g6.xlarge, no NAT), gp3 storage, up/pause/down scripts with cost readout; pod resources fitted to the node",
+      "features": [
+        "vllm-inference"
+      ]
+    },
+    {
+      "date": "2026-10-20",
+      "task": "Local rehearsal before AWS: CPU vLLM overlay for Docker Desktop, Ollama stand-in for Qwen3-4B, smoke test that drives the MCP tools",
+      "features": [
+        "vllm-inference"
+      ]
+    },
+    {
+      "date": "2026-10-22",
+      "task": "Local rehearsal passed on Docker Desktop Kubernetes (auth, chat, tool calls); fixed a vLLM startup crash from Kubernetes service-link env vars (enableServiceLinks: false), longer rollout deadline",
+      "features": [
+        "vllm-inference"
+      ]
+    },
+    {
+      "date": "2026-10-22",
+      "task": "Stand-in smoke test passed: local Qwen3-4B drove the real MCP tools and reported the graph's fit score. Omnigent configs moved to v0.19.1 (harness under executor.config, agent policies under guardrails), validated by Omnigent's own parser; startup scripts point runs at the guardrailed server",
+      "features": [
+        "vllm-inference",
+        "omnigent-workflow",
+        "omnigent-policies"
+      ]
+    },
+    {
+      "date": "2026-10-22",
+      "task": "Scripted curriculum runner: fixed parse -> reason -> review order with tool allow-lists in code, because the Qwen3-4B Omnigent orchestrator stalled after dispatching the parsers",
+      "features": [
+        "omnigent-workflow"
+      ]
+    },
+    {
+      "date": "2026-10-22",
+      "task": "First full local run (Qwen3-4B + Llama 3.1 on CPU, about 10 min). Fixes from it: run tool calls the reviewer writes as text, require a verdict, and add code checks that caught a module ordered before its prerequisite",
+      "features": [
+        "omnigent-workflow"
+      ]
+    },
+    {
+      "date": "2026-10-22",
+      "task": "Second local run: revision fixed the ordering, then the graph checks passed while Llama 3.1 claimed 7 failures. The verdict now comes from the graph checks (builds_on added as check 4); the reviewer model is advisory",
+      "features": [
+        "omnigent-workflow"
+      ]
+    },
+    {
+      "date": "2026-10-22",
+      "task": "Third local run: one issue left, builds_on naming a skill taught by an earlier module. Check 4 now allows skills the user has or learns in an earlier module (code check and agent prompts)",
+      "features": [
         "omnigent-workflow"
       ]
     }

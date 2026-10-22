@@ -1,0 +1,52 @@
+# Local, CPU-only rehearsal of deploy/k8s/vllm on Docker Desktop Kubernetes (or kind/minikube).
+# No GPU, no cloud, $0.
+#
+#   .\scripts\vllm_tunnel.ps1 -Deploy -Local        # macOS/Linux: scripts/vllm_tunnel.sh deploy-local
+#
+# Same namespace, Service, API-key Secret, served model name (qwen3-4b), tool-call parser and
+# probes as the GPU deployment, so the tunnel, the auth, the agents' gateway and
+# scripts/vllm_smoke.py work unchanged. Differences: vLLM's CPU image (no v0.11.0 CPU build
+# exists; v0.11.1 is the nearest) and a 0.6B model that fits a laptop. This tests the plumbing,
+# not answer quality: use scripts/vllm_standin.* (Qwen3-4B on Ollama) for a real agent run.
+apiVersion: kustomize.config.k8s.io/v1beta1
+kind: Kustomization
+resources:
+  - ../vllm
+patches:
+  - target: {kind: PersistentVolumeClaim, name: vllm-model-cache}
+    patch: |
+      - op: replace
+        path: /spec/resources/requests/storage
+        value: 5Gi
+  - target: {kind: Deployment, name: vllm}
+    patch: |
+      - op: replace
+        path: /spec/template/spec/containers/0/image
+        value: public.ecr.aws/q9t5s3a7/vllm-cpu-release-repo:v0.11.1
+      - op: replace
+        path: /spec/template/spec/containers/0/args
+        value:
+          - --model=Qwen/Qwen3-0.6B
+          - --served-model-name=qwen3-4b
+          - --host=0.0.0.0
+          - --port=8000
+          - --dtype=bfloat16
+          - --max-model-len=4096
+          - --max-num-seqs=4
+          - --enable-auto-tool-choice
+          - --tool-call-parser=hermes
+      - op: add
+        path: /spec/template/spec/containers/0/env/-
+        value: {name: VLLM_CPU_KVCACHE_SPACE, value: "1"}
+      # "auto" pins threads with set_mempolicy, which needs CAP_SYS_NICE; the pod drops all capabilities.
+      - op: add
+        path: /spec/template/spec/containers/0/env/-
+        value: {name: VLLM_CPU_OMP_THREADS_BIND, value: nobind}
+      - op: replace
+        path: /spec/template/spec/containers/0/resources
+        value:
+          requests: {cpu: "2", memory: 3Gi}
+          limits: {memory: 6Gi}
+      - op: replace
+        path: /spec/template/spec/volumes/1/emptyDir/sizeLimit
+        value: 512Mi

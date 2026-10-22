@@ -103,17 +103,17 @@
 
 <section id="workflow"><div class="wrap">
   <h2>Multi-agent workflow</h2>
-  <p class="sub">An orchestrator coordinates three agents. Every score and priority in the output is copied from
-    NextNode's deterministic graph tools, never computed by a model.</p>
+  <p class="sub">A fixed script runs three agents in order. Every score and priority in the output is copied from
+    NextNode's deterministic graph tools, never computed by a model, and the verdict comes from checks in code.</p>
   <div class="flow">
-    <div class="step"><div class="n">01 · ORCHESTRATOR</div><h3>Route work</h3>
-      <p>Dispatches each step, enforces a 6-dispatch cap and one revision at most.</p><span class="chip a">vLLM · Qwen3-4B</span></div>
+    <div class="step"><div class="n">01 · RUNNER</div><h3>Fixed order</h3>
+      <p>Parse, reason, review, one revision at most. Code, not a model: a 4B orchestrator stalled after dispatching.</p><span class="chip v">Code</span></div>
     <div class="step"><div class="n">02 · PARSER</div><h3>Text → JSON</h3>
       <p>Extracts skills with an evidence label mapped to fixed proficiency numbers.</p><span class="chip a">vLLM · Qwen3-4B</span></div>
     <div class="step"><div class="n">03 · REASONER</div><h3>Graph tools</h3>
       <p>Upserts the data, calls calculate_skill_gap and prerequisite lookups, drafts modules.</p><span class="chip a">vLLM · Qwen3-4B</span></div>
     <div class="step"><div class="n">04 · REVIEWER</div><h3>Verify</h3>
-      <p>A different model family re-runs the graph tools and returns PASS or REVISE with evidence.</p><span class="chip t">Ollama · Llama 3.1</span></div>
+      <p>Seven checks in code against the graph decide PASS or REVISE; a different model family adds advisory notes.</p><span class="chip t">Code + Llama 3.1</span></div>
     <div class="step"><div class="n">05 · OUTPUT</div><h3>Curriculum</h3>
       <p>Ordered modules, activities, hours and mastery evidence, plus unmapped skills.</p><span class="chip v">Reviewed</span></div>
   </div>
@@ -121,7 +121,7 @@
     <div class="card"><h3>Ontology</h3><p>Version-controlled JSON: skills, aliases, domains, prerequisite chains.</p></div>
     <div class="card"><h3>Neo4j graph</h3><p>Users, jobs and skills; scoring traverses up to 3 prerequisite hops.</p></div>
     <div class="card"><h3>LLM gate</h3><p>Rate limiter, content-hash cache, Gemini JSON mode, 429 with Retry-After.</p></div>
-    <div class="card"><h3>Guardrails</h3><p>Daily token/request ledger, loop guard, dispatch cap, read-only reviewer.</p></div>
+    <div class="card"><h3>Guardrails</h3><p>Tool allow-lists per agent, read-only reviewer, tool-call cap, one revision max.</p></div>
   </div>
   <p class="note">Status: the graph engine, API and web app are live. The NextNode MCP server (7 graph tools) is built and
     verified against the live graph; agent configs and guardrails are tested. Next: a first full agent run on a local model.</p>
@@ -268,10 +268,10 @@ function renderScenario() {
 }
 
 const AGENTS = [
-  ["orch", "Orchestrator", "routes the work", "vLLM · Qwen3-4B", "a"],
+  ["orch", "Runner", "fixed order", "Code", "v"],
   ["parser", "Parser", "text → JSON", "vLLM · Qwen3-4B", "a"],
   ["reasoner", "Reasoner", "graph tools", "vLLM · Qwen3-4B", "a"],
-  ["reviewer", "Reviewer", "verifies", "Ollama · Llama 3.1", "t"],
+  ["reviewer", "Reviewer", "graph checks decide", "Code + Llama 3.1", "t"],
 ];
 function renderPipeline() {
   $("pipeline").replaceChildren(...AGENTS.map(([id, name, what, model, c]) =>
@@ -301,7 +301,7 @@ async function runAgents() {
   const a = analyze(current, proficiencies);
 
   setAgent("orch", "running");
-  log("o", "orchestrator", `Task: ${current.candidate.name} → ${current.job.title}. Dispatching parser (1/6).`);
+  log("o", "runner", `Task: ${current.candidate.name} → ${current.job.title}. Step 1 of 3: parse.`);
   await sleep(550); setAgent("orch", "done");
 
   setAgent("parser", "running");
@@ -327,13 +327,13 @@ async function runAgents() {
   showResults(a);
 
   setAgent("reviewer", "running");
-  log("v", "reviewer", "Re-running the graph tools independently…"); await sleep(400);
+  log("v", "reviewer", "Checking the draft against the graph in code (Llama 3.1 adds advisory notes)…"); await sleep(400);
   const checks = review(a, modules);
   for (const [name, ok] of checks) { log(ok ? "v" : "x", "reviewer", `${ok ? "✓" : "✗"} ${name}`); await sleep(150); }
   const pass = checks.every(([, ok]) => ok);
   log(pass ? "v" : "x", "reviewer", pass ? "Verdict: PASS" : "Verdict: REVISE");
   setAgent("reviewer", "done");
-  log("o", "orchestrator", `Done: ${modules.length} modules, reviewer ${pass ? "PASS" : "REVISE"}, ${a.unmapped.length} unmapped term(s).`);
+  log("o", "runner", `Done: ${modules.length} modules, verdict ${pass ? "PASS" : "REVISE"}, ${a.unmapped.length} unmapped term(s).`);
   showReview(a, checks, modules);
   btn.disabled = false;
 }

@@ -9,7 +9,8 @@ name: reasoner
 description: Writes parsed data into NextNode, runs the gap analysis, and drafts the curriculum.
 
 executor:
-  harness: openai-agents
+  config:
+    harness: openai-agents     # Omnigent 0.19+: the harness lives under executor.config
   model: qwen3-4b               # --served-model-name in deploy/k8s/vllm/deployment.yaml
   auth:
     type: provider
@@ -63,7 +64,7 @@ prompt: |
         "skill": "<canonical name from the roadmap>",
         "priority": "<copied from the roadmap step>",
         "why": "<the roadmap step's reason, copied>",
-        "builds_on": ["<skills the user already HAS that are prerequisites>"],
+        "builds_on": ["<prerequisites the user already HAS or an EARLIER module teaches>"],
         "learn_first": ["<prerequisites the user lacks, if any>"],
         "activities": [{"type": "project" | "course" | "reading" | "practice",
                         "description": "<what to do, concretely>"}],
