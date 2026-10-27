@@ -1,0 +1,185 @@
+{
+  "version": 1,
+  "notes": "20 tasks for the harness eval (eval/run_eval.py). Each has a deterministic expectation. Tasks 1-12 are normal runs (10 pre-parsed, 2 from raw text so the parser runs); 13-20 inject faults to exercise retry, the breaker, model retries, missing graph data, rollback and the approval queue. All users and jobs use eval- ids so --cleanup can delete them.",
+  "tasks": [
+    {"id": "eval-01", "category": "normal", "description": "Data analyst to ML engineer (NLP)",
+     "user_id": "eval-01-user", "job_id": "eval-01-job",
+     "resume": {"kind": "resume", "name": "Eval 01", "target_domain": "nlp", "skills": [
+       {"name": "Python", "evidence": "professional", "proficiency": 0.8}, {"name": "SQL", "evidence": "professional", "proficiency": 0.8},
+       {"name": "Pandas", "evidence": "professional", "proficiency": 0.8}, {"name": "NumPy", "evidence": "coursework", "proficiency": 0.5}]},
+     "job": {"kind": "job", "title": "ML Engineer", "company": "Eval Co", "seniority": "mid", "domains": ["nlp"],
+       "core_skills": [{"name": "Python", "weight": 0.6}, {"name": "PyTorch", "weight": 0.6}],
+       "preferred_skills": [{"name": "HuggingFace Transformers", "weight": 0.6}], "nice_to_have_skills": []},
+     "expect": {"status": ["shipped"]}},
+
+    {"id": "eval-02", "category": "normal", "description": "Backend engineer to MLOps",
+     "user_id": "eval-02-user", "job_id": "eval-02-job",
+     "resume": {"kind": "resume", "name": "Eval 02", "target_domain": "ml_infrastructure", "skills": [
+       {"name": "Python", "evidence": "professional", "proficiency": 0.8}, {"name": "Docker", "evidence": "professional", "proficiency": 0.8},
+       {"name": "Linux", "evidence": "professional", "proficiency": 0.8}, {"name": "Git", "evidence": "professional", "proficiency": 0.8}]},
+     "job": {"kind": "job", "title": "MLOps Engineer", "company": "Eval Co", "seniority": "mid", "domains": ["ml_infrastructure"],
+       "core_skills": [{"name": "Kubernetes", "weight": 0.6}, {"name": "Docker", "weight": 0.6}],
+       "preferred_skills": [{"name": "MLflow", "weight": 0.6}], "nice_to_have_skills": []},
+     "expect": {"status": ["shipped"]}},
+
+    {"id": "eval-03", "category": "normal", "description": "Analyst to data engineer",
+     "user_id": "eval-03-user", "job_id": "eval-03-job",
+     "resume": {"kind": "resume", "name": "Eval 03", "target_domain": "data_engineering", "skills": [
+       {"name": "SQL", "evidence": "professional", "proficiency": 0.8}, {"name": "Python", "evidence": "project", "proficiency": 0.6},
+       {"name": "Tableau", "evidence": "professional", "proficiency": 0.8}]},
+     "job": {"kind": "job", "title": "Data Engineer", "company": "Eval Co", "seniority": "mid", "domains": ["data_engineering"],
+       "core_skills": [{"name": "SQL", "weight": 0.6}, {"name": "Apache Spark", "weight": 0.6}],
+       "preferred_skills": [{"name": "Apache Airflow", "weight": 0.6}], "nice_to_have_skills": []},
+     "expect": {"status": ["shipped"]}},
+
+    {"id": "eval-04", "category": "normal", "description": "Python developer to computer vision",
+     "user_id": "eval-04-user", "job_id": "eval-04-job",
+     "resume": {"kind": "resume", "name": "Eval 04", "target_domain": "computer_vision", "skills": [
+       {"name": "Python", "evidence": "professional", "proficiency": 0.8}, {"name": "NumPy", "evidence": "project", "proficiency": 0.6}]},
+     "job": {"kind": "job", "title": "Computer Vision Engineer", "company": "Eval Co", "seniority": "junior", "domains": ["computer_vision"],
+       "core_skills": [{"name": "OpenCV", "weight": 0.4}, {"name": "Python", "weight": 0.4}],
+       "preferred_skills": [{"name": "Computer Vision", "weight": 0.4}], "nice_to_have_skills": []},
+     "expect": {"status": ["shipped"]}},
+
+    {"id": "eval-05", "category": "normal", "description": "Strong candidate, small gap",
+     "user_id": "eval-05-user", "job_id": "eval-05-job",
+     "resume": {"kind": "resume", "name": "Eval 05", "target_domain": "nlp", "skills": [
+       {"name": "Python", "evidence": "led", "proficiency": 0.95}, {"name": "PyTorch", "evidence": "professional", "proficiency": 0.8},
+       {"name": "Natural Language Processing", "evidence": "professional", "proficiency": 0.8}]},
+     "job": {"kind": "job", "title": "NLP Engineer", "company": "Eval Co", "seniority": "senior", "domains": ["nlp"],
+       "core_skills": [{"name": "PyTorch", "weight": 0.8}, {"name": "Natural Language Processing", "weight": 0.8}],
+       "preferred_skills": [{"name": "LLM fine-tuning", "weight": 0.8}], "nice_to_have_skills": []},
+     "expect": {"status": ["shipped"]}},
+
+    {"id": "eval-06", "category": "normal", "description": "ML researcher to RAG engineer",
+     "user_id": "eval-06-user", "job_id": "eval-06-job",
+     "resume": {"kind": "resume", "name": "Eval 06", "target_domain": "nlp", "skills": [
+       {"name": "Python", "evidence": "professional", "proficiency": 0.8}, {"name": "Machine Learning", "evidence": "professional", "proficiency": 0.8},
+       {"name": "Elasticsearch", "evidence": "project", "proficiency": 0.6}]},
+     "job": {"kind": "job", "title": "RAG Engineer", "company": "Eval Co", "seniority": "mid", "domains": ["nlp"],
+       "core_skills": [{"name": "Retrieval-Augmented Generation", "weight": 0.6}, {"name": "Vector Databases", "weight": 0.6}],
+       "preferred_skills": [{"name": "LangChain", "weight": 0.6}], "nice_to_have_skills": []},
+     "expect": {"status": ["shipped"]}},
+
+    {"id": "eval-07", "category": "normal", "description": "Statistician to data scientist",
+     "user_id": "eval-07-user", "job_id": "eval-07-job",
+     "resume": {"kind": "resume", "name": "Eval 07", "target_domain": null, "skills": [
+       {"name": "R", "evidence": "professional", "proficiency": 0.8}, {"name": "Statistics", "evidence": "led", "proficiency": 0.95},
+       {"name": "Probability", "evidence": "professional", "proficiency": 0.8}]},
+     "job": {"kind": "job", "title": "Data Scientist", "company": "Eval Co", "seniority": "mid", "domains": [],
+       "core_skills": [{"name": "Python", "weight": 0.6}, {"name": "scikit-learn", "weight": 0.6}],
+       "preferred_skills": [{"name": "Pandas", "weight": 0.6}], "nice_to_have_skills": []},
+     "expect": {"status": ["shipped"]}},
+
+    {"id": "eval-08", "category": "normal", "description": "Cloud engineer to ML platform",
+     "user_id": "eval-08-user", "job_id": "eval-08-job",
+     "resume": {"kind": "resume", "name": "Eval 08", "target_domain": "ml_infrastructure", "skills": [
+       {"name": "AWS", "evidence": "professional", "proficiency": 0.8}, {"name": "Kubernetes", "evidence": "professional", "proficiency": 0.8},
+       {"name": "Docker", "evidence": "professional", "proficiency": 0.8}]},
+     "job": {"kind": "job", "title": "ML Platform Engineer", "company": "Eval Co", "seniority": "senior", "domains": ["ml_infrastructure"],
+       "core_skills": [{"name": "Kubernetes", "weight": 0.8}, {"name": "Ray", "weight": 0.8}],
+       "preferred_skills": [{"name": "MLOps", "weight": 0.8}], "nice_to_have_skills": []},
+     "expect": {"status": ["shipped"]}},
+
+    {"id": "eval-09", "category": "normal", "description": "Junior with little experience",
+     "user_id": "eval-09-user", "job_id": "eval-09-job",
+     "resume": {"kind": "resume", "name": "Eval 09", "target_domain": "data_engineering", "skills": [
+       {"name": "Python", "evidence": "coursework", "proficiency": 0.5}]},
+     "job": {"kind": "job", "title": "Junior Data Engineer", "company": "Eval Co", "seniority": "junior", "domains": ["data_engineering"],
+       "core_skills": [{"name": "SQL", "weight": 0.4}, {"name": "Python", "weight": 0.4}],
+       "preferred_skills": [{"name": "PostgreSQL", "weight": 0.4}], "nice_to_have_skills": []},
+     "expect": {"status": ["shipped"]}},
+
+    {"id": "eval-10", "category": "normal", "description": "Streaming data role",
+     "user_id": "eval-10-user", "job_id": "eval-10-job",
+     "resume": {"kind": "resume", "name": "Eval 10", "target_domain": "data_engineering", "skills": [
+       {"name": "Java", "evidence": "professional", "proficiency": 0.8}, {"name": "SQL", "evidence": "professional", "proficiency": 0.8},
+       {"name": "Apache Spark", "evidence": "project", "proficiency": 0.6}]},
+     "job": {"kind": "job", "title": "Streaming Data Engineer", "company": "Eval Co", "seniority": "mid", "domains": ["data_engineering"],
+       "core_skills": [{"name": "Apache Kafka", "weight": 0.6}, {"name": "Apache Spark", "weight": 0.6}],
+       "preferred_skills": [{"name": "Scala", "weight": 0.6}], "nice_to_have_skills": []},
+     "expect": {"status": ["shipped"]}},
+
+    {"id": "eval-11", "category": "normal", "description": "Raw text: the sample resume and job description (parser runs)",
+     "user_id": "eval-11-user", "job_id": "eval-11-job",
+     "resume_text": "Alex Rivera\nData Analyst, Brightline Retail (2022-present)\n- Built weekly sales dashboards in Python (pandas) and SQL on a Postgres warehouse.\n- Automated data cleaning pipelines with Airflow; maintain 12 production DAGs.\n- Trained a demand-forecasting model with scikit-learn as a side project.\nEducation: B.S. Statistics. Coursework: linear algebra, NumPy, machine learning.\nFamiliar with Docker and Git.",
+     "job_text": "Machine Learning Engineer (mid-level) - Northwind Labs\nWe build NLP features for customer support. You will train and ship transformer models.\nRequirements:\n- Strong Python and PyTorch\n- Experience with Hugging Face Transformers\n- Docker and deploying models behind an API\nStrongly preferred: Kubernetes, MLflow.\nBonus: experience with vector databases or RAG.",
+     "expect": {"status": ["shipped"]}},
+
+    {"id": "eval-12", "category": "normal", "description": "Raw text: a short computer-vision resume and job (parser runs)",
+     "user_id": "eval-12-user", "job_id": "eval-12-job",
+     "resume_text": "Sam Lee\nSoftware Engineer, 3 years. Built image-processing tools in Python with OpenCV and NumPy at a robotics startup. Coursework in linear algebra.",
+     "job_text": "Computer Vision Engineer (junior)\nRequired: Python, OpenCV. Strongly preferred: PyTorch. Bonus: Docker.",
+     "expect": {"status": ["shipped"]}},
+
+    {"id": "eval-13", "category": "fault", "description": "calculate_skill_gap times out once: retried with backoff and recovered",
+     "user_id": "eval-13-user", "job_id": "eval-13-job",
+     "resume": {"kind": "resume", "name": "Eval 13", "target_domain": "ml_infrastructure", "skills": [
+       {"name": "Python", "evidence": "professional", "proficiency": 0.8}, {"name": "Docker", "evidence": "project", "proficiency": 0.6}]},
+     "job": {"kind": "job", "title": "MLOps Engineer", "company": "Eval Co", "seniority": "mid", "domains": ["ml_infrastructure"],
+       "core_skills": [{"name": "Docker", "weight": 0.6}, {"name": "Kubernetes", "weight": 0.6}], "preferred_skills": [], "nice_to_have_skills": []},
+     "faults": {"tool": {"calculate_skill_gap": {"code": "TIMEOUT", "times": 1}}},
+     "expect": {"status": ["shipped", "needs_approval"], "min_recovered": 1}},
+
+    {"id": "eval-14", "category": "fault", "description": "The graph is unavailable twice during the user upsert: recovered on the third attempt",
+     "user_id": "eval-14-user", "job_id": "eval-14-job",
+     "resume": {"kind": "resume", "name": "Eval 14", "target_domain": "data_engineering", "skills": [
+       {"name": "SQL", "evidence": "professional", "proficiency": 0.8}, {"name": "Python", "evidence": "professional", "proficiency": 0.8}]},
+     "job": {"kind": "job", "title": "Data Engineer", "company": "Eval Co", "seniority": "mid", "domains": ["data_engineering"],
+       "core_skills": [{"name": "SQL", "weight": 0.6}, {"name": "Apache Airflow", "weight": 0.6}], "preferred_skills": [], "nice_to_have_skills": []},
+     "faults": {"tool": {"upsert_user_skills": {"code": "GRAPH_UNAVAILABLE", "times": 2}}},
+     "expect": {"status": ["shipped", "needs_approval"], "min_recovered": 1}},
+
+    {"id": "eval-15", "category": "fault", "description": "calculate_skill_gap always fails: the breaker opens and the run fails as a retrieval error",
+     "user_id": "eval-15-user", "job_id": "eval-15-job",
+     "resume": {"kind": "resume", "name": "Eval 15", "target_domain": "nlp", "skills": [
+       {"name": "Python", "evidence": "professional", "proficiency": 0.8}]},
+     "job": {"kind": "job", "title": "NLP Engineer", "company": "Eval Co", "seniority": "mid", "domains": ["nlp"],
+       "core_skills": [{"name": "PyTorch", "weight": 0.6}], "preferred_skills": [], "nice_to_have_skills": []},
+     "faults": {"tool": {"calculate_skill_gap": {"code": "GRAPH_UNAVAILABLE", "times": -1}}},
+     "expect": {"status": ["failed"], "failure_category": "retrieval", "min_breaker_opens": 1}},
+
+    {"id": "eval-16", "category": "fault", "description": "The reasoner's first answer is malformed: the JSON retry recovers",
+     "user_id": "eval-16-user", "job_id": "eval-16-job",
+     "resume": {"kind": "resume", "name": "Eval 16", "target_domain": "ml_infrastructure", "skills": [
+       {"name": "Python", "evidence": "professional", "proficiency": 0.8}, {"name": "Linux", "evidence": "professional", "proficiency": 0.8}]},
+     "job": {"kind": "job", "title": "ML Infrastructure Engineer", "company": "Eval Co", "seniority": "mid", "domains": ["ml_infrastructure"],
+       "core_skills": [{"name": "Docker", "weight": 0.6}], "preferred_skills": [{"name": "Kubernetes", "weight": 0.6}], "nice_to_have_skills": []},
+     "faults": {"model": {"reasoner": {"kind": "malformed", "times": 1}}},
+     "expect": {"status": ["shipped", "needs_approval"]}},
+
+    {"id": "eval-17", "category": "fault", "description": "The reasoner is malformed on both attempts: the run fails as a model error, nothing ships",
+     "user_id": "eval-17-user", "job_id": "eval-17-job",
+     "resume": {"kind": "resume", "name": "Eval 17", "target_domain": "nlp", "skills": [
+       {"name": "Python", "evidence": "professional", "proficiency": 0.8}]},
+     "job": {"kind": "job", "title": "NLP Engineer", "company": "Eval Co", "seniority": "mid", "domains": ["nlp"],
+       "core_skills": [{"name": "Natural Language Processing", "weight": 0.6}], "preferred_skills": [], "nice_to_have_skills": []},
+     "faults": {"model": {"reasoner": {"kind": "malformed", "times": 2}}},
+     "expect": {"status": ["failed"], "failure_category": "model"}},
+
+    {"id": "eval-18", "category": "fault", "description": "The job does not exist in the graph and no job text is given: the run fails, nothing ships",
+     "user_id": "eval-18-user", "job_id": "eval-18-missing-job",
+     "resume": {"kind": "resume", "name": "Eval 18", "target_domain": "nlp", "skills": [
+       {"name": "Python", "evidence": "professional", "proficiency": 0.8}]},
+     "expect": {"status": ["failed"]}},
+
+    {"id": "eval-19", "category": "fault", "description": "The draft and the revision are corrupted: the worse revision is rolled back and the run is queued",
+     "user_id": "eval-19-user", "job_id": "eval-19-job",
+     "resume": {"kind": "resume", "name": "Eval 19", "target_domain": "nlp", "skills": [
+       {"name": "NumPy", "evidence": "project", "proficiency": 0.6}, {"name": "SQL", "evidence": "professional", "proficiency": 0.8}]},
+     "job": {"kind": "job", "title": "ML Engineer", "company": "Eval Co", "seniority": "mid", "domains": ["nlp"],
+       "core_skills": [{"name": "Python", "weight": 0.6}, {"name": "PyTorch", "weight": 0.6}],
+       "preferred_skills": [{"name": "HuggingFace Transformers", "weight": 0.6}], "nice_to_have_skills": []},
+     "faults": {"draft": "reverse_modules", "revision": "reverse_modules_and_fit"},
+     "expect": {"status": ["needs_approval"], "rollback": true}},
+
+    {"id": "eval-20", "category": "fault", "description": "Many skills are not in the ontology: low confidence, queued for approval",
+     "user_id": "eval-20-user", "job_id": "eval-20-job",
+     "resume": {"kind": "resume", "name": "Eval 20", "target_domain": null, "skills": [
+       {"name": "Python", "evidence": "professional", "proficiency": 0.8}, {"name": "Basket Weaving", "evidence": "led", "proficiency": 0.95},
+       {"name": "Quantum Knitting", "evidence": "project", "proficiency": 0.6}, {"name": "Underwater Welding", "evidence": "professional", "proficiency": 0.8}]},
+     "job": {"kind": "job", "title": "Data Scientist", "company": "Eval Co", "seniority": "mid", "domains": [],
+       "core_skills": [{"name": "Python", "weight": 0.6}, {"name": "scikit-learn", "weight": 0.6}], "preferred_skills": [], "nice_to_have_skills": []},
+     "expect": {"status": ["needs_approval"]}}
+  ]
+}
