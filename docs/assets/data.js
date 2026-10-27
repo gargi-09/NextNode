@@ -1620,7 +1620,7 @@ window.NEXTNODE = {
    "status": "live",
    "llm": false,
    "writes": false,
-   "summary": "184 tests that need no database, no API key and no network: golden scores, Cypher contracts, the breaker, the limiter, payloads, MCP tools, Omnigent configs, the agent runner, Kubernetes manifests and demo parity. GitHub Actions runs them, plus frontend lint and build, on every push.",
+   "summary": "207 tests that need no database, no API key and no network: golden scores, Cypher contracts, the breaker, the limiter, payloads, MCP tools, Omnigent configs, the agent runner and harness, Kubernetes manifests and demo parity. GitHub Actions runs them, plus frontend lint and build, on every push.",
    "how": [
     "Run: python -m pytest   (frontend: npm --prefix frontend run lint)",
     ".github/workflows/ci.yml: Python tests (with Node, for the demo parity test) and frontend lint + build. No secrets needed.",
@@ -1676,6 +1676,29 @@ window.NEXTNODE = {
     "scripts/curriculum_run.py",
     "omnigent/providers.example.yaml",
     "tests/test_curriculum_run.py"
+   ],
+   "endpoints": []
+  },
+  {
+   "id": "agent-harness",
+   "title": "Agent harness (recovery, checkpoints, approvals, traces)",
+   "category": "Multi-agent",
+   "status": "built",
+   "llm": true,
+   "writes": true,
+   "summary": "Runs the curriculum agents with production-style recovery: per-tool retry with backoff and circuit breakers, a checkpoint after every stage with resume and rollback, an approval queue for low-confidence results, deterministic evaluators, OpenTelemetry traces, model record/replay and a 20-task eval with fault injection.",
+   "how": [
+    "python -m harness run --user-id u --job-id j --resume cv.txt --job jd.txt runs parse, draft, verify and at most one revision; a revision that makes the draft worse is rolled back.",
+    "Tool errors are classified from the MCP server's codes: GRAPH_UNAVAILABLE and timeouts are retried with exponential backoff (3 attempts); NOT_FOUND and invalid input fail at once; 3 failed calls open that tool's breaker for 30 s.",
+    "A REVISE verdict, a rollback or 3+ unmapped skills sends the run to the approval queue (python -m harness approvals list / approve / reject) instead of shipping it.",
+    "Seven evaluators in the Phoenix evals shape recompute the verdict from graph facts; the reviewer model is recorded as an advisory LLM annotation.",
+    "Spans for each run, stage, model turn and tool call (only allow-listed attributes, never arguments or resume text) go to .omnigent-logs/runs/<id>/traces.jsonl, or over OTLP to Phoenix when OTEL_EXPORTER_OTLP_ENDPOINT is set.",
+    "python -m eval.run_eval --mode record once, then --mode replay: 20 tasks (8 with injected faults), with success rate, p50/p95 latency, tokens and failure causes written to eval/results/latest.md."
+   ],
+   "files": [
+    "harness/",
+    "eval/",
+    "tests/test_harness.py"
    ],
    "endpoints": []
   },
@@ -2182,6 +2205,14 @@ window.NEXTNODE = {
    "date": "2026-10-27",
    "task": "System design doc (docs/DESIGN.md), README with measured results and limitations, and GitHub Actions CI for tests, lint and build",
    "features": [
+    "test-suite"
+   ]
+  },
+  {
+   "date": "2026-10-27",
+   "task": "Agent harness: per-tool retry and breakers, checkpoints with resume and rollback, approval queue, Phoenix-style evaluators, OpenTelemetry traces, record/replay and a 20-task eval with fault injection",
+   "features": [
+    "agent-harness",
     "test-suite"
    ]
   }

@@ -14,12 +14,13 @@ flowchart LR
   API -->|"resolve names"| ONT["Ontology (60 skills, 107 aliases)"]
   API -->|"Cypher via circuit breaker"| NEO[("Neo4j Aura")]
   API --> SCORE["Deterministic scoring + roadmap"]
-  RUN["Agent runner (curriculum_run.py)"] -->|"MCP, bearer token, loopback"| MCP["MCP server (7 tools)"]
+  RUN["Agent harness (harness/)"] -->|"MCP: retry, breaker per tool"| MCP["MCP server (7 tools)"]
   MCP --> ONT
   MCP -->|"same services as the API"| NEO
   RUN -->|"OpenAI-compatible"| QWEN["Qwen3-4B: vLLM or Ollama"]
   RUN -->|"advisory review"| LLAMA["Llama 3.1 8B: Ollama"]
   RUN -->|"verdict"| CHECKS["7 graph checks in code"]
+  RUN -->|"checkpoints, approvals, spans"| LOGS[("Run store + OTel traces")]
 ```
 
 ## The core split: neural reads, symbolic decides
@@ -41,6 +42,10 @@ when the LLM is down: only parsing new text needs it.
 | **Model rate limit** | Global limiter (8/min, 200/day, Pacific-midnight reset) checks before any network call; Gemini 429s are classified | No retry on 429; repeated text is served from a content-hash cache; explanations stop at 80% of the daily budget so parsing keeps working | 429 with Retry-After and a "free-tier budget reached" banner |
 | **Malformed model output** | JSON parse + Pydantic schema validation; in the agent runner, a missing verdict or a tool call written as text | One retry with the error, then a typed error (HTTP 502) or a failed run; text-written tool calls are executed if the tool is allow-listed | An error naming the step, never a half-valid result |
 | **Orchestrator stalls** (measured: a Qwen3-4B Omnigent orchestrator stalled after dispatching in 2 of 2 runs) | The run stops progressing after the parsers finish | Orchestration moved into code: a fixed parse → reason → review sequence, one revision max, tool calls capped at 25 per agent | Each step printed live; the run always ends with a verdict |
+
+## The agent harness
+
+`harness/` wraps the agents in a fixed stage machine: parse, draft, verify, at most one revision, then ship or queue. Every stage ends in a checkpoint, so a run resumes after its last good stage (graph writes are idempotent upserts). Every tool call goes through a retry layer (transient errors only, exponential backoff with jitter, 3 attempts) and a breaker per tool. A revision that verifies worse than the draft it replaces is rolled back. Results that are not clearly good (REVISE, a rollback, 3+ unmapped skills) go to an approval queue, never straight to the user. Failures are classified as retrieval, model or execution. A 20-task eval injects faults deterministically to exercise each of these paths; model answers are recorded once and replayed, while tool calls always hit the real graph.
 
 ## Tradeoffs
 
@@ -70,6 +75,8 @@ when the LLM is down: only parsing new text needs it.
 | Agent runner | 25 tool calls per agent, 1 revision, 6,000 characters per tool result (fits a 16k context) |
 | Full agent run, laptop CPU (Qwen3-4B + Llama 3.1 on Ollama) | 1,238–1,246 s in the two complete runs with a revision |
 | Neo4j breaker | Opens after 3 failures in 60 s, 30 s cooldown |
+| Harness, per tool | 3 attempts for transient errors; breaker opens after 3 failed calls, 30 s cooldown |
+| Harness, per run | 1 revision; approval when REVISE, rolled back, or 3+ unmapped skills |
 
 ## What I did not build
 
@@ -80,4 +87,4 @@ when the LLM is down: only parsing new text needs it.
 - **No real traffic.** Single user, local runs only; no load testing.
 - **No multi-tenancy or auth on the REST API.** It is meant for local use; only the MCP server
   requires a token.
-- **No shared state** for the rate limiter, cache or agent runs across processes.
+- **No shared state** for the rate limiter, cache or agent runs across processes; the approval queue and checkpoints are local files.

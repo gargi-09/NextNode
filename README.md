@@ -8,6 +8,26 @@ AI-powered career intelligence tool that thinks in graphs. Paste your resume and
 
 **[docs/DESIGN.md](docs/DESIGN.md)**: one page with the component diagram, the neural/symbolic split, how each failure mode is detected and handled, the tradeoffs (with measured evidence), limits, and what is not built. Phase-level details: [graph and scoring](docs/TDD-phase1-2.md), [MCP server and agents](docs/TDD-phase3-omnigent.md), [self-hosted inference](docs/TDD-phase4-vllm.md).
 
+## Agent harness
+
+`harness/` runs the curriculum agents (Parser, Reasoner, Reviewer on self-hosted Qwen3-4B and Llama 3.1) with production-style recovery on top of NextNode's MCP graph tools:
+
+- **Per-tool retry and circuit breakers:** transient errors (`GRAPH_UNAVAILABLE`, timeouts) are retried with exponential backoff (3 attempts); `NOT_FOUND` and invalid input fail at once; 3 failed calls open that tool's breaker for 30 s.
+- **Checkpoints, resume and rollback:** state is saved after every stage; `--resume-run` continues after the last good stage; a revision that makes the draft worse is rolled back.
+- **Approval queue:** a REVISE verdict, a rollback or 3+ unmapped skills sends the run to a human instead of shipping it.
+- **Deterministic evaluators** (the shape of my Phoenix evals project) decide the verdict from graph facts; the reviewer model is an advisory annotation.
+- **OpenTelemetry traces** for each run, stage, model turn and tool call, with no arguments or resume text in spans; local JSONL, or OTLP to Phoenix via `OTEL_EXPORTER_OTLP_ENDPOINT`.
+- **A 20-task eval** with fault injection (timeouts, a dead tool, malformed model output, a missing job, rollback, low confidence), recorded once with live models and replayed after.
+
+```bash
+venv\Scripts\python -m harness run --user-id demo-user --job-id demo-job --resume omnigent\samples\resume.txt --job omnigent\samples\jd.txt
+venv\Scripts\python -m harness approvals list
+venv\Scripts\python -m eval.run_eval --mode record    # once, live models (hours on a laptop CPU)
+venv\Scripts\python -m eval.run_eval --mode replay    # after: recorded model answers, real graph
+```
+
+Eval results land in `eval/results/latest.md`; only measured numbers are reported there.
+
 ## What makes it different
 
 Most career tools are keyword matchers. Nextnode models skills as a graph — with prerequisite relationships, domain clusters, and transferability weights — then runs deterministic symbolic rules over that graph to compute scores. The LLM handles unstructured extraction; the graph handles reasoning. Same input always produces the same output, and every score is explainable.
@@ -167,6 +187,8 @@ nextnode/
 ├── omnigent/         # multi-agent workflow configs and policies
 ├── deploy/k8s/       # vLLM manifests (vllm/) and the local CPU rehearsal overlay (vllm-local/)
 ├── deploy/aws/       # EKS cluster config (written, not deployed)
+├── harness/          # agent harness: retry/breakers, checkpoints, approvals, evaluators, traces
+├── eval/             # 20 harness eval tasks, the eval runner, results
 ├── scripts/          # seed builder, page generator, agent runner, smoke tests, startup scripts
 └── tests/
 ```
@@ -184,7 +206,7 @@ Only numbers measured in this repo or on my laptop; nothing estimated.
 
 | What | Result |
 |---|---|
-| Automated tests | 184 passing (run on every push by GitHub Actions) |
+| Automated tests | 207 passing (run on every push by GitHub Actions) |
 | Ontology | 60 skills, 107 aliases, 46 prerequisite edges, 4 domains |
 | Pages demo vs. Python engine | Scores match exactly (parity test runs the JavaScript port under Node) |
 | vLLM on a local Kubernetes cluster (CPU, Qwen3-0.6B) | Smoke test 5/5: key enforced, model name, chat, structured tool call |
