@@ -4,6 +4,10 @@
 
 AI-powered career intelligence tool that thinks in graphs. Paste your resume and a job description, get back a personalized fit score, skill gap breakdown, learning roadmap, and career pivot analysis — all powered by a neurosymbolic reasoning engine built on a knowledge graph.
 
+## Design
+
+**[docs/DESIGN.md](docs/DESIGN.md)**: one page with the component diagram, the neural/symbolic split, how each failure mode is detected and handled, the tradeoffs (with measured evidence), limits, and what is not built. Phase-level details: [graph and scoring](docs/TDD-phase1-2.md), [MCP server and agents](docs/TDD-phase3-omnigent.md), [self-hosted inference](docs/TDD-phase4-vllm.md).
+
 ## What makes it different
 
 Most career tools are keyword matchers. Nextnode models skills as a graph — with prerequisite relationships, domain clusters, and transferability weights — then runs deterministic symbolic rules over that graph to compute scores. The LLM handles unstructured extraction; the graph handles reasoning. Same input always produces the same output, and every score is explainable.
@@ -24,7 +28,8 @@ Most career tools are keyword matchers. Nextnode models skills as a graph — wi
 - **Gemini 2.5 Flash** — skill extraction and explanation
 - **React + Vite + Tailwind** — frontend
 - **D3.js** — skill graph visualization
-- **Google Cloud Run** — deployment target
+- **MCP (Model Context Protocol)** — 7 graph tools for AI agents
+- **Omnigent, Ollama, vLLM, Kubernetes** — multi-agent workflow and self-hosted models (Qwen3-4B, Llama 3.1)
 
 ## How it works
 
@@ -42,8 +47,8 @@ Most career tools are keyword matchers. Nextnode models skills as a graph — wi
 ## Setup
 
 ```bash
-git clone https://github.com/yourusername/nextnode
-cd nextnode
+git clone https://github.com/gargi-09/NextNode
+cd NextNode
 python -m venv venv && source venv/bin/activate
 pip install -r requirements.txt
 ```
@@ -160,8 +165,9 @@ nextnode/
 ├── frontend/         # React 19 + Vite UI
 ├── docs/             # GitHub Pages demo + sandbox, design docs (TDDs)
 ├── omnigent/         # multi-agent workflow configs and policies
-├── deploy/k8s/vllm/  # self-hosted model server manifests (Phase 4)
-├── scripts/          # seed builder, migrations, page generator, startup scripts
+├── deploy/k8s/       # vLLM manifests (vllm/) and the local CPU rehearsal overlay (vllm-local/)
+├── deploy/aws/       # EKS cluster config (written, not deployed)
+├── scripts/          # seed builder, page generator, agent runner, smoke tests, startup scripts
 └── tests/
 ```
 
@@ -172,5 +178,35 @@ Nodes: `Skill`, `User`, `JobPosting`, `Domain`
 Key relationships: `HAS_SKILL` (proficiency), `REQUIRES_SKILL` (importance + weight),
 `PREREQUISITE_OF` (strength), `BELONGS_TO` (skill → domain), `TARGETS`, `IN_DOMAIN`
 
+## Measured results
+
+Only numbers measured in this repo or on my laptop; nothing estimated.
+
+| What | Result |
+|---|---|
+| Automated tests | 184 passing (run on every push by GitHub Actions) |
+| Ontology | 60 skills, 107 aliases, 46 prerequisite edges, 4 domains |
+| Pages demo vs. Python engine | Scores match exactly (parity test runs the JavaScript port under Node) |
+| vLLM on a local Kubernetes cluster (CPU, Qwen3-0.6B) | Smoke test 5/5: key enforced, model name, chat, structured tool call |
+| Qwen3-4B (Ollama) driving the real MCP tools | Called `calculate_skill_gap` with the right ids and reported the graph's exact fit score |
+| Full agent run on a laptop CPU (Qwen3-4B + Llama 3.1) | 1,238–1,246 s for the two complete runs with a revision |
+| Omnigent orchestrator on Qwen3-4B | Stalled after dispatching in 2 of 2 runs, which is why orchestration moved into code |
+| Llama 3.1 8B as reviewer | Reported all 7 checks failing on a curriculum the graph checks passed, so its findings are advisory |
+
+## Limitations
+
+- **The public demo runs in your browser.** It uses an in-browser copy of the API and the
+  scoring engine with sample data; it does not touch Neo4j or any model. The live path (FastAPI,
+  Neo4j, Gemini, agents) runs locally.
+- **Not deployed to the cloud.** The EKS config is written but no cluster exists, and Cloud Run is
+  not set up.
+- **Not tested under real traffic.** Single user, local runs only.
+- **No auth or multi-tenancy on the REST API**; it is meant for local use. Only the MCP server
+  requires a token.
+- **Small local models are slow and imperfect.** A full agent run takes about 20 minutes on CPU,
+  and the 4B parser underrates some skills.
+
 ## Status
-Work in progress.
+
+Phases 1–3 built and tested; Phase 4 (self-hosted inference) rehearsed locally, cloud
+deployment pending.
