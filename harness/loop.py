@@ -1,4 +1,6 @@
-"""The harness loop: parse -> draft -> verify -> (revise, maybe roll back) -> ship or queue.
+"""The harness loop: parse -> ingest -> draft -> verify -> (revise, maybe roll back) -> ship or queue.
+
+Graph writes (ingest) happen in code; the models only read the graph and write the plan.
 
 Every stage ends in a checkpoint. A failure is classified by where it happened:
   retrieval  the graph could not answer (tool errors, circuit open, missing user or job)
@@ -15,7 +17,7 @@ from pathlib import Path
 
 import httpx
 
-from curriculum_run import Agent, graph_facts, load_agent, require_verdict
+from curriculum_run import WRITE_TOOLS, Agent, graph_facts, load_agent, require_verdict
 from harness import RUNS_DIR
 from harness.approvals import ApprovalQueue
 from harness.checkpoints import Checkpoints
@@ -136,10 +138,15 @@ class Harness:
                 state["parsed"] = parsed
                 cp.save("parsed", state)
 
+        if "ingested" not in state:
+            with tracer.span("stage", {"stage": "ingest"}):
+                state["ingested"] = await self._ingest(task, state["parsed"], tools)
+                cp.save("ingested", state)
+
         if "draft" not in state:
             with tracer.span("stage", {"stage": "draft"}):
                 reasoner = self._reasoner(task, usage, faults, tracer, tools)
-                draft = await self._ask(reasoner, self._task_text(task, state["parsed"]))
+                draft = await self._ask(reasoner, self._task_text(task, state["ingested"]))
                 state["draft"] = faults.corrupt("draft", draft)
                 state["curriculum"] = state["draft"]
                 cp.save("drafted", state)
@@ -152,7 +159,7 @@ class Harness:
             with tracer.span("stage", {"stage": "revise"}) as span:
                 if reasoner is None:      # resumed run: the reasoner's conversation is gone, restate it
                     reasoner = self._reasoner(task, usage, faults, tracer, tools)
-                    reasoner.messages.append({"role": "user", "content": self._task_text(task, state["parsed"])})
+                    reasoner.messages.append({"role": "user", "content": self._task_text(task, state["ingested"])})
                     reasoner.messages.append({"role": "assistant", "content": json.dumps(state["curriculum"])})
                 revised = await self._ask(reasoner, "Issues to fix:\n" + json.dumps(state["issues"]))
                 revised = faults.corrupt("revision", revised)
@@ -168,16 +175,44 @@ class Harness:
         return state
 
     def _reasoner(self, task, usage, faults, tracer, tools) -> Agent:
+        # the harness has already written the user and the job: the reasoner only reads
         return Agent(self.specs["reasoner"], self._model("reasoner", task, usage, faults, tracer),
-                     tools.call, self.mcp_tools)
+                     tools.call, [t for t in self.mcp_tools if t.name not in WRITE_TOOLS])
 
     @staticmethod
-    def _task_text(task: Task, parsed: dict) -> str:
-        text = f"user_id: {task.user_id}\njob_id: {task.job_id}\n"
-        for kind in ("resume", "job"):
-            if kind in parsed:
-                text += f"\n{kind.upper()} JSON:\n{json.dumps(parsed[kind])}\n"
-        return text
+    async def _ingest(task: Task, parsed: dict, tools: ToolRunner) -> dict:
+        """Write the parsed resume and job to the graph in code, before any model drafts.
+        Leaving this to the reasoner failed when it skipped the upsert and went straight to the
+        gap analysis (eval-11), or when its upsert turn came back malformed (eval-16)."""
+        calls = []
+        if "resume" in parsed:
+            r = parsed["resume"]
+            calls.append(("upsert_user_skills", {
+                "user_id": task.user_id, "name": r.get("name"), "target_domain": r.get("target_domain"),
+                "skills": [{"name": s["name"], "proficiency": s["proficiency"]}
+                           for s in r.get("skills") or [] if s.get("name") and s.get("proficiency") is not None]}))
+        if "job" in parsed:
+            j = parsed["job"]
+            calls.append(("upsert_job_posting", {
+                "job_id": task.job_id, "title": j.get("title") or task.job_id, "company": j.get("company"),
+                "seniority": j.get("seniority"), "domains": j.get("domains") or [],
+                **{k: [{"name": s["name"], "weight": s["weight"]} for s in j.get(k) or []
+                       if s.get("name") and s.get("weight") is not None]
+                   for k in ("core_skills", "preferred_skills", "nice_to_have_skills")}}))
+        unmapped = []
+        for name, args in calls:
+            ok, text = await tools.call(name, {k: v for k, v in args.items() if v is not None})
+            if not ok:
+                raise StageError("retrieval", f"{name} failed: {text[:300]}")
+            unmapped += json.loads(text).get("unmapped_skills") or []
+        return {"stored": [name for name, _ in calls], "unmapped_skills": unmapped}
+
+    @staticmethod
+    def _task_text(task: Task, ingested: dict) -> str:
+        return (f"user_id: {task.user_id}\njob_id: {task.job_id}\n\n"
+                "The user and the job are already stored in NextNode: skip step 1 and start with "
+                "calculate_skill_gap.\n"
+                f"unmapped_skills from the upserts: {json.dumps(ingested.get('unmapped_skills') or [])}\n")
 
     @staticmethod
     async def _ask(agent: Agent, content: str, max_tokens: int = 2048, validate=None) -> dict:

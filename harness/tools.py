@@ -5,8 +5,10 @@
 Errors are classified from the MCP server's coded JSON (app/mcp_server.py):
   transient  GRAPH_UNAVAILABLE, INTERNAL, a timeout     -> retried with exponential backoff + jitter
   permanent  NOT_FOUND, INVALID_INPUT, UNPROCESSABLE, CONFLICT, CIRCUIT_OPEN -> returned at once
-Each tool has its own breaker: 3 consecutive failed calls (after retries) open it for 30 s,
-then one probe call is let through. Another tool keeps working while one is open.
+Each tool has its own breaker inside the retry loop (the usual retry(breaker(call)) layering):
+every transient failure counts, so 3 in a row open it for 30 s, retrying stops, and later
+calls fail fast with CIRCUIT_OPEN until one probe is let through. A permanent error means the
+tool answered, so it resets the count. Another tool keeps working while one is open.
 """
 import asyncio
 import json
@@ -112,6 +114,8 @@ class ToolRunner:
                 return False, coded("CIRCUIT_OPEN", f"{name} is failing; circuit open for "
                                                     f"{breaker.cooldown_s:.0f}s. Do not call it again now.")
             for attempt in range(1, self.max_attempts + 1):
+                if attempt > 1 and not breaker.allow():
+                    break                         # opened during this call: stop retrying
                 self.stats.attempts += 1
                 t = time.monotonic()
                 ok, text = await self._attempt(name, arguments)
@@ -126,13 +130,16 @@ class ToolRunner:
                     _set(span, attempts=attempt, outcome="ok")
                     return True, text
                 self._count(code)
-                if code not in TRANSIENT or attempt == self.max_attempts:
+                if code not in TRANSIENT:
+                    breaker.success()             # the tool answered: it is up, the request was bad
+                    break
+                opens_before = breaker.opens
+                breaker.failure()
+                self.stats.breaker_opens += breaker.opens - opens_before
+                if attempt == self.max_attempts or not breaker.allow():
                     break
                 self.stats.retries += 1
                 await self._sleep(self.backoff(attempt))
-            opens_before = breaker.opens
-            breaker.failure()
-            self.stats.breaker_opens += breaker.opens - opens_before
             self.stats.failed += 1
             _set(span, attempts=attempt, outcome=code)
             return False, text

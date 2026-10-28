@@ -144,5 +144,8 @@ def test_rerunning_record_mode_skips_tasks_already_recorded(tmp_path):
     fixture.turns("eval-01", "reasoner").append({"hash": "h", "response": {}})
     progress = tmp_path / "progress.json"
     progress.write_text(json.dumps({"eval-01": {"cause": None}, "eval-02": {"cause": None}}), encoding="utf-8")
-    assert set(run_eval.load_progress(fixture, fresh=False, path=progress)) == {"eval-01"}  # eval-02 has no answers
-    assert run_eval.load_progress(fixture, fresh=True, path=progress) == {}
+    assert set(run_eval.load_progress(fixture, path=progress)) == {"eval-01"}   # eval-02 has no answers
+    assert run_eval.load_progress(fixture, fresh={"eval-01"}, path=progress) == {}
+    fixture.turns("eval-02", "reasoner").append({"hash": "h", "response": {}})
+    # --fresh --only eval-01 must keep eval-02's progress
+    assert set(run_eval.load_progress(fixture, fresh={"eval-01"}, path=progress)) == {"eval-02"}

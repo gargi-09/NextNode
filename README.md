@@ -12,7 +12,8 @@ AI-powered career intelligence tool that thinks in graphs. Paste your resume and
 
 `harness/` runs the curriculum agents (Parser, Reasoner, Reviewer on self-hosted Qwen3-4B and Llama 3.1) with production-style recovery on top of NextNode's MCP graph tools:
 
-- **Per-tool retry and circuit breakers:** transient errors (`GRAPH_UNAVAILABLE`, timeouts) are retried with exponential backoff (3 attempts); `NOT_FOUND` and invalid input fail at once; 3 failed calls open that tool's breaker for 30 s.
+- **Per-tool retry and circuit breakers:** transient errors (`GRAPH_UNAVAILABLE`, timeouts) are retried with exponential backoff (3 attempts); `NOT_FOUND` and invalid input fail at once; 3 failed attempts in a row open that tool's breaker for 30 s, which stops the retries and fails later calls fast.
+- **Graph writes in code:** the harness stores the parsed resume and job itself; the models only read the graph and write the plan.
 - **Checkpoints, resume and rollback:** state is saved after every stage; `--resume-run` continues after the last good stage; a revision that makes the draft worse is rolled back.
 - **Approval queue:** a REVISE verdict, a rollback or 3+ unmapped skills sends the run to a human instead of shipping it.
 - **Deterministic evaluators** (the shape of my Phoenix evals project) decide the verdict from graph facts; the reviewer model is an advisory annotation.
@@ -206,7 +207,7 @@ Only numbers measured in this repo or on my laptop; nothing estimated.
 
 | What | Result |
 |---|---|
-| Automated tests | 213 passing (run on every push by GitHub Actions) |
+| Automated tests | 217 passing (run on every push by GitHub Actions) |
 | Ontology | 60 skills, 107 aliases, 46 prerequisite edges, 4 domains |
 | Pages demo vs. Python engine | Scores match exactly (parity test runs the JavaScript port under Node) |
 | vLLM on a local Kubernetes cluster (CPU, Qwen3-0.6B) | Smoke test 5/5: key enforced, model name, chat, structured tool call |

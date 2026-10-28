@@ -149,9 +149,9 @@ def test_breaker_opens_per_tool_and_recovers_after_cooldown():
     graph = FakeGraph(fail={"calculate_skill_gap": ["GRAPH_UNAVAILABLE"] * 9})
     tools = ToolRunner(graph, max_attempts=3, breaker_threshold=3, breaker_cooldown_s=30,
                        sleep=no_sleep, clock=lambda: now[0])
-    for _ in range(3):
-        assert not run(tools.call("calculate_skill_gap", {}))[0]
+    assert not run(tools.call("calculate_skill_gap", {}))[0]       # 3 failed attempts open it
     assert tools.breaker("calculate_skill_gap").state == "open" and tools.stats.breaker_opens == 1
+    assert len(graph.calls) == 3 and tools.stats.retries == 2
     before = len(graph.calls)
     ok, text = run(tools.call("calculate_skill_gap", {}))
     assert error_code(text) == "CIRCUIT_OPEN" and len(graph.calls) == before   # not called while open
@@ -160,6 +160,17 @@ def test_breaker_opens_per_tool_and_recovers_after_cooldown():
     graph.fail["calculate_skill_gap"] = []
     assert run(tools.call("calculate_skill_gap", {}))[0]
     assert tools.breaker("calculate_skill_gap").state == "closed"
+
+
+def test_the_breaker_stops_retries_and_a_permanent_error_resets_it():
+    graph = FakeGraph(fail={"calculate_skill_gap": ["GRAPH_UNAVAILABLE", "GRAPH_UNAVAILABLE", "NOT_FOUND",
+                                                    "GRAPH_UNAVAILABLE", "GRAPH_UNAVAILABLE"]})
+    tools = ToolRunner(graph, max_attempts=5, breaker_threshold=2, sleep=no_sleep)
+    run(tools.call("calculate_skill_gap", {}))
+    assert len(graph.calls) == 2 and tools.breaker("calculate_skill_gap").state == "open"   # 2 of 5 attempts
+    tools = ToolRunner(graph, max_attempts=3, breaker_threshold=2, sleep=no_sleep)
+    ok, text = run(tools.call("calculate_skill_gap", {}))                   # NOT_FOUND: the tool answered
+    assert error_code(text) == "NOT_FOUND" and tools.breaker("calculate_skill_gap").state == "closed"
 
 
 def test_breaker_reopens_when_the_probe_fails():
@@ -259,9 +270,42 @@ def test_a_good_draft_ships(tmp_path):
     assert result["status"] == "shipped" and result["verdict"] == "PASS" and result["revisions"] == 0
     assert result["tokens"] == {"prompt": 200, "completion": 20, "total": 220, "model_calls": 2, "source": "live"}
     assert sorted(p.name for p in (tmp_path / "runs" / "r").glob("checkpoint-*")) == [
-        "checkpoint-01-parsed.json", "checkpoint-02-drafted.json", "checkpoint-03-verified.json",
-        "checkpoint-05-final.json"]
+        "checkpoint-01-parsed.json", "checkpoint-02-ingested.json", "checkpoint-03-drafted.json",
+        "checkpoint-04-verified.json",
+        "checkpoint-06-final.json"]
     assert not h.approvals.pending()
+
+
+def test_the_harness_writes_the_user_and_job_and_the_reasoner_only_reads(tmp_path):
+    graph = FakeGraph()
+    h, models = make(tmp_path, REASONER_OK, graph)
+    seen = []
+    handler = models.client()._transport.handler
+
+    def spy(request):
+        seen.append({t["function"]["name"] for t in json.loads(request.content).get("tools") or []})
+        return handler(request)
+
+    client = httpx.Client(base_url="http://fake", transport=httpx.MockTransport(spy))
+    h.clients = {"vllm-gpu": client, "ollama-local": client}
+    result = run(h.run(TASK))
+    assert result["status"] == "shipped"
+    assert graph.calls[:2] == ["upsert_user_skills", "upsert_job_posting"]        # in code, before the draft
+    assert seen and all(not names & {"upsert_user_skills", "upsert_job_posting"} for names in seen)
+
+
+def test_a_malformed_first_reasoner_turn_no_longer_loses_the_upsert(tmp_path):
+    # eval-16: the injected malformed turn used to replace the reasoner's upsert call
+    h, _ = make(tmp_path, REASONER_OK + REASONER_OK)
+    result = run(h.run(Task(**{**vars(TASK), "faults": {"model": {"reasoner": {"times": 1}}}})))
+    assert result["status"] == "shipped"
+
+
+def test_a_failed_upsert_fails_the_run_as_retrieval_before_any_model_call(tmp_path):
+    graph = FakeGraph(fail={"upsert_user_skills": ["INVALID_INPUT"]})
+    h, models = make(tmp_path, REASONER_OK, graph)
+    result = run(h.run(TASK))
+    assert result["status"] == "failed" and result["failure_category"] == "retrieval" and models.requests == 0
 
 
 def test_a_transient_tool_failure_is_recovered(tmp_path):
@@ -286,7 +330,7 @@ def test_malformed_model_output_twice_fails_as_model(tmp_path):
     h, _ = make(tmp_path, [answer(GOOD), answer(GOOD)])
     result = run(h.run(Task(**{**vars(TASK), "faults": {"model": {"reasoner": {"times": 2}}}})))
     assert result["status"] == "failed" and result["failure_category"] == "model"
-    assert not (tmp_path / "runs" / result["run_id"] / "checkpoint-05-final.json").exists()
+    assert not (tmp_path / "runs" / result["run_id"] / "checkpoint-06-final.json").exists()
 
 
 def test_a_worse_revision_is_rolled_back_and_queued(tmp_path):

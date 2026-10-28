@@ -1,6 +1,6 @@
 """Checkpoints: the run state saved as JSON after every completed stage.
 
-    .omnigent-logs/runs/<run_id>/checkpoint-01-parsed.json, -02-drafted.json, ...
+    .omnigent-logs/runs/<run_id>/checkpoint-01-parsed.json, -02-ingested.json, ...
 
 `latest()` returns the last saved state, so `python -m harness run --resume-run <run_id>` restarts
 after the last good stage (graph writes are idempotent upserts, so repeating one is safe).
@@ -9,7 +9,7 @@ Checkpoints hold parsed resume data: they live under .omnigent-logs/, which git 
 import json
 from pathlib import Path
 
-STAGES = ("parsed", "drafted", "verified", "revised", "final")
+STAGES = ("parsed", "ingested", "drafted", "verified", "revised", "final")
 
 
 class Checkpoints:

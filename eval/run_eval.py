@@ -78,13 +78,14 @@ def crashed_result(error: str, latency_s: float) -> dict:
             "tools": vars(ToolStats())}
 
 
-def load_progress(fixture, fresh: bool, path: Path = PROGRESS) -> dict:
+def load_progress(fixture, fresh: set[str] = frozenset(), path: Path = PROGRESS) -> dict:
     """Rows of tasks recorded by an earlier record run, keyed by task id; only those whose
-    recorded answers are still in the fixture."""
-    if fresh or fixture is None or not path.exists():
+    recorded answers are still in the fixture. Tasks in `fresh` are dropped (to record them
+    again) while every other task's progress is kept."""
+    if fixture is None or not path.exists():
         return {}
     rows = json.loads(path.read_text(encoding="utf-8"))
-    return {k: v for k, v in rows.items() if fixture.data.get(k)}
+    return {k: v for k, v in rows.items() if fixture.data.get(k) and k not in fresh}
 
 
 def resumable(row: dict) -> bool:
@@ -166,7 +167,8 @@ async def run_all(args) -> int:
     stamp = time.strftime("%Y%m%d-%H%M%S")
     rows = []
     clients = model_clients(args.key_from_cluster) if mode != "replay" else {}
-    progress = load_progress(fixture, args.fresh) if mode == "record" else {}
+    fresh = {t["id"] for t in tasks} if args.fresh else set()    # with --only: just those tasks
+    progress = load_progress(fixture, fresh) if mode == "record" else {}
     async with mcp_session(args.mcp_port) as (call, tools):
         harness = Harness(clients, call, tools, config, fixture=fixture, runs_dir=EVAL_RUNS, approvals=queue)
         for i, spec in enumerate(tasks, 1):

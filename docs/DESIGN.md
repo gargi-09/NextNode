@@ -45,7 +45,7 @@ when the LLM is down: only parsing new text needs it.
 
 ## The agent harness
 
-`harness/` wraps the agents in a fixed stage machine: parse, draft, verify, at most one revision, then ship or queue. Every stage ends in a checkpoint, so a run resumes after its last good stage (graph writes are idempotent upserts). Every tool call goes through a retry layer (transient errors only, exponential backoff with jitter, 3 attempts) and a breaker per tool. A revision that verifies worse than the draft it replaces is rolled back. Results that are not clearly good (REVISE, a rollback, 3+ unmapped skills) go to an approval queue, never straight to the user. Failures are classified as retrieval, model or execution. A 20-task eval injects faults deterministically to exercise each of these paths; model answers are recorded once and replayed, while tool calls always hit the real graph.
+`harness/` wraps the agents in a fixed stage machine: parse, ingest (the harness writes the user and job to the graph; models never get write tools), draft, verify, at most one revision, then ship or queue. Every stage ends in a checkpoint, so a run resumes after its last good stage (graph writes are idempotent upserts). Every tool call goes through a retry layer (transient errors only, exponential backoff with jitter, 3 attempts) and a breaker per tool inside that loop, so a dead tool opens its breaker after 3 failed attempts and the next call fails fast. A revision that verifies worse than the draft it replaces is rolled back. Results that are not clearly good (REVISE, a rollback, 3+ unmapped skills) go to an approval queue, never straight to the user. Failures are classified as retrieval, model or execution. A 20-task eval injects faults deterministically to exercise each of these paths; model answers are recorded once and replayed, while tool calls always hit the real graph.
 
 ## Tradeoffs
 
@@ -75,7 +75,7 @@ when the LLM is down: only parsing new text needs it.
 | Agent runner | 25 tool calls per agent, 1 revision, 6,000 characters per tool result (fits a 16k context) |
 | Full agent run, laptop CPU (Qwen3-4B + Llama 3.1 on Ollama) | 1,238–1,246 s in the two complete runs with a revision |
 | Neo4j breaker | Opens after 3 failures in 60 s, 30 s cooldown |
-| Harness, per tool | 3 attempts for transient errors; breaker opens after 3 failed calls, 30 s cooldown |
+| Harness, per tool | 3 attempts for transient errors; breaker opens after 3 failed attempts in a row, 30 s cooldown |
 | Harness, per run | 1 revision; approval when REVISE, rolled back, or 3+ unmapped skills |
 
 ## What I did not build
