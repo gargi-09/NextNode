@@ -58,6 +58,7 @@ class Fixture:
 class Usage:
     def __init__(self):
         self.prompt = self.completion = self.calls = self.drift = 0
+        self.turns: dict[str, int] = {}     # next turn per agent, shared by every client of a run
 
     def add(self, usage: dict | None):
         self.calls += 1
@@ -79,7 +80,13 @@ class ModelClient:
             raise ValueError(f"{mode} mode needs a fixture")
         self.agent, self.mode, self.http, self.fixture, self.task = agent, mode, http, fixture, task
         self.usage, self.faults, self.tracer = usage or Usage(), faults, tracer
-        self.turn, self.drift = 0, 0
+        self.drift = 0
+
+    @property
+    def turn(self) -> int:
+        # Per agent across the whole run, not per client: the parser gets a new client for the
+        # resume and for the job, and the job must replay turn 1, not the resume's turn 0.
+        return self.usage.turns.get(self.agent, 0)
 
     def post(self, path: str, json: dict):                      # noqa: A002 - httpx.Client signature
         body, digest = json, request_hash(json)
@@ -101,7 +108,7 @@ class ModelClient:
                 data = r.json()
                 if self.mode == "record":
                     self.fixture.turns(self.task, self.agent).append({"hash": digest, "response": data})
-            self.turn += 1
+            self.usage.turns[self.agent] = self.turn + 1
             self.usage.add(data.get("usage"))
             if span is not None:
                 u = data.get("usage") or {}

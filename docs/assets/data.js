@@ -1620,7 +1620,7 @@ window.NEXTNODE = {
    "status": "live",
    "llm": false,
    "writes": false,
-   "summary": "217 tests that need no database, no API key and no network: golden scores, Cypher contracts, the breaker, the limiter, payloads, MCP tools, Omnigent configs, the agent runner and harness, Kubernetes manifests and demo parity. GitHub Actions runs them, plus frontend lint and build, on every push.",
+   "summary": "218 tests that need no database, no API key and no network: golden scores, Cypher contracts, the breaker, the limiter, payloads, MCP tools, Omnigent configs, the agent runner and harness, Kubernetes manifests and demo parity. GitHub Actions runs them, plus frontend lint and build, on every push.",
    "how": [
     "Run: python -m pytest   (frontend: npm --prefix frontend run lint)",
     ".github/workflows/ci.yml: Python tests (with Node, for the demo parity test) and frontend lint + build. No secrets needed.",
@@ -2228,6 +2228,13 @@ window.NEXTNODE = {
   {
    "date": "2026-10-28",
    "task": "Harness: graph writes moved into code (ingest stage), breaker moved inside the retry loop, eval --fresh/--only keeps other tasks' progress",
+   "features": [
+    "agent-harness"
+   ]
+  },
+  {
+   "date": "2026-10-28",
+   "task": "Harness replay: an agent's turn count is kept across the run, so the job parse replays its own answer, not the resume's",
    "features": [
     "agent-harness"
    ]

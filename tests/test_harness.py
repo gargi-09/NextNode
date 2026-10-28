@@ -18,7 +18,7 @@ from harness.checkpoints import Checkpoints
 from harness.evaluators import deterministic_verdict, run_evaluators
 from harness.faults import Faults
 from harness.loop import Config, Harness, Task
-from harness.replay import Fixture, ModelClient, ReplayMiss
+from harness.replay import Fixture, ModelClient, ReplayMiss, Usage
 from harness.tools import Breaker, ToolRunner, coded, error_code
 from harness.tracing import Tracer
 
@@ -257,6 +257,22 @@ def test_record_then_replay(tmp_path):
     other = ModelClient("parser", mode="replay", fixture=Fixture(tmp_path / "f.json"), task="t1")
     other.post("/v1/chat/completions", json={**body, "messages": []})
     assert other.drift == 1
+
+
+def test_replay_continues_an_agents_turns_across_clients_of_one_run(tmp_path):
+    # eval-11: the parser gets one client for the resume and a new one for the job; in replay the
+    # job's client must get turn 1, not the resume's turn 0 again
+    fx, usage = Fixture(tmp_path / "f.json"), Usage()
+    models = FakeModels([answer({"kind": "resume"}), answer({"kind": "job"})])
+    for _ in range(2):
+        ModelClient("parser", mode="record", http=models.client(), fixture=fx, task="t1", usage=usage).post(
+            "/v1/chat/completions", json={"model": "m", "messages": []})
+    fx.save()
+    usage, fx = Usage(), Fixture(tmp_path / "f.json")
+    kinds = [json.loads(ModelClient("parser", mode="replay", fixture=fx, task="t1", usage=usage).post(
+        "/v1/chat/completions", json={"model": "m", "messages": []}).json()["choices"][0]["message"]["content"])["kind"]
+        for _ in range(2)]
+    assert kinds == ["resume", "job"]
 
 
 # ─────────────────────────── the loop, end to end with fakes ───────────────────────────
