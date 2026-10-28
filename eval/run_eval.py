@@ -9,6 +9,11 @@ Model answers are live (record) or replayed (replay); every tool call always goe
 MCP server and Neo4j. Results: eval/results/latest.md (table) and a JSON file per run, with
 task success rate, p50/p95 latency, tokens per task (labelled live or recorded) and a failure
 breakdown by cause. Only measured values are written; nothing is estimated.
+
+Record mode saves each finished task (its recorded answers and its result row) as it goes, so
+rerunning after a crash or Ctrl-C skips the tasks already recorded and keeps their live
+measurements; --fresh records everything again. A task that raises is reported as a failed
+row and the run continues.
 """
 import argparse
 import asyncio
@@ -31,6 +36,7 @@ TASKS = ROOT / "eval" / "tasks.json"
 FIXTURE = ROOT / "eval" / "fixtures" / "recorded.json"
 RESULTS = ROOT / "eval" / "results"
 EVAL_RUNS = RUNS_DIR.parent / "eval-runs"
+PROGRESS = RESULTS / "record-progress.json"
 
 
 def load_tasks(only: set[str] | None = None) -> list[dict]:
@@ -61,6 +67,30 @@ def cause(result: dict, passed: bool) -> str | None:
     if result["status"] == "failed":
         return result.get("failure_category") or "execution"
     return "model"          # finished but not as expected: the drafts did not reach the expected verdict
+
+
+def crashed_result(error: str, latency_s: float) -> dict:
+    """The result of a task whose run raised instead of returning (counted as execution)."""
+    from harness.tools import ToolStats
+    return {"status": "failed", "failure_category": "execution", "error": error, "verdict": None,
+            "rollback": False, "latency_s": round(latency_s, 3), "faults_injected": [], "drift": 0,
+            "tokens": {"prompt": 0, "completion": 0, "total": 0, "model_calls": 0, "source": "live"},
+            "tools": vars(ToolStats())}
+
+
+def load_progress(fixture, fresh: bool, path: Path = PROGRESS) -> dict:
+    """Rows of tasks recorded by an earlier record run, keyed by task id; only those whose
+    recorded answers are still in the fixture."""
+    if fresh or fixture is None or not path.exists():
+        return {}
+    rows = json.loads(path.read_text(encoding="utf-8"))
+    return {k: v for k, v in rows.items() if fixture.data.get(k)}
+
+
+def resumable(row: dict) -> bool:
+    """A recorded row is kept for reruns unless it failed for an execution reason (model server
+    down, a crash): those tasks are recorded again."""
+    return row["cause"] != "execution"
 
 
 def percentile(values: list[float], p: float) -> float | None:
@@ -136,14 +166,22 @@ async def run_all(args) -> int:
     stamp = time.strftime("%Y%m%d-%H%M%S")
     rows = []
     clients = model_clients(args.key_from_cluster) if mode != "replay" else {}
+    progress = load_progress(fixture, args.fresh) if mode == "record" else {}
     async with mcp_session(args.mcp_port) as (call, tools):
         harness = Harness(clients, call, tools, config, fixture=fixture, runs_dir=EVAL_RUNS, approvals=queue)
         for i, spec in enumerate(tasks, 1):
             task = Task.from_dict(spec)
             print(f"\n=== [{i}/{len(tasks)}] {task.id}: {spec['description']}", flush=True)
-            result = await harness.run(task, run_id=f"{task.id}-{mode}-{stamp}")
-            if fixture is not None and mode == "record":
-                fixture.save()                               # keep what is recorded so far
+            if task.id in progress:
+                rows.append(progress[task.id])
+                print(f"    -> already recorded ({progress[task.id]['status']}); --fresh records it again",
+                      flush=True)
+                continue
+            t0 = time.monotonic()
+            try:
+                result = await harness.run(task, run_id=f"{task.id}-{mode}-{stamp}")
+            except Exception as e:                           # one broken task must not end the eval
+                result = crashed_result(f"crashed: {e.__class__.__name__}: {e}"[:300], time.monotonic() - t0)
             problems = check_expectation(result, spec.get("expect", {}))
             row = {"task_id": task.id, "category": spec["category"], "status": result["status"],
                    "expected": spec.get("expect", {}).get("status", ["shipped"]), "passed": not problems,
@@ -152,6 +190,12 @@ async def run_all(args) -> int:
                    "verdict": result["verdict"], "error": result["error"], "faults": result["faults_injected"],
                    "drift": result.get("drift", 0)}
             rows.append(row)
+            if fixture is not None and mode == "record":
+                fixture.save()                               # keep what is recorded so far
+                if resumable(row):
+                    progress[task.id] = row
+                    PROGRESS.parent.mkdir(parents=True, exist_ok=True)
+                    PROGRESS.write_text(json.dumps(progress, indent=1), encoding="utf-8")
             print(f"    -> {result['status']} ({'PASS' if row['passed'] else 'FAIL: ' + '; '.join(problems)}) "
                   f"in {result['latency_s']:.1f}s", flush=True)
     summary = summarize(rows, mode)
@@ -191,7 +235,8 @@ def main(argv=None) -> int:
     p.add_argument("--reviewer", action="store_true", help="also run the advisory reviewer model (slower)")
     p.add_argument("--key-from-cluster", action="store_true")
     p.add_argument("--mcp-port", type=int, default=8768)
-    p.add_argument("--cleanup", action="store_true", help="delete the eval-* users and jobs, then exit")
+    p.add_argument("--fresh", action="store_true", help="record mode: record every task again")
+    p.add_argument("--cleanup",action="store_true", help="delete the eval-* users and jobs, then exit")
     args = p.parse_args(argv)
     return asyncio.run(cleanup() if args.cleanup else run_all(args))
 

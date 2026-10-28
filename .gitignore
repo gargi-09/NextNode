@@ -15,3 +15,5 @@ CLAUDE.md
 # Omnigent: project-level config (`omnigent config set` in the repo) and --profiling output
 .omnigent/
 *.prof
+# eval: which tasks a record run already finished (local resume state)
+eval/results/record-progress.json

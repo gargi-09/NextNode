@@ -206,7 +206,7 @@ Only numbers measured in this repo or on my laptop; nothing estimated.
 
 | What | Result |
 |---|---|
-| Automated tests | 207 passing (run on every push by GitHub Actions) |
+| Automated tests | 213 passing (run on every push by GitHub Actions) |
 | Ontology | 60 skills, 107 aliases, 46 prerequisite edges, 4 domains |
 | Pages demo vs. Python engine | Scores match exactly (parity test runs the JavaScript port under Node) |
 | vLLM on a local Kubernetes cluster (CPU, Qwen3-0.6B) | Smoke test 5/5: key enforced, model name, chat, structured tool call |

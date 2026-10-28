@@ -177,15 +177,22 @@ def check_tool_call(client: httpx.Client, args, report: Report):
 # ─────────────────────────── MCP end to end ───────────────────────────
 
 def start_mcp_server(port: int, token: str) -> subprocess.Popen:
+    # The server logs a line per request. Its log goes to a file, never to a pipe: nothing reads a
+    # pipe while the run goes on, so after ~50 calls the OS buffer fills and the server freezes.
     python = Path(sys.executable)
+    log_path = ROOT / ".omnigent-logs" / f"mcp-server-{port}.log"
+    log_path.parent.mkdir(parents=True, exist_ok=True)
+    log = open(log_path, "wb")
     proc = subprocess.Popen([str(python), "-m", "app.mcp_server", "--transport", "http",
                              "--host", "127.0.0.1", "--port", str(port)],
                             cwd=ROOT, env={**os.environ, "NEXTNODE_MCP_TOKEN": token},
-                            stdout=subprocess.DEVNULL, stderr=subprocess.PIPE)
+                            stdout=subprocess.DEVNULL, stderr=log)
+    log.close()                                     # the child keeps its own handle
     for _ in range(40):
         time.sleep(0.5)
         if proc.poll() is not None:
-            sys.exit("ERROR: MCP server exited: " + proc.stderr.read().decode(errors="replace")[-800:])
+            sys.exit("ERROR: MCP server exited: "
+                     + log_path.read_text(encoding="utf-8", errors="replace")[-800:])
         try:
             if httpx.get(f"http://127.0.0.1:{port}/health", timeout=2).status_code == 200:
                 return proc
