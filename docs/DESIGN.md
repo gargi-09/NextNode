@@ -47,6 +47,19 @@ when the LLM is down: only parsing new text needs it.
 
 `harness/` wraps the agents in a fixed stage machine: parse, ingest (the harness writes the user and job to the graph; models never get write tools), draft, verify, at most one revision, then ship or queue. Every stage ends in a checkpoint, so a run resumes after its last good stage (graph writes are idempotent upserts). Every tool call goes through a retry layer (transient errors only, exponential backoff with jitter, 3 attempts) and a breaker per tool inside that loop, so a dead tool opens its breaker after 3 failed attempts and the next call fails fast. A revision that verifies worse than the draft it replaces is rolled back. Results that are not clearly good (REVISE, a rollback, 3+ unmapped skills) go to an approval queue, never straight to the user. Failures are classified as retrieval, model or execution. A 20-task eval injects faults deterministically to exercise each of these paths; model answers are recorded once and replayed, while tool calls always hit the real graph.
 
+Measured (2026-10-28, Qwen3-4B on Ollama, laptop CPU): 18/20 tasks ended as expected, in the live
+recording and again in replay with 0 drift. All 8 fault tasks were handled: retried and recovered,
+breaker opened, worse revision rolled back, low-confidence run queued, failures with nothing
+shipped. The 2 misses are model errors the graph checks caught (a fit score not copied exactly;
+`builds_on` naming skills the user lacks), so both runs were queued for approval instead of
+shipped. Latency: p50 106 s / p95 248 s live, 3.6 s / 7.7 s in replay.
+
+The first full eval (15/20) found three harness defects, now fixed: the reasoner sometimes skipped
+its graph write (writes moved into code), the breaker counted calls after retries so a dead tool
+never opened it (moved inside the retry loop), and replay restarted an agent's turns for each new
+client (the job parse got the resume's answer). Getting it to run overnight also needed a fix:
+the MCP server froze after about 50 calls because its log filled a pipe nothing read.
+
 ## Tradeoffs
 
 - **Deterministic checks over LLM-as-judge.** In a measured run, the Llama 3.1 8B reviewer

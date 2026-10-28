@@ -1,34 +1,33 @@
 {
  "summary": {
-  "mode": "replay",
+  "mode": "record",
   "tasks": 20,
-  "passed": 15,
-  "success_rate": 0.75,
+  "passed": 18,
+  "success_rate": 0.9,
   "statuses": {
-   "shipped": 12,
-   "needs_approval": 2,
-   "failed": 6
+   "shipped": 13,
+   "needs_approval": 4,
+   "failed": 3
   },
   "latency_s": {
-   "p50": 4.64,
-   "p95": 10.818,
-   "what": "harness + real MCP/Neo4j calls; model answers replayed"
+   "p50": 106.261,
+   "p95": 247.991,
+   "what": "model + harness + graph"
   },
   "tokens_per_task": {
-   "mean": 11533.6,
-   "source": "recorded"
+   "mean": 10738.5,
+   "source": "live"
   },
   "failure_causes": {
-   "model": 2,
-   "retrieval": 3
+   "model": 2
   },
   "tool_totals": {
-   "calls": 194,
-   "retries": 7,
+   "calls": 278,
+   "retries": 5,
    "recovered": 2,
-   "breaker_opens": 0
+   "breaker_opens": 1
   },
-  "replay_drift": 38
+  "replay_drift": 0
  },
  "rows": [
   {
@@ -41,13 +40,13 @@
    "passed": true,
    "problems": [],
    "cause": null,
-   "latency_s": 3.687,
+   "latency_s": 117.546,
    "tokens": {
-    "prompt": 11996,
-    "completion": 816,
-    "total": 12812,
+    "prompt": 7117,
+    "completion": 559,
+    "total": 7676,
     "model_calls": 4,
-    "source": "recorded"
+    "source": "live"
    },
    "tools": {
     "calls": 11,
@@ -75,17 +74,17 @@
    "passed": true,
    "problems": [],
    "cause": null,
-   "latency_s": 5.558,
+   "latency_s": 186.866,
    "tokens": {
-    "prompt": 11992,
-    "completion": 805,
-    "total": 12797,
-    "model_calls": 4,
-    "source": "recorded"
+    "prompt": 18579,
+    "completion": 1179,
+    "total": 19758,
+    "model_calls": 8,
+    "source": "live"
    },
    "tools": {
-    "calls": 11,
-    "attempts": 11,
+    "calls": 20,
+    "attempts": 20,
     "retries": 0,
     "recovered": 0,
     "failed": 0,
@@ -109,13 +108,13 @@
    "passed": true,
    "problems": [],
    "cause": null,
-   "latency_s": 7.78,
+   "latency_s": 87.151,
    "tokens": {
-    "prompt": 8535,
-    "completion": 757,
-    "total": 9292,
-    "model_calls": 3,
-    "source": "recorded"
+    "prompt": 7026,
+    "completion": 543,
+    "total": 7569,
+    "model_calls": 4,
+    "source": "live"
    },
    "tools": {
     "calls": 11,
@@ -143,13 +142,13 @@
    "passed": true,
    "problems": [],
    "cause": null,
-   "latency_s": 8.694,
+   "latency_s": 165.977,
    "tokens": {
-    "prompt": 20915,
-    "completion": 1404,
-    "total": 22319,
-    "model_calls": 6,
-    "source": "recorded"
+    "prompt": 15671,
+    "completion": 1057,
+    "total": 16728,
+    "model_calls": 7,
+    "source": "live"
    },
    "tools": {
     "calls": 19,
@@ -177,17 +176,17 @@
    "passed": true,
    "problems": [],
    "cause": null,
-   "latency_s": 6.83,
+   "latency_s": 137.044,
    "tokens": {
-    "prompt": 18513,
-    "completion": 1130,
-    "total": 19643,
+    "prompt": 12470,
+    "completion": 933,
+    "total": 13403,
     "model_calls": 6,
-    "source": "recorded"
+    "source": "live"
    },
    "tools": {
-    "calls": 15,
-    "attempts": 15,
+    "calls": 16,
+    "attempts": 16,
     "retries": 0,
     "recovered": 0,
     "failed": 0,
@@ -199,7 +198,7 @@
    "verdict": "PASS",
    "error": null,
    "faults": [],
-   "drift": 5
+   "drift": 0
   },
   {
    "task_id": "eval-06",
@@ -211,17 +210,17 @@
    "passed": true,
    "problems": [],
    "cause": null,
-   "latency_s": 4.64,
+   "latency_s": 196.653,
    "tokens": {
-    "prompt": 17619,
-    "completion": 1578,
-    "total": 19197,
-    "model_calls": 5,
-    "source": "recorded"
+    "prompt": 13226,
+    "completion": 1395,
+    "total": 14621,
+    "model_calls": 6,
+    "source": "live"
    },
    "tools": {
-    "calls": 21,
-    "attempts": 21,
+    "calls": 20,
+    "attempts": 20,
     "retries": 0,
     "recovered": 0,
     "failed": 0,
@@ -233,7 +232,7 @@
    "verdict": "PASS",
    "error": null,
    "faults": [],
-   "drift": 4
+   "drift": 0
   },
   {
    "task_id": "eval-07",
@@ -247,13 +246,13 @@
     "status needs_approval, expected shipped"
    ],
    "cause": "model",
-   "latency_s": 16.845,
+   "latency_s": 207.786,
    "tokens": {
-    "prompt": 30016,
-    "completion": 1615,
-    "total": 31631,
-    "model_calls": 9,
-    "source": "recorded"
+    "prompt": 15035,
+    "completion": 1450,
+    "total": 16485,
+    "model_calls": 7,
+    "source": "live"
    },
    "tools": {
     "calls": 21,
@@ -269,29 +268,31 @@
    "verdict": "REVISE",
    "error": null,
    "faults": [],
-   "drift": 7
+   "drift": 0
   },
   {
    "task_id": "eval-08",
    "category": "normal",
-   "status": "shipped",
+   "status": "needs_approval",
    "expected": [
     "shipped"
    ],
-   "passed": true,
-   "problems": [],
-   "cause": null,
-   "latency_s": 6.155,
+   "passed": false,
+   "problems": [
+    "status needs_approval, expected shipped"
+   ],
+   "cause": "model",
+   "latency_s": 181.841,
    "tokens": {
-    "prompt": 14395,
-    "completion": 797,
-    "total": 15192,
-    "model_calls": 5,
-    "source": "recorded"
+    "prompt": 12777,
+    "completion": 1232,
+    "total": 14009,
+    "model_calls": 6,
+    "source": "live"
    },
    "tools": {
-    "calls": 11,
-    "attempts": 11,
+    "calls": 18,
+    "attempts": 18,
     "retries": 0,
     "recovered": 0,
     "failed": 0,
@@ -300,10 +301,10 @@
     "breakers_open": []
    },
    "rollback": false,
-   "verdict": "PASS",
+   "verdict": "REVISE",
    "error": null,
    "faults": [],
-   "drift": 4
+   "drift": 0
   },
   {
    "task_id": "eval-09",
@@ -315,13 +316,13 @@
    "passed": true,
    "problems": [],
    "cause": null,
-   "latency_s": 2.574,
+   "latency_s": 80.75,
    "tokens": {
-    "prompt": 8225,
-    "completion": 697,
-    "total": 8922,
-    "model_calls": 3,
-    "source": "recorded"
+    "prompt": 6833,
+    "completion": 572,
+    "total": 7405,
+    "model_calls": 4,
+    "source": "live"
    },
    "tools": {
     "calls": 11,
@@ -337,7 +338,7 @@
    "verdict": "PASS",
    "error": null,
    "faults": [],
-   "drift": 2
+   "drift": 0
   },
   {
    "task_id": "eval-10",
@@ -349,13 +350,13 @@
    "passed": true,
    "problems": [],
    "cause": null,
-   "latency_s": 2.591,
+   "latency_s": 78.698,
    "tokens": {
-    "prompt": 8475,
-    "completion": 697,
-    "total": 9172,
-    "model_calls": 3,
-    "source": "recorded"
+    "prompt": 6889,
+    "completion": 511,
+    "total": 7400,
+    "model_calls": 4,
+    "source": "live"
    },
    "tools": {
     "calls": 11,
@@ -371,45 +372,41 @@
    "verdict": "PASS",
    "error": null,
    "faults": [],
-   "drift": 2
+   "drift": 0
   },
   {
    "task_id": "eval-11",
    "category": "normal",
-   "status": "failed",
+   "status": "shipped",
    "expected": [
     "shipped"
    ],
-   "passed": false,
-   "problems": [
-    "status failed, expected shipped"
-   ],
-   "cause": "retrieval",
-   "latency_s": 2.541,
+   "passed": true,
+   "problems": [],
+   "cause": null,
+   "latency_s": 529.587,
    "tokens": {
-    "prompt": 6364,
-    "completion": 812,
-    "total": 7176,
-    "model_calls": 4,
-    "source": "recorded"
+    "prompt": 19556,
+    "completion": 3283,
+    "total": 22839,
+    "model_calls": 8,
+    "source": "live"
    },
    "tools": {
-    "calls": 3,
-    "attempts": 3,
+    "calls": 26,
+    "attempts": 26,
     "retries": 0,
     "recovered": 0,
-    "failed": 3,
+    "failed": 0,
     "breaker_opens": 0,
-    "by_code": {
-     "NOT_FOUND": 3
-    },
+    "by_code": {},
     "breakers_open": []
    },
    "rollback": false,
-   "verdict": null,
-   "error": "graph facts unavailable: calculate_skill_gap failed: Error executing tool calculate_skill_gap: {\"code\": \"NOT_FOUND\", \"message\": \"User 'eval-11-user' not found\"}",
+   "verdict": "PASS",
+   "error": null,
    "faults": [],
-   "drift": 3
+   "drift": 0
   },
   {
    "task_id": "eval-12",
@@ -421,13 +418,13 @@
    "passed": true,
    "problems": [],
    "cause": null,
-   "latency_s": 10.818,
+   "latency_s": 133.806,
    "tokens": {
-    "prompt": 10114,
-    "completion": 1165,
-    "total": 11279,
-    "model_calls": 5,
-    "source": "recorded"
+    "prompt": 8500,
+    "completion": 996,
+    "total": 9496,
+    "model_calls": 6,
+    "source": "live"
    },
    "tools": {
     "calls": 12,
@@ -443,7 +440,7 @@
    "verdict": "PASS",
    "error": null,
    "faults": [],
-   "drift": 4
+   "drift": 0
   },
   {
    "task_id": "eval-13",
@@ -456,17 +453,17 @@
    "passed": true,
    "problems": [],
    "cause": null,
-   "latency_s": 10.097,
+   "latency_s": 79.232,
    "tokens": {
-    "prompt": 7977,
-    "completion": 451,
-    "total": 8428,
-    "model_calls": 3,
-    "source": "recorded"
+    "prompt": 7160,
+    "completion": 440,
+    "total": 7600,
+    "model_calls": 4,
+    "source": "live"
    },
    "tools": {
-    "calls": 9,
-    "attempts": 10,
+    "calls": 13,
+    "attempts": 14,
     "retries": 1,
     "recovered": 1,
     "failed": 0,
@@ -482,7 +479,7 @@
    "faults": [
     "tool:calculate_skill_gap:TIMEOUT"
    ],
-   "drift": 2
+   "drift": 0
   },
   {
    "task_id": "eval-14",
@@ -495,13 +492,13 @@
    "passed": true,
    "problems": [],
    "cause": null,
-   "latency_s": 5.489,
+   "latency_s": 56.14,
    "tokens": {
-    "prompt": 10397,
-    "completion": 449,
-    "total": 10846,
-    "model_calls": 4,
-    "source": "recorded"
+    "prompt": 4690,
+    "completion": 305,
+    "total": 4995,
+    "model_calls": 3,
+    "source": "live"
    },
    "tools": {
     "calls": 9,
@@ -522,7 +519,7 @@
     "tool:upsert_user_skills:GRAPH_UNAVAILABLE",
     "tool:upsert_user_skills:GRAPH_UNAVAILABLE"
    ],
-   "drift": 3
+   "drift": 0
   },
   {
    "task_id": "eval-15",
@@ -531,38 +528,36 @@
    "expected": [
     "failed"
    ],
-   "passed": false,
-   "problems": [
-    "0 breaker open(s), expected >= 1"
-   ],
-   "cause": "retrieval",
-   "latency_s": 4.698,
+   "passed": true,
+   "problems": [],
+   "cause": null,
+   "latency_s": 14.453,
    "tokens": {
-    "prompt": 4604,
-    "completion": 196,
-    "total": 4800,
+    "prompt": 2626,
+    "completion": 55,
+    "total": 2681,
     "model_calls": 2,
-    "source": "recorded"
+    "source": "live"
    },
    "tools": {
     "calls": 4,
-    "attempts": 8,
-    "retries": 4,
+    "attempts": 5,
+    "retries": 2,
     "recovered": 0,
     "failed": 2,
-    "breaker_opens": 0,
+    "breaker_opens": 1,
     "by_code": {
-     "GRAPH_UNAVAILABLE": 6
+     "GRAPH_UNAVAILABLE": 3,
+     "CIRCUIT_OPEN": 1
     },
-    "breakers_open": []
+    "breakers_open": [
+     "calculate_skill_gap"
+    ]
    },
    "rollback": false,
    "verdict": null,
-   "error": "graph facts unavailable: calculate_skill_gap failed: {\"code\": \"GRAPH_UNAVAILABLE\", \"message\": \"calculate_skill_gap failed with GRAPH_UNAVAILABLE (injected)\"}",
+   "error": "graph facts unavailable: calculate_skill_gap failed: {\"code\": \"CIRCUIT_OPEN\", \"message\": \"calculate_skill_gap is failing; circuit open for 30s. Do not call it again now.\"}",
    "faults": [
-    "tool:calculate_skill_gap:GRAPH_UNAVAILABLE",
-    "tool:calculate_skill_gap:GRAPH_UNAVAILABLE",
-    "tool:calculate_skill_gap:GRAPH_UNAVAILABLE",
     "tool:calculate_skill_gap:GRAPH_UNAVAILABLE",
     "tool:calculate_skill_gap:GRAPH_UNAVAILABLE",
     "tool:calculate_skill_gap:GRAPH_UNAVAILABLE"
@@ -572,39 +567,35 @@
   {
    "task_id": "eval-16",
    "category": "fault",
-   "status": "failed",
+   "status": "shipped",
    "expected": [
     "shipped",
     "needs_approval"
    ],
-   "passed": false,
-   "problems": [
-    "status failed, expected shipped or needs_approval"
-   ],
-   "cause": "retrieval",
-   "latency_s": 2.236,
+   "passed": true,
+   "problems": [],
+   "cause": null,
+   "latency_s": 89.868,
    "tokens": {
-    "prompt": 6797,
-    "completion": 290,
-    "total": 7087,
-    "model_calls": 3,
-    "source": "recorded"
+    "prompt": 10231,
+    "completion": 509,
+    "total": 10740,
+    "model_calls": 6,
+    "source": "live"
    },
    "tools": {
-    "calls": 3,
-    "attempts": 3,
+    "calls": 15,
+    "attempts": 15,
     "retries": 0,
     "recovered": 0,
-    "failed": 3,
+    "failed": 0,
     "breaker_opens": 0,
-    "by_code": {
-     "NOT_FOUND": 3
-    },
+    "by_code": {},
     "breakers_open": []
    },
    "rollback": false,
-   "verdict": null,
-   "error": "graph facts unavailable: calculate_skill_gap failed: Error executing tool calculate_skill_gap: {\"code\": \"NOT_FOUND\", \"message\": \"User 'eval-16-user' not found\"}",
+   "verdict": "PASS",
+   "error": null,
    "faults": [
     "model:reasoner:malformed"
    ],
@@ -620,17 +611,17 @@
    "passed": true,
    "problems": [],
    "cause": null,
-   "latency_s": 0.011,
+   "latency_s": 9.494,
    "tokens": {
-    "prompt": 4353,
-    "completion": 244,
-    "total": 4597,
+    "prompt": 2609,
+    "completion": 57,
+    "total": 2666,
     "model_calls": 2,
-    "source": "recorded"
+    "source": "live"
    },
    "tools": {
-    "calls": 0,
-    "attempts": 0,
+    "calls": 2,
+    "attempts": 2,
     "retries": 0,
     "recovered": 0,
     "failed": 0,
@@ -657,23 +648,23 @@
    "passed": true,
    "problems": [],
    "cause": null,
-   "latency_s": 0.674,
+   "latency_s": 8.43,
    "tokens": {
-    "prompt": 6536,
-    "completion": 117,
-    "total": 6653,
-    "model_calls": 3,
-    "source": "recorded"
+    "prompt": 1278,
+    "completion": 40,
+    "total": 1318,
+    "model_calls": 1,
+    "source": "live"
    },
    "tools": {
-    "calls": 3,
-    "attempts": 3,
+    "calls": 2,
+    "attempts": 2,
     "retries": 0,
     "recovered": 0,
-    "failed": 2,
+    "failed": 1,
     "breaker_opens": 0,
     "by_code": {
-     "NOT_FOUND": 2
+     "NOT_FOUND": 1
     },
     "breakers_open": []
    },
@@ -686,27 +677,24 @@
   {
    "task_id": "eval-19",
    "category": "fault",
-   "status": "failed",
+   "status": "needs_approval",
    "expected": [
     "needs_approval"
    ],
-   "passed": false,
-   "problems": [
-    "status failed, expected needs_approval",
-    "rollback False, expected True"
-   ],
-   "cause": "model",
-   "latency_s": 0.01,
+   "passed": true,
+   "problems": [],
+   "cause": null,
+   "latency_s": 247.991,
    "tokens": {
-    "prompt": 0,
-    "completion": 0,
-    "total": 0,
-    "model_calls": 0,
-    "source": "recorded"
+    "prompt": 15600,
+    "completion": 1711,
+    "total": 17311,
+    "model_calls": 7,
+    "source": "live"
    },
    "tools": {
-    "calls": 0,
-    "attempts": 0,
+    "calls": 22,
+    "attempts": 22,
     "retries": 0,
     "recovered": 0,
     "failed": 0,
@@ -714,10 +702,13 @@
     "by_code": {},
     "breakers_open": []
    },
-   "rollback": false,
-   "verdict": null,
-   "error": "no recorded turn 0 for eval-19/reasoner; record again",
-   "faults": [],
+   "rollback": true,
+   "verdict": "REVISE",
+   "error": null,
+   "faults": [
+    "draft:reverse_modules",
+    "revision:reverse_modules_and_fit"
+   ],
    "drift": 0
   },
   {
@@ -730,17 +721,17 @@
    "passed": true,
    "problems": [],
    "cause": null,
-   "latency_s": 4.184,
+   "latency_s": 106.261,
    "tokens": {
-    "prompt": 8218,
-    "completion": 612,
-    "total": 8830,
-    "model_calls": 3,
-    "source": "recorded"
+    "prompt": 9278,
+    "completion": 792,
+    "total": 10070,
+    "model_calls": 5,
+    "source": "live"
    },
    "tools": {
-    "calls": 9,
-    "attempts": 9,
+    "calls": 15,
+    "attempts": 15,
     "retries": 0,
     "recovered": 0,
     "failed": 0,
@@ -752,7 +743,7 @@
    "verdict": "PASS",
    "error": null,
    "faults": [],
-   "drift": 2
+   "drift": 0
   }
  ]
 }

@@ -864,7 +864,8 @@
         "A REVISE verdict, a rollback or 3+ unmapped skills sends the run to the approval queue (python -m harness approvals list / approve / reject) instead of shipping it.",
         "Seven evaluators in the Phoenix evals shape recompute the verdict from graph facts; the reviewer model is recorded as an advisory LLM annotation.",
         "Spans for each run, stage, model turn and tool call (only allow-listed attributes, never arguments or resume text) go to .omnigent-logs/runs/<id>/traces.jsonl, or over OTLP to Phoenix when OTEL_EXPORTER_OTLP_ENDPOINT is set.",
-        "python -m eval.run_eval --mode record once, then --mode replay: 20 tasks (8 with injected faults), with success rate, p50/p95 latency, tokens and failure causes written to eval/results/latest.md."
+        "python -m eval.run_eval --mode record once, then --mode replay: 20 tasks (8 with injected faults), with success rate, p50/p95 latency, tokens and failure causes written to eval/results/latest.md.",
+        "Measured 2026-10-28 (Qwen3-4B, laptop CPU): 18/20 tasks as expected, live and in replay (0 drift); all 8 fault tasks handled; the 2 misses were model errors the graph checks caught and queued. p50/p95 per task: 106 s / 248 s live, 3.6 s / 7.7 s replayed."
       ],
       "files": [
         "harness/",
@@ -1175,6 +1176,13 @@
     {
       "date": "2026-10-28",
       "task": "Harness replay: an agent's turn count is kept across the run, so the job parse replays its own answer, not the resume's",
+      "features": [
+        "agent-harness"
+      ]
+    },
+    {
+      "date": "2026-10-28",
+      "task": "Harness eval measured: 18/20 live and in replay; results in README, DESIGN.md and eval/results/",
       "features": [
         "agent-harness"
       ]
