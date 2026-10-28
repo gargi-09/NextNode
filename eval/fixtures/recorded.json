@@ -1,0 +1,3151 @@
+{
+ "eval-15": {
+  "reasoner": [
+   {
+    "hash": "999ad3b8434ff5d4",
+    "response": {
+     "id": "chatcmpl-955",
+     "object": "chat.completion",
+     "created": 1793163012,
+     "model": "qwen3-4b",
+     "system_fingerprint": "fp_ollama",
+     "choices": [
+      {
+       "index": 0,
+       "message": {
+        "role": "assistant",
+        "content": "",
+        "tool_calls": [
+         {
+          "id": "hmiPwkG0gHNgJJc7wMRmjbW9sqXft0AA",
+          "index": 0,
+          "type": "function",
+          "function": {
+           "name": "upsert_user_skills",
+           "arguments": "{\"user_id\":\"eval-15-user\",\"skills\":[{\"category\":\"nlp\",\"name\":\"Python\",\"proficiency\":0.8}]}"
+          }
+         },
+         {
+          "id": "d3ymbcln6X6qpYT4qQuYcHQZujHkbcru",
+          "index": 1,
+          "type": "function",
+          "function": {
+           "name": "upsert_job_posting",
+           "arguments": "{\"job_id\":\"eval-15-job\",\"title\":\"NLP Engineer\",\"company\":\"Eval Co\",\"seniority\":\"mid\",\"core_skills\":[{\"category\":\"nlp\",\"name\":\"PyTorch\",\"weight\":0.6}],\"domains\":[\"nlp\"]}"
+          }
+         },
+         {
+          "id": "nxRzQALI1USpT50MFCfdLCg7C5crDzFb",
+          "index": 2,
+          "type": "function",
+          "function": {
+           "name": "calculate_skill_gap",
+           "arguments": "{\"user_id\":\"eval-15-user\",\"job_id\":\"eval-15-job\"}"
+          }
+         }
+        ]
+       },
+       "finish_reason": "tool_calls"
+      }
+     ],
+     "usage": {
+      "prompt_tokens": 2148,
+      "prompt_tokens_details": {
+       "cached_tokens": 2006
+      },
+      "completion_tokens": 178,
+      "total_tokens": 2326
+     }
+    }
+   },
+   {
+    "hash": "93b8d063120bbbea",
+    "response": {
+     "id": "chatcmpl-961",
+     "object": "chat.completion",
+     "created": 1793163030,
+     "model": "qwen3-4b",
+     "system_fingerprint": "fp_ollama",
+     "choices": [
+      {
+       "index": 0,
+       "message": {
+        "role": "assistant",
+        "content": "{\"error\": \"calculate_skill_gap failed with GRAPH_UNAVAILABLE (injected)\"}"
+       },
+       "finish_reason": "stop"
+      }
+     ],
+     "usage": {
+      "prompt_tokens": 2456,
+      "prompt_tokens_details": {
+       "cached_tokens": 2177
+      },
+      "completion_tokens": 18,
+      "total_tokens": 2474
+     }
+    }
+   }
+  ]
+ },
+ "eval-18": {
+  "reasoner": [
+   {
+    "hash": "abfd06aac47f432c",
+    "response": {
+     "id": "chatcmpl-871",
+     "object": "chat.completion",
+     "created": 1793163107,
+     "model": "qwen3-4b",
+     "system_fingerprint": "fp_ollama",
+     "choices": [
+      {
+       "index": 0,
+       "message": {
+        "role": "assistant",
+        "content": "",
+        "tool_calls": [
+         {
+          "id": "P0gz7YwesYANhUn7Phv7A3XqX9EKzXHn",
+          "index": 0,
+          "type": "function",
+          "function": {
+           "name": "upsert_user_skills",
+           "arguments": "{\"user_id\":\"eval-18-user\",\"skills\":[{\"category\":\"programming\",\"level\":\"intermediate\",\"name\":\"Python\",\"proficiency\":0.8}]}"
+          }
+         }
+        ]
+       },
+       "finish_reason": "tool_calls"
+      }
+     ],
+     "usage": {
+      "prompt_tokens": 2078,
+      "prompt_tokens_details": {
+       "cached_tokens": 2006
+      },
+      "completion_tokens": 60,
+      "total_tokens": 2138
+     }
+    }
+   },
+   {
+    "hash": "d304ddadd1b79d41",
+    "response": {
+     "id": "chatcmpl-34",
+     "object": "chat.completion",
+     "created": 1793163116,
+     "model": "qwen3-4b",
+     "system_fingerprint": "fp_ollama",
+     "choices": [
+      {
+       "index": 0,
+       "message": {
+        "role": "assistant",
+        "content": "",
+        "tool_calls": [
+         {
+          "id": "eIRtpBpds9Zi3sjw3BfHcZUK9j0TcEEW",
+          "index": 0,
+          "type": "function",
+          "function": {
+           "name": "calculate_skill_gap",
+           "arguments": "{\"user_id\":\"eval-18-user\",\"job_id\":\"eval-18-missing-job\"}"
+          }
+         }
+        ]
+       },
+       "finish_reason": "tool_calls"
+      }
+     ],
+     "usage": {
+      "prompt_tokens": 2188,
+      "prompt_tokens_details": {
+       "cached_tokens": 2107
+      },
+      "completion_tokens": 39,
+      "total_tokens": 2227
+     }
+    }
+   },
+   {
+    "hash": "009fd2a271af13a8",
+    "response": {
+     "id": "chatcmpl-736",
+     "object": "chat.completion",
+     "created": 1793163121,
+     "model": "qwen3-4b",
+     "system_fingerprint": "fp_ollama",
+     "choices": [
+      {
+       "index": 0,
+       "message": {
+        "role": "assistant",
+        "content": "{\"error\": \"Job 'eval-18-missing-job' not found\"}"
+       },
+       "finish_reason": "stop"
+      }
+     ],
+     "usage": {
+      "prompt_tokens": 2270,
+      "prompt_tokens_details": {
+       "cached_tokens": 2226
+      },
+      "completion_tokens": 18,
+      "total_tokens": 2288
+     }
+    }
+   }
+  ]
+ },
+ "eval-01": {
+  "reasoner": [
+   {
+    "hash": "42c39c9a771206d8",
+    "response": {
+     "id": "chatcmpl-487",
+     "object": "chat.completion",
+     "created": 1793160808,
+     "model": "qwen3-4b",
+     "system_fingerprint": "fp_ollama",
+     "choices": [
+      {
+       "index": 0,
+       "message": {
+        "role": "assistant",
+        "content": "",
+        "tool_calls": [
+         {
+          "id": "FcGnFAHCAxdTB0RuxcEMRbgN5XmAFXB7",
+          "index": 0,
+          "type": "function",
+          "function": {
+           "name": "upsert_user_skills",
+           "arguments": "{\"user_id\":\"eval-01-user\",\"skills\":[{\"name\":\"Python\",\"proficiency\":0.8},{\"name\":\"SQL\",\"proficiency\":0.8},{\"name\":\"Pandas\",\"proficiency\":0.8},{\"name\":\"NumPy\",\"proficiency\":0.5}],\"target_domain\":\"nlp\"}"
+          }
+         },
+         {
+          "id": "UHWvcN7NuMN77qM6iJ1pId8QJo6ANVRX",
+          "index": 1,
+          "type": "function",
+          "function": {
+           "name": "upsert_job_posting",
+           "arguments": "{\"job_id\":\"eval-01-job\",\"title\":\"ML Engineer\",\"company\":\"Eval Co\",\"seniority\":\"mid\",\"core_skills\":[{\"name\":\"Python\",\"weight\":0.6},{\"name\":\"PyTorch\",\"weight\":0.6}],\"preferred_skills\":[{\"name\":\"HuggingFace Transformers\",\"weight\":0.6}],\"domains\":[\"nlp\"]}"
+          }
+         },
+         {
+          "id": "wZWs11XOAN8FgyTzOLYTKknF6aaaiZpl",
+          "index": 2,
+          "type": "function",
+          "function": {
+           "name": "calculate_skill_gap",
+           "arguments": "{\"user_id\":\"eval-01-user\",\"job_id\":\"eval-01-job\"}"
+          }
+         }
+        ]
+       },
+       "finish_reason": "tool_calls"
+      }
+     ],
+     "usage": {
+      "prompt_tokens": 2246,
+      "prompt_tokens_details": {
+       "cached_tokens": 0
+      },
+      "completion_tokens": 250,
+      "total_tokens": 2496
+     }
+    }
+   },
+   {
+    "hash": "926060fdbac91afa",
+    "response": {
+     "id": "chatcmpl-251",
+     "object": "chat.completion",
+     "created": 1793160831,
+     "model": "qwen3-4b",
+     "system_fingerprint": "fp_ollama",
+     "choices": [
+      {
+       "index": 0,
+       "message": {
+        "role": "assistant",
+        "content": "",
+        "tool_calls": [
+         {
+          "id": "HZYpJV0TnkTn9Y7RV5rwCqtWrekKiNRB",
+          "index": 0,
+          "type": "function",
+          "function": {
+           "name": "get_skill_prerequisites",
+           "arguments": "{\"skill\":\"PyTorch\"}"
+          }
+         }
+        ]
+       },
+       "finish_reason": "tool_calls"
+      }
+     ],
+     "usage": {
+      "prompt_tokens": 3129,
+      "prompt_tokens_details": {
+       "cached_tokens": 2495
+      },
+      "completion_tokens": 24,
+      "total_tokens": 3153
+     }
+    }
+   },
+   {
+    "hash": "fb04f795a1679767",
+    "response": {
+     "id": "chatcmpl-554",
+     "object": "chat.completion",
+     "created": 1793160837,
+     "model": "qwen3-4b",
+     "system_fingerprint": "fp_ollama",
+     "choices": [
+      {
+       "index": 0,
+       "message": {
+        "role": "assistant",
+        "content": "",
+        "tool_calls": [
+         {
+          "id": "G30UVIjOdzMpE5DUJPB0gfCQVsMm6I4D",
+          "index": 0,
+          "type": "function",
+          "function": {
+           "name": "get_skill_prerequisites",
+           "arguments": "{\"skill\":\"HuggingFace Transformers\"}"
+          }
+         }
+        ]
+       },
+       "finish_reason": "tool_calls"
+      }
+     ],
+     "usage": {
+      "prompt_tokens": 3239,
+      "prompt_tokens_details": {
+       "cached_tokens": 3152
+      },
+      "completion_tokens": 25,
+      "total_tokens": 3264
+     }
+    }
+   },
+   {
+    "hash": "330f8c0d9d6fb12e",
+    "response": {
+     "id": "chatcmpl-66",
+     "object": "chat.completion",
+     "created": 1793160910,
+     "model": "qwen3-4b",
+     "system_fingerprint": "fp_ollama",
+     "choices": [
+      {
+       "index": 0,
+       "message": {
+        "role": "assistant",
+        "content": "{\n  \"user_id\": \"eval-01-user\",\n  \"job_id\": \"eval-01-job\",\n  \"fit_score\": 0.594,\n  \"scoring_version\": \"1\",\n  \"modules\": [\n    {\n      \"order\": 1,\n      \"skill\": \"PyTorch\",\n      \"priority\": \"medium\",\n      \"why\": \"Not in your profile but you own 2 prerequisite(s) \u2014 quick to learn\",\n      \"builds_on\": [\n        \"NumPy\"\n      ],\n      \"learn_first\": [\n        \"Python\"\n      ],\n      \"activities\": [\n        {\n          \"type\": \"project\",\n          \"description\": \"Build a neural network from scratch using PyTorch to classify images with a simple CNN, leveraging NumPy for matrix operations and Python for control flow.\"\n        },\n        {\n          \"type\": \"course\",\n          \"description\": \"Complete a foundational PyTorch course covering tensors, autograd, and model building.\"\n        }\n      ],\n      \"estimated_hours\": 60,\n      \"evidence_of_mastery\": \"Successfully train and evaluate a CNN on the CIFAR-10 dataset using PyTorch.\"\n    },\n    {\n      \"order\": 2,\n      \"skill\": \"HuggingFace Transformers\",\n      \"priority\": \"medium\",\n      \"why\": \"Not in your profile but you own 2 prerequisite(s) \u2014 quick to learn\",\n      \"builds_on\": [\n        \"PyTorch\"\n      ],\n      \"learn_first\": [],\n      \"activities\": [\n        {\n          \"type\": \"project\",\n          \"description\": \"Implement a text classification pipeline using HuggingFace Transformers, fine-tuning a pre-trained model on a custom dataset.\"\n        },\n        {\n          \"type\": \"reading\",\n          \"description\": \"Read the HuggingFace Transformers documentation and key papers on transformer architectures.\"\n        }\n      ],\n      \"estimated_hours\": 40,\n      \"evidence_of_mastery\": \"Successfully fine-tune a pre-trained transformer model on a custom text classification task and achieve >80% accuracy.\"\n    }\n  ],\n  \"unmapped_skills\": [],\n  \"notes\": \"The user already has strong proficiency in Python, SQL, Pandas, and NumPy, which are foundational. The main gaps are in PyTorch and HuggingFace Transformers, both of which are core and preferred skills respectively. The roadmap prioritizes learning PyTorch first as a prerequisite for HuggingFace Transformers.\"\n}"
+       },
+       "finish_reason": "stop"
+      }
+     ],
+     "usage": {
+      "prompt_tokens": 3382,
+      "prompt_tokens_details": {
+       "cached_tokens": 3263
+      },
+      "completion_tokens": 517,
+      "total_tokens": 3899
+     }
+    }
+   }
+  ]
+ },
+ "eval-02": {
+  "reasoner": [
+   {
+    "hash": "12e9c48d26b473b2",
+    "response": {
+     "id": "chatcmpl-349",
+     "object": "chat.completion",
+     "created": 1793160948,
+     "model": "qwen3-4b",
+     "system_fingerprint": "fp_ollama",
+     "choices": [
+      {
+       "index": 0,
+       "message": {
+        "role": "assistant",
+        "content": "",
+        "tool_calls": [
+         {
+          "id": "5CaGSpF8z3luoFfD2QzgN5BYPWOIWsxc",
+          "index": 0,
+          "type": "function",
+          "function": {
+           "name": "upsert_user_skills",
+           "arguments": "{\"user_id\":\"eval-02-user\",\"skills\":[{\"name\":\"Python\",\"proficiency\":0.8},{\"name\":\"Docker\",\"proficiency\":0.8},{\"name\":\"Linux\",\"proficiency\":0.8},{\"name\":\"Git\",\"proficiency\":0.8}]}"
+          }
+         },
+         {
+          "id": "gzmc6nVbqB2SedqCPFs6QRJp0PY73r9E",
+          "index": 1,
+          "type": "function",
+          "function": {
+           "name": "upsert_job_posting",
+           "arguments": "{\"job_id\":\"eval-02-job\",\"title\":\"MLOps Engineer\",\"company\":\"Eval Co\",\"seniority\":\"mid\",\"core_skills\":[{\"name\":\"Kubernetes\",\"weight\":0.6},{\"name\":\"Docker\",\"weight\":0.6}],\"preferred_skills\":[{\"name\":\"MLflow\",\"weight\":0.6}],\"domains\":[\"ml_infrastructure\"]}"
+          }
+         },
+         {
+          "id": "evvOVWXKaiYPqHSJtV4oZ7PTmAxEdDE4",
+          "index": 2,
+          "type": "function",
+          "function": {
+           "name": "calculate_skill_gap",
+           "arguments": "{\"user_id\":\"eval-02-user\",\"job_id\":\"eval-02-job\"}"
+          }
+         }
+        ]
+       },
+       "finish_reason": "tool_calls"
+      }
+     ],
+     "usage": {
+      "prompt_tokens": 2246,
+      "prompt_tokens_details": {
+       "cached_tokens": 2006
+      },
+      "completion_tokens": 243,
+      "total_tokens": 2489
+     }
+    }
+   },
+   {
+    "hash": "c23c419aa4145830",
+    "response": {
+     "id": "chatcmpl-964",
+     "object": "chat.completion",
+     "created": 1793160970,
+     "model": "qwen3-4b",
+     "system_fingerprint": "fp_ollama",
+     "choices": [
+      {
+       "index": 0,
+       "message": {
+        "role": "assistant",
+        "content": "",
+        "tool_calls": [
+         {
+          "id": "7YBiVUHlAVWYOAr4tcuGDLQDKLCHvlvR",
+          "index": 0,
+          "type": "function",
+          "function": {
+           "name": "get_skill_prerequisites",
+           "arguments": "{\"skill\":\"Kubernetes\"}"
+          }
+         }
+        ]
+       },
+       "finish_reason": "tool_calls"
+      }
+     ],
+     "usage": {
+      "prompt_tokens": 3112,
+      "prompt_tokens_details": {
+       "cached_tokens": 2488
+      },
+      "completion_tokens": 23,
+      "total_tokens": 3135
+     }
+    }
+   },
+   {
+    "hash": "a164fe8e8ddcbe5c",
+    "response": {
+     "id": "chatcmpl-735",
+     "object": "chat.completion",
+     "created": 1793160976,
+     "model": "qwen3-4b",
+     "system_fingerprint": "fp_ollama",
+     "choices": [
+      {
+       "index": 0,
+       "message": {
+        "role": "assistant",
+        "content": "",
+        "tool_calls": [
+         {
+          "id": "sjTPGvmj6aSsmxIflgBEdDr5Dnfqidr3",
+          "index": 0,
+          "type": "function",
+          "function": {
+           "name": "get_skill_prerequisites",
+           "arguments": "{\"skill\":\"MLflow\"}"
+          }
+         }
+        ]
+       },
+       "finish_reason": "tool_calls"
+      }
+     ],
+     "usage": {
+      "prompt_tokens": 3221,
+      "prompt_tokens_details": {
+       "cached_tokens": 3134
+      },
+      "completion_tokens": 23,
+      "total_tokens": 3244
+     }
+    }
+   },
+   {
+    "hash": "ea440807d149bee4",
+    "response": {
+     "id": "chatcmpl-272",
+     "object": "chat.completion",
+     "created": 1793161050,
+     "model": "qwen3-4b",
+     "system_fingerprint": "fp_ollama",
+     "choices": [
+      {
+       "index": 0,
+       "message": {
+        "role": "assistant",
+        "content": "{\n  \"user_id\": \"eval-02-user\",\n  \"job_id\": \"eval-02-job\",\n  \"fit_score\": 0.535,\n  \"scoring_version\": \"1\",\n  \"modules\": [\n    {\n      \"order\": 1,\n      \"skill\": \"Kubernetes\",\n      \"priority\": \"medium\",\n      \"why\": \"Not in your profile but you own 2 prerequisite(s) \u2014 quick to learn\",\n      \"builds_on\": [\n        \"Docker\"\n      ],\n      \"learn_first\": [\n        \"Linux\"\n      ],\n      \"activities\": [\n        {\n          \"type\": \"project\",\n          \"description\": \"Deploy a multi-container application using Kubernetes on a local cluster with Docker as the container runtime.\"\n        },\n        {\n          \"type\": \"course\",\n          \"description\": \"Complete a hands-on Kubernetes course covering core concepts like pods, services, and deployments.\"\n        }\n      ],\n      \"estimated_hours\": 40,\n      \"evidence_of_mastery\": \"Successfully deploy and manage a production-grade microservice application on Kubernetes with automated scaling and health checks.\"\n    },\n    {\n      \"order\": 2,\n      \"skill\": \"MLflow\",\n      \"priority\": \"medium\",\n      \"why\": \"Not in your profile but you own 1 prerequisite(s) \u2014 quick to learn\",\n      \"builds_on\": [\n        \"Python\"\n      ],\n      \"learn_first\": [\n        \"Machine Learning\",\n        \"Statistics\",\n        \"Linear Algebra\",\n        \"Probability\"\n      ],\n      \"activities\": [\n        {\n          \"type\": \"reading\",\n          \"description\": \"Read the MLflow documentation and understand its core components: tracking, registry, and model serving.\"\n        },\n        {\n          \"type\": \"project\",\n          \"description\": \"Build a machine learning pipeline that logs experiments, tracks parameters, and serves models using MLflow.\"\n        }\n      ],\n      \"estimated_hours\": 30,\n      \"evidence_of_mastery\": \"Complete a machine learning pipeline with experiment tracking, model registry, and model serving using MLflow.\"\n    }\n  ],\n  \"unmapped_skills\": [],\n  \"notes\": \"The user already has strong proficiency in Docker, Linux, Python, and Git. The main gaps are in Kubernetes and MLflow. Both are prioritized as medium due to their importance and the availability of prerequisites. The roadmap starts with Kubernetes because it has a stronger prerequisite chain and is more foundational for MLOps.\"\n}"
+       },
+       "finish_reason": "stop"
+      }
+     ],
+     "usage": {
+      "prompt_tokens": 3413,
+      "prompt_tokens_details": {
+       "cached_tokens": 3243
+      },
+      "completion_tokens": 516,
+      "total_tokens": 3929
+     }
+    }
+   }
+  ]
+ },
+ "eval-03": {
+  "reasoner": [
+   {
+    "hash": "4035817b3bfc5f63",
+    "response": {
+     "id": "chatcmpl-335",
+     "object": "chat.completion",
+     "created": 1793161083,
+     "model": "qwen3-4b",
+     "system_fingerprint": "fp_ollama",
+     "choices": [
+      {
+       "index": 0,
+       "message": {
+        "role": "assistant",
+        "content": "",
+        "tool_calls": [
+         {
+          "id": "bdyVpL7PTyvBh2MpXlE9lurGY491Dsc5",
+          "index": 0,
+          "type": "function",
+          "function": {
+           "name": "upsert_user_skills",
+           "arguments": "{\"user_id\":\"eval-03-user\",\"skills\":[{\"name\":\"SQL\",\"proficiency\":0.8},{\"name\":\"Python\",\"proficiency\":0.6},{\"name\":\"Tableau\",\"proficiency\":0.8}]}"
+          }
+         },
+         {
+          "id": "ukY5Xpx8M4EMW7wUScZTP5wGWxrPYSLM",
+          "index": 1,
+          "type": "function",
+          "function": {
+           "name": "upsert_job_posting",
+           "arguments": "{\"job_id\":\"eval-03-job\",\"title\":\"Data Engineer\",\"company\":\"Eval Co\",\"seniority\":\"mid\",\"core_skills\":[{\"name\":\"SQL\",\"weight\":0.6},{\"name\":\"Apache Spark\",\"weight\":0.6}],\"preferred_skills\":[{\"name\":\"Apache Airflow\",\"weight\":0.6}],\"domains\":[\"data_engineering\"]}"
+          }
+         },
+         {
+          "id": "7aoT1Zdye4unPPMIMen73VktXw9ZeDyP",
+          "index": 2,
+          "type": "function",
+          "function": {
+           "name": "calculate_skill_gap",
+           "arguments": "{\"user_id\":\"eval-03-user\",\"job_id\":\"eval-03-job\"}"
+          }
+         }
+        ]
+       },
+       "finish_reason": "tool_calls"
+      }
+     ],
+     "usage": {
+      "prompt_tokens": 2222,
+      "prompt_tokens_details": {
+       "cached_tokens": 2006
+      },
+      "completion_tokens": 226,
+      "total_tokens": 2448
+     }
+    }
+   },
+   {
+    "hash": "fc0973a486a8e975",
+    "response": {
+     "id": "chatcmpl-734",
+     "object": "chat.completion",
+     "created": 1793161104,
+     "model": "qwen3-4b",
+     "system_fingerprint": "fp_ollama",
+     "choices": [
+      {
+       "index": 0,
+       "message": {
+        "role": "assistant",
+        "content": "",
+        "tool_calls": [
+         {
+          "id": "1AxiqCPL3uFLI1fXaQ6aqRGiDZp2kGzf",
+          "index": 0,
+          "type": "function",
+          "function": {
+           "name": "get_skill_prerequisites",
+           "arguments": "{\"skill\":\"Apache Spark\"}"
+          }
+         },
+         {
+          "id": "1gJ58bBiAPbFjSxA5bnkmBPv0hMZB4t7",
+          "index": 1,
+          "type": "function",
+          "function": {
+           "name": "get_skill_prerequisites",
+           "arguments": "{\"skill\":\"Apache Airflow\"}"
+          }
+         }
+        ]
+       },
+       "finish_reason": "tool_calls"
+      }
+     ],
+     "usage": {
+      "prompt_tokens": 3066,
+      "prompt_tokens_details": {
+       "cached_tokens": 2447
+      },
+      "completion_tokens": 47,
+      "total_tokens": 3113
+     }
+    }
+   },
+   {
+    "hash": "61bdad038da2b18e",
+    "response": {
+     "id": "chatcmpl-444",
+     "object": "chat.completion",
+     "created": 1793161172,
+     "model": "qwen3-4b",
+     "system_fingerprint": "fp_ollama",
+     "choices": [
+      {
+       "index": 0,
+       "message": {
+        "role": "assistant",
+        "content": "{\n  \"user_id\": \"eval-03-user\",\n  \"job_id\": \"eval-03-job\",\n  \"fit_score\": 0.535,\n  \"scoring_version\": \"1\",\n  \"modules\": [\n    {\n      \"order\": 1,\n      \"skill\": \"Apache Spark\",\n      \"priority\": \"medium\",\n      \"why\": \"Not in your profile but you own 2 prerequisite(s) \u2014 quick to learn\",\n      \"builds_on\": [\n        \"Python\",\n        \"SQL\"\n      ],\n      \"learn_first\": [],\n      \"activities\": [\n        {\n          \"type\": \"project\",\n          \"description\": \"Build a data pipeline using Apache Spark to process 100MB of CSV data and write results to a Parquet file.\"\n        },\n        {\n          \"type\": \"course\",\n          \"description\": \"Complete a 5-part course on Apache Spark fundamentals covering RDDs, DataFrames, and Spark SQL.\"\n        }\n      ],\n      \"estimated_hours\": 40,\n      \"evidence_of_mastery\": \"Successfully run a Spark job on a sample dataset and produce a Parquet output file.\"\n    },\n    {\n      \"order\": 2,\n      \"skill\": \"Apache Airflow\",\n      \"priority\": \"medium\",\n      \"why\": \"Not in your profile but you own 1 prerequisite(s) \u2014 quick to learn\",\n      \"builds_on\": [\n        \"Python\"\n      ],\n      \"learn_first\": [],\n      \"activities\": [\n        {\n          \"type\": \"project\",\n          \"description\": \"Create a workflow that schedules and runs a Python script to process data using Airflow.\"\n        },\n        {\n          \"type\": \"course\",\n          \"description\": \"Complete a 4-part course on Apache Airflow for data engineers covering DAGs and triggers.\"\n        }\n      ],\n      \"estimated_hours\": 30,\n      \"evidence_of_mastery\": \"Successfully deploy and run a data pipeline workflow using Airflow with error handling and monitoring.\"\n    }\n  ],\n  \"unmapped_skills\": [],\n  \"notes\": \"The user already has proficiency in SQL and Python, which are prerequisites for both Apache Spark and Apache Airflow. Both skills are core or preferred in the job, and the roadmap prioritizes them as medium due to the availability of prerequisites.\"\n}"
+       },
+       "finish_reason": "stop"
+      }
+     ],
+     "usage": {
+      "prompt_tokens": 3247,
+      "prompt_tokens_details": {
+       "cached_tokens": 3112
+      },
+      "completion_tokens": 484,
+      "total_tokens": 3731
+     }
+    }
+   }
+  ]
+ },
+ "eval-04": {
+  "reasoner": [
+   {
+    "hash": "647a5eb1f7aee0db",
+    "response": {
+     "id": "chatcmpl-229",
+     "object": "chat.completion",
+     "created": 1793161202,
+     "model": "qwen3-4b",
+     "system_fingerprint": "fp_ollama",
+     "choices": [
+      {
+       "index": 0,
+       "message": {
+        "role": "assistant",
+        "content": "",
+        "tool_calls": [
+         {
+          "id": "84VOLYGsXkhCA0sCSQl2ObfpuR4jKNhq",
+          "index": 0,
+          "type": "function",
+          "function": {
+           "name": "upsert_user_skills",
+           "arguments": "{\"user_id\":\"eval-04-user\",\"skills\":[{\"name\":\"Python\",\"proficiency\":0.8},{\"name\":\"NumPy\",\"proficiency\":0.6}],\"target_domain\":\"computer_vision\"}"
+          }
+         },
+         {
+          "id": "B2ZYczowc8GXt72LuToWaNNttT6ytCf9",
+          "index": 1,
+          "type": "function",
+          "function": {
+           "name": "upsert_job_posting",
+           "arguments": "{\"job_id\":\"eval-04-job\",\"title\":\"Computer Vision Engineer\",\"company\":\"Eval Co\",\"seniority\":\"junior\",\"core_skills\":[{\"name\":\"OpenCV\",\"weight\":0.4},{\"name\":\"Python\",\"weight\":0.4}],\"preferred_skills\":[{\"name\":\"Computer Vision\",\"weight\":0.4}],\"domains\":[\"computer_vision\"]}"
+          }
+         },
+         {
+          "id": "8tZa1FjY0yS80B0BsW99Kh2DqM5tr9Yf",
+          "index": 2,
+          "type": "function",
+          "function": {
+           "name": "calculate_skill_gap",
+           "arguments": "{\"user_id\":\"eval-04-user\",\"job_id\":\"eval-04-job\"}"
+          }
+         }
+        ]
+       },
+       "finish_reason": "tool_calls"
+      }
+     ],
+     "usage": {
+      "prompt_tokens": 2201,
+      "prompt_tokens_details": {
+       "cached_tokens": 2006
+      },
+      "completion_tokens": 220,
+      "total_tokens": 2421
+     }
+    }
+   },
+   {
+    "hash": "912b46d420fa78cd",
+    "response": {
+     "id": "chatcmpl-46",
+     "object": "chat.completion",
+     "created": 1793161223,
+     "model": "qwen3-4b",
+     "system_fingerprint": "fp_ollama",
+     "choices": [
+      {
+       "index": 0,
+       "message": {
+        "role": "assistant",
+        "content": "",
+        "tool_calls": [
+         {
+          "id": "ejEiR9Z32ZIs42Or4xogSqC3EHkp6b6N",
+          "index": 0,
+          "type": "function",
+          "function": {
+           "name": "get_skill_prerequisites",
+           "arguments": "{\"skill\":\"OpenCV\"}"
+          }
+         },
+         {
+          "id": "3PEGitHQEtsZVVy8jFaKMME86ffU2hET",
+          "index": 1,
+          "type": "function",
+          "function": {
+           "name": "get_skill_prerequisites",
+           "arguments": "{\"skill\":\"Computer Vision\"}"
+          }
+         }
+        ]
+       },
+       "finish_reason": "tool_calls"
+      }
+     ],
+     "usage": {
+      "prompt_tokens": 3035,
+      "prompt_tokens_details": {
+       "cached_tokens": 2420
+      },
+      "completion_tokens": 46,
+      "total_tokens": 3081
+     }
+    }
+   },
+   {
+    "hash": "c9b8dc41ec052c8e",
+    "response": {
+     "id": "chatcmpl-653",
+     "object": "chat.completion",
+     "created": 1793161298,
+     "model": "qwen3-4b",
+     "system_fingerprint": "fp_ollama",
+     "choices": [
+      {
+       "index": 0,
+       "message": {
+        "role": "assistant",
+        "content": "{\n  \"user_id\": \"eval-04-user\",\n  \"job_id\": \"eval-04-job\",\n  \"fit_score\": 0.56,\n  \"scoring_version\": \"1\",\n  \"modules\": [\n    {\n      \"order\": 1,\n      \"skill\": \"OpenCV\",\n      \"priority\": \"medium\",\n      \"why\": \"Not in your profile but you own 2 prerequisite(s) \u2014 quick to learn\",\n      \"builds_on\": [\n        \"NumPy\",\n        \"Python\"\n      ],\n      \"learn_first\": [],\n      \"activities\": [\n        {\n          \"type\": \"project\",\n          \"description\": \"Build a face detection demo using OpenCV on a dataset of 500 images with labeled faces.\"\n        }\n      ],\n      \"estimated_hours\": 40,\n      \"evidence_of_mastery\": \"Successfully detect faces in at least 90% of test images using OpenCV's Haar cascades.\"\n    },\n    {\n      \"order\": 2,\n      \"skill\": \"Computer Vision\",\n      \"priority\": \"medium\",\n      \"why\": \"Not in your profile but you own 1 prerequisite(s) \u2014 quick to learn\",\n      \"builds_on\": [\n        \"Deep Learning\",\n        \"Machine Learning\",\n        \"Statistics\",\n        \"Linear Algebra\",\n        \"Python\"\n      ],\n      \"learn_first\": [\n        \"Deep Learning\",\n        \"Machine Learning\",\n        \"Statistics\",\n        \"Linear Algebra\"\n      ],\n      \"activities\": [\n        {\n          \"type\": \"course\",\n          \"description\": \"Complete a 5-part course on foundational computer vision concepts including image filtering, edge detection, and object recognition.\"\n        },\n        {\n          \"type\": \"reading\",\n          \"description\": \"Read and summarize 3 research papers on computer vision applications in real-world scenarios.\"\n        },\n        {\n          \"type\": \"project\",\n          \"description\": \"Implement a simple object detection model using a pre-trained CNN and evaluate it on a public dataset.\"\n        }\n      ],\n      \"estimated_hours\": 80,\n      \"evidence_of_mastery\": \"Successfully implement and evaluate a computer vision model on a public dataset with at least 70% accuracy.\"\n    }\n  ],\n  \"unmapped_skills\": [],\n  \"notes\": \"The user already has Python and NumPy, which are prerequisites for OpenCV. However, the user lacks core skills like OpenCV and Computer Vision. The roadmap prioritizes learning OpenCV first due to its direct applicability and fewer prerequisites.\"\n}"
+       },
+       "finish_reason": "stop"
+      }
+     ],
+     "usage": {
+      "prompt_tokens": 3333,
+      "prompt_tokens_details": {
+       "cached_tokens": 3080
+      },
+      "completion_tokens": 528,
+      "total_tokens": 3861
+     }
+    }
+   },
+   {
+    "hash": "241afc0038cd389a",
+    "response": {
+     "id": "chatcmpl-636",
+     "object": "chat.completion",
+     "created": 1793161305,
+     "model": "qwen3-4b",
+     "system_fingerprint": "fp_ollama",
+     "choices": [
+      {
+       "index": 0,
+       "message": {
+        "role": "assistant",
+        "content": "",
+        "tool_calls": [
+         {
+          "id": "siop6R4ET2mz7k0F3iFmwYOWzLdwdCmg",
+          "index": 0,
+          "type": "function",
+          "function": {
+           "name": "get_skill_prerequisites",
+           "arguments": "{\"skill\":\"Deep Learning\"}"
+          }
+         }
+        ]
+       },
+       "finish_reason": "tool_calls"
+      }
+     ],
+     "usage": {
+      "prompt_tokens": 3931,
+      "prompt_tokens_details": {
+       "cached_tokens": 3860
+      },
+      "completion_tokens": 23,
+      "total_tokens": 3954
+     }
+    }
+   },
+   {
+    "hash": "4662c174da219e8a",
+    "response": {
+     "id": "chatcmpl-985",
+     "object": "chat.completion",
+     "created": 1793161314,
+     "model": "qwen3-4b",
+     "system_fingerprint": "fp_ollama",
+     "choices": [
+      {
+       "index": 0,
+       "message": {
+        "role": "assistant",
+        "content": "",
+        "tool_calls": [
+         {
+          "id": "inqKaZkwAvGadrG0RTbb5aK1Ch9NC3u1",
+          "index": 0,
+          "type": "function",
+          "function": {
+           "name": "get_skill_prerequisites",
+           "arguments": "{\"skill\":\"Machine Learning\"}"
+          }
+         }
+        ]
+       },
+       "finish_reason": "tool_calls"
+      }
+     ],
+     "usage": {
+      "prompt_tokens": 4126,
+      "prompt_tokens_details": {
+       "cached_tokens": 3953
+      },
+      "completion_tokens": 23,
+      "total_tokens": 4149
+     }
+    }
+   },
+   {
+    "hash": "661550b74258a7a4",
+    "response": {
+     "id": "chatcmpl-497",
+     "object": "chat.completion",
+     "created": 1793161406,
+     "model": "qwen3-4b",
+     "system_fingerprint": "fp_ollama",
+     "choices": [
+      {
+       "index": 0,
+       "message": {
+        "role": "assistant",
+        "content": "{\n  \"user_id\": \"eval-04-user\",\n  \"job_id\": \"eval-04-job\",\n  \"fit_score\": 0.56,\n  \"scoring_version\": \"1\",\n  \"modules\": [\n    {\n      \"order\": 1,\n      \"skill\": \"OpenCV\",\n      \"priority\": \"medium\",\n      \"why\": \"Not in your profile but you own 2 prerequisite(s) \u2014 quick to learn\",\n      \"builds_on\": [\n        \"NumPy\",\n        \"Python\"\n      ],\n      \"learn_first\": [],\n      \"activities\": [\n        {\n          \"type\": \"project\",\n          \"description\": \"Build a face detection demo using OpenCV on a dataset of 500 images with labeled faces.\"\n        }\n      ],\n      \"estimated_hours\": 40,\n      \"evidence_of_mastery\": \"Successfully detect faces in at least 90% of test images using OpenCV's Haar cascades.\"\n    },\n    {\n      \"order\": 2,\n      \"skill\": \"Computer Vision\",\n      \"priority\": \"medium\",\n      \"why\": \"Not in your profile but you own 1 prerequisite(s) \u2014 quick to learn\",\n      \"builds_on\": [\n        \"Python\"\n      ],\n      \"learn_first\": [\n        \"Machine Learning\",\n        \"Statistics\",\n        \"Linear Algebra\"\n      ],\n      \"activities\": [\n        {\n          \"type\": \"course\",\n          \"description\": \"Complete a 5-part course on foundational computer vision concepts including image filtering, edge detection, and object recognition.\"\n        },\n        {\n          \"type\": \"reading\",\n          \"description\": \"Read and summarize 3 research papers on computer vision applications in real-world scenarios.\"\n        },\n        {\n          \"type\": \"project\",\n          \"description\": \"Implement a simple object detection model using a pre-trained CNN and evaluate it on a public dataset.\"\n        }\n      ],\n      \"estimated_hours\": 80,\n      \"evidence_of_mastery\": \"Successfully implement and evaluate a computer vision model on a public dataset with at least 70% accuracy.\"\n    }\n  ],\n  \"unmapped_skills\": [],\n  \"notes\": \"The user already has Python and NumPy, which are prerequisites for OpenCV. However, the user lacks core skills like OpenCV and Computer Vision. The roadmap prioritizes learning OpenCV first due to its direct applicability and fewer prerequisites. The original module for 'Computer Vision' incorrectly listed prerequisites that the user neither has nor learns earlier. The corrected module now only lists Python as a direct prerequisite, with the other skills (Machine Learning, Statistics, Linear Algebra) being learned in a separate, earlier module as required by the prerequisite chain.\"\n}"
+       },
+       "finish_reason": "stop"
+      }
+     ],
+     "usage": {
+      "prompt_tokens": 4289,
+      "prompt_tokens_details": {
+       "cached_tokens": 4148
+      },
+      "completion_tokens": 564,
+      "total_tokens": 4853
+     }
+    }
+   }
+  ]
+ },
+ "eval-05": {
+  "reasoner": [
+   {
+    "hash": "7bea5574fc6a1c96",
+    "response": {
+     "id": "chatcmpl-219",
+     "object": "chat.completion",
+     "created": 1793161447,
+     "model": "qwen3-4b",
+     "system_fingerprint": "fp_ollama",
+     "choices": [
+      {
+       "index": 0,
+       "message": {
+        "role": "assistant",
+        "content": "",
+        "tool_calls": [
+         {
+          "id": "mIiLlb98TulnZXzd45AUWBeJBGGMrCPw",
+          "index": 0,
+          "type": "function",
+          "function": {
+           "name": "upsert_user_skills",
+           "arguments": "{\"user_id\":\"eval-05-user\",\"skills\":[{\"name\":\"Python\",\"proficiency\":0.95},{\"name\":\"PyTorch\",\"proficiency\":0.8},{\"name\":\"Natural Language Processing\",\"proficiency\":0.8}],\"target_domain\":\"nlp\"}"
+          }
+         },
+         {
+          "id": "CFrMCn7Yjm0FK05b3yDztHlVjerNEq26",
+          "index": 1,
+          "type": "function",
+          "function": {
+           "name": "upsert_job_posting",
+           "arguments": "{\"job_id\":\"eval-05-job\",\"title\":\"NLP Engineer\",\"company\":\"Eval Co\",\"seniority\":\"senior\",\"core_skills\":[{\"name\":\"PyTorch\",\"weight\":0.8},{\"name\":\"Natural Language Processing\",\"weight\":0.8}],\"preferred_skills\":[{\"name\":\"LLM fine-tuning\",\"weight\":0.8}],\"domains\":[\"nlp\"]}"
+          }
+         }
+        ]
+       },
+       "finish_reason": "tool_calls"
+      }
+     ],
+     "usage": {
+      "prompt_tokens": 2231,
+      "prompt_tokens_details": {
+       "cached_tokens": 2006
+      },
+      "completion_tokens": 278,
+      "total_tokens": 2509
+     }
+    }
+   },
+   {
+    "hash": "8ad01c003d21876e",
+    "response": {
+     "id": "chatcmpl-182",
+     "object": "chat.completion",
+     "created": 1793161462,
+     "model": "qwen3-4b",
+     "system_fingerprint": "fp_ollama",
+     "choices": [
+      {
+       "index": 0,
+       "message": {
+        "role": "assistant",
+        "content": "",
+        "tool_calls": [
+         {
+          "id": "Ovs7fExtrrIsrCmP4rsAVKwFISdJ50f5",
+          "index": 0,
+          "type": "function",
+          "function": {
+           "name": "calculate_skill_gap",
+           "arguments": "{\"user_id\":\"eval-05-user\",\"job_id\":\"eval-05-job\"}"
+          }
+         }
+        ]
+       },
+       "finish_reason": "tool_calls"
+      }
+     ],
+     "usage": {
+      "prompt_tokens": 2566,
+      "prompt_tokens_details": {
+       "cached_tokens": 2233
+      },
+      "completion_tokens": 37,
+      "total_tokens": 2603
+     }
+    }
+   },
+   {
+    "hash": "673c2a8d18452af3",
+    "response": {
+     "id": "chatcmpl-9",
+     "object": "chat.completion",
+     "created": 1793161478,
+     "model": "qwen3-4b",
+     "system_fingerprint": "fp_ollama",
+     "choices": [
+      {
+       "index": 0,
+       "message": {
+        "role": "assistant",
+        "content": "",
+        "tool_calls": [
+         {
+          "id": "jNNpHLO31UyREsj4G2eokXtgzpaUIxaq",
+          "index": 0,
+          "type": "function",
+          "function": {
+           "name": "get_skill_prerequisites",
+           "arguments": "{\"skill\":\"LLM fine-tuning\"}"
+          }
+         }
+        ]
+       },
+       "finish_reason": "tool_calls"
+      }
+     ],
+     "usage": {
+      "prompt_tokens": 3045,
+      "prompt_tokens_details": {
+       "cached_tokens": 2602
+      },
+      "completion_tokens": 26,
+      "total_tokens": 3071
+     }
+    }
+   },
+   {
+    "hash": "b95d53abc880b1c7",
+    "response": {
+     "id": "chatcmpl-811",
+     "object": "chat.completion",
+     "created": 1793161529,
+     "model": "qwen3-4b",
+     "system_fingerprint": "fp_ollama",
+     "choices": [
+      {
+       "index": 0,
+       "message": {
+        "role": "assistant",
+        "content": "{\n  \"user_id\": \"eval-05-user\",\n  \"job_id\": \"eval-05-job\",\n  \"fit_score\": 0.863,\n  \"scoring_version\": \"1\",\n  \"modules\": [\n    {\n      \"order\": 1,\n      \"skill\": \"LLM fine-tuning\",\n      \"priority\": \"medium\",\n      \"why\": \"Not in your profile but you own 2 prerequisite(s) \u2014 quick to learn\",\n      \"builds_on\": [\n        \"PyTorch\",\n        \"HuggingFace Transformers\"\n      ],\n      \"learn_first\": [\n        \"NumPy\"\n      ],\n      \"activities\": [\n        {\n          \"type\": \"project\",\n          \"description\": \"Build a fine-tuning pipeline for a small language model using Hugging Face Transformers and PyTorch, processing a dataset of 1000+ documents.\"\n        },\n        {\n          \"type\": \"course\",\n          \"description\": \"Complete a foundational course on Hugging Face Transformers and PyTorch integration.\"\n        },\n        {\n          \"type\": \"practice\",\n          \"description\": \"Implement and test a simple fine-tuning workflow with a pre-trained model on a custom dataset.\"\n        }\n      ],\n      \"estimated_hours\": 60,\n      \"evidence_of_mastery\": \"Successfully fine-tune a model on a custom dataset and evaluate performance with metrics like BLEU and ROUGE.\"\n    }\n  ],\n  \"unmapped_skills\": [],\n  \"notes\": \"The main gap is in LLM fine-tuning, which is a preferred skill. You already have proficiency in PyTorch and NLP, which are prerequisites. Focus on building hands-on experience with Hugging Face and PyTorch to bridge this gap.\"\n}"
+       },
+       "finish_reason": "stop"
+      }
+     ],
+     "usage": {
+      "prompt_tokens": 3220,
+      "prompt_tokens_details": {
+       "cached_tokens": 3070
+      },
+      "completion_tokens": 367,
+      "total_tokens": 3587
+     }
+    }
+   },
+   {
+    "hash": "9169f5040734a6d4",
+    "response": {
+     "id": "chatcmpl-330",
+     "object": "chat.completion",
+     "created": 1793161538,
+     "model": "qwen3-4b",
+     "system_fingerprint": "fp_ollama",
+     "choices": [
+      {
+       "index": 0,
+       "message": {
+        "role": "assistant",
+        "content": "",
+        "tool_calls": [
+         {
+          "id": "98TaVLKYZ7mR5e7EETXqETskGxXopE0D",
+          "index": 0,
+          "type": "function",
+          "function": {
+           "name": "get_skill_prerequisites",
+           "arguments": "{\"skill\":\"HuggingFace Transformers\"}"
+          }
+         }
+        ]
+       },
+       "finish_reason": "tool_calls"
+      }
+     ],
+     "usage": {
+      "prompt_tokens": 3654,
+      "prompt_tokens_details": {
+       "cached_tokens": 3586
+      },
+      "completion_tokens": 25,
+      "total_tokens": 3679
+     }
+    }
+   },
+   {
+    "hash": "33b7dd6fab4bc71b",
+    "response": {
+     "id": "chatcmpl-486",
+     "object": "chat.completion",
+     "created": 1793161596,
+     "model": "qwen3-4b",
+     "system_fingerprint": "fp_ollama",
+     "choices": [
+      {
+       "index": 0,
+       "message": {
+        "role": "assistant",
+        "content": "{\n  \"user_id\": \"eval-05-user\",\n  \"job_id\": \"eval-05-job\",\n  \"fit_score\": 0.863,\n  \"scoring_version\": \"1\",\n  \"modules\": [\n    {\n      \"order\": 1,\n      \"skill\": \"LLM fine-tuning\",\n      \"priority\": \"medium\",\n      \"why\": \"Not in your profile but you own 2 prerequisite(s) \u2014 quick to learn\",\n      \"builds_on\": [\n        \"PyTorch\",\n        \"PyTorch\"\n      ],\n      \"learn_first\": [\n        \"NumPy\"\n      ],\n      \"activities\": [\n        {\n          \"type\": \"project\",\n          \"description\": \"Build a fine-tuning pipeline for a small language model using Hugging Face Transformers and PyTorch, processing a dataset of 1000+ documents.\"\n        },\n        {\n          \"type\": \"course\",\n          \"description\": \"Complete a foundational course on Hugging Face Transformers and PyTorch integration.\"\n        },\n        {\n          \"type\": \"practice\",\n          \"description\": \"Implement and test a simple fine-tuning workflow with a pre-trained model on a custom dataset.\"\n        }\n      ],\n      \"estimated_hours\": 60,\n      \"evidence_of_mastery\": \"Successfully fine-tune a model on a custom dataset and evaluate performance with metrics like BLEU and ROUGE.\"\n    }\n  ],\n  \"unmapped_skills\": [],\n  \"notes\": \"The main gap is in LLM fine-tuning, which is a preferred skill. You already have proficiency in PyTorch and NLP, which are prerequisites. Focus on building hands-on experience with Hugging Face and PyTorch to bridge this gap. HuggingFace Transformers is a prerequisite but not a standalone skill in your profile; it is built upon PyTorch and Python, which you already have.\"\n}"
+       },
+       "finish_reason": "stop"
+      }
+     ],
+     "usage": {
+      "prompt_tokens": 3797,
+      "prompt_tokens_details": {
+       "cached_tokens": 3678
+      },
+      "completion_tokens": 397,
+      "total_tokens": 4194
+     }
+    }
+   }
+  ]
+ },
+ "eval-06": {
+  "reasoner": [
+   {
+    "hash": "a5a0f2157620a60d",
+    "response": {
+     "id": "chatcmpl-381",
+     "object": "chat.completion",
+     "created": 1793161629,
+     "model": "qwen3-4b",
+     "system_fingerprint": "fp_ollama",
+     "choices": [
+      {
+       "index": 0,
+       "message": {
+        "role": "assistant",
+        "content": "",
+        "tool_calls": [
+         {
+          "id": "UNHI9rOx57hZaGo9ZMA8OyfxQ1v3tmST",
+          "index": 0,
+          "type": "function",
+          "function": {
+           "name": "upsert_user_skills",
+           "arguments": "{\"user_id\":\"eval-06-user\",\"skills\":[{\"category\":\"programming\",\"name\":\"Python\",\"proficiency\":0.8},{\"category\":\"machine learning\",\"name\":\"Machine Learning\",\"proficiency\":0.8},{\"category\":\"data infrastructure\",\"name\":\"Elasticsearch\",\"proficiency\":0.6}]}"
+          }
+         },
+         {
+          "id": "xxY0Oq4TL3PwTQiXmNUECUQWAxybPDb9",
+          "index": 1,
+          "type": "function",
+          "function": {
+           "name": "upsert_job_posting",
+           "arguments": "{\"job_id\":\"eval-06-job\",\"title\":\"RAG Engineer\",\"company\":\"Eval Co\",\"seniority\":\"mid\",\"core_skills\":[{\"category\":\"nlp\",\"name\":\"Retrieval-Augmented Generation\",\"weight\":0.6},{\"category\":\"nlp\",\"name\":\"Vector Databases\",\"weight\":0.6}],\"preferred_skills\":[{\"category\":\"nlp\",\"name\":\"LangChain\",\"weight\":0.6}],\"domains\":[\"nlp\"]}"
+          }
+         },
+         {
+          "id": "srgsnBhxOmLo2ZvSi6BQbOeYlL9cmlxg",
+          "index": 2,
+          "type": "function",
+          "function": {
+           "name": "calculate_skill_gap",
+           "arguments": "{\"user_id\":\"eval-06-user\",\"job_id\":\"eval-06-job\"}"
+          }
+         }
+        ]
+       },
+       "finish_reason": "tool_calls"
+      }
+     ],
+     "usage": {
+      "prompt_tokens": 2228,
+      "prompt_tokens_details": {
+       "cached_tokens": 2006
+      },
+      "completion_tokens": 277,
+      "total_tokens": 2505
+     }
+    }
+   },
+   {
+    "hash": "aaa6fa63fca51cf6",
+    "response": {
+     "id": "chatcmpl-767",
+     "object": "chat.completion",
+     "created": 1793161660,
+     "model": "qwen3-4b",
+     "system_fingerprint": "fp_ollama",
+     "choices": [
+      {
+       "index": 0,
+       "message": {
+        "role": "assistant",
+        "content": "",
+        "tool_calls": [
+         {
+          "id": "sROJdNxcoOpY9a8AGPZZwuRwy7vXg0t1",
+          "index": 0,
+          "type": "function",
+          "function": {
+           "name": "get_skill_prerequisites",
+           "arguments": "{\"skill\":\"Vector Databases\"}"
+          }
+         },
+         {
+          "id": "OfbCcJfSZqqV35gwrYB3ysBkthEcU0S1",
+          "index": 1,
+          "type": "function",
+          "function": {
+           "name": "get_skill_prerequisites",
+           "arguments": "{\"skill\":\"Retrieval-Augmented Generation\"}"
+          }
+         },
+         {
+          "id": "dbbKDm9YkFZKMpNOu6Ot58Ihn7JzeIys",
+          "index": 2,
+          "type": "function",
+          "function": {
+           "name": "get_skill_prerequisites",
+           "arguments": "{\"skill\":\"LangChain\"}"
+          }
+         }
+        ]
+       },
+       "finish_reason": "tool_calls"
+      }
+     ],
+     "usage": {
+      "prompt_tokens": 3211,
+      "prompt_tokens_details": {
+       "cached_tokens": 2257
+      },
+      "completion_tokens": 74,
+      "total_tokens": 3285
+     }
+    }
+   },
+   {
+    "hash": "00b25e30acc5aa4d",
+    "response": {
+     "id": "chatcmpl-496",
+     "object": "chat.completion",
+     "created": 1793161751,
+     "model": "qwen3-4b",
+     "system_fingerprint": "fp_ollama",
+     "choices": [
+      {
+       "index": 0,
+       "message": {
+        "role": "assistant",
+        "content": "{\n  \"user_id\": \"eval-06-user\",\n  \"job_id\": \"eval-06-job\",\n  \"fit_score\": 0.265,\n  \"scoring_version\": \"1\",\n  \"modules\": [\n    {\n      \"order\": 1,\n      \"skill\": \"Vector Databases\",\n      \"priority\": \"medium\",\n      \"why\": \"Not in your profile but you own 2 prerequisite(s) \u2014 quick to learn\",\n      \"builds_on\": [\n        \"Elasticsearch\",\n        \"Python\"\n      ],\n      \"learn_first\": [],\n      \"activities\": [\n        {\n          \"type\": \"project\",\n          \"description\": \"Build a RAG system using a vector database to store and retrieve documents, then integrate it with a language model to generate responses.\"\n        }\n      ],\n      \"estimated_hours\": 40,\n      \"evidence_of_mastery\": \"Successfully implement a RAG pipeline with a vector database and retrieve relevant documents from a corpus.\"\n    },\n    {\n      \"order\": 2,\n      \"skill\": \"Retrieval-Augmented Generation\",\n      \"priority\": \"medium\",\n      \"why\": \"Not in your profile but you own 2 prerequisite(s) \u2014 quick to learn\",\n      \"builds_on\": [\n        \"Vector Databases\"\n      ],\n      \"learn_first\": [],\n      \"activities\": [\n        {\n          \"type\": \"project\",\n          \"description\": \"Develop a retrieval-augmented generation system that retrieves relevant documents and uses them to generate human-like responses.\"\n        }\n      ],\n      \"estimated_hours\": 60,\n      \"evidence_of_mastery\": \"Demonstrate a RAG system that retrieves relevant documents and generates coherent, context-aware responses.\"\n    },\n    {\n      \"order\": 3,\n      \"skill\": \"LangChain\",\n      \"priority\": \"medium\",\n      \"why\": \"Not in your profile but you own 1 prerequisite(s) \u2014 quick to learn\",\n      \"builds_on\": [\n        \"Python\"\n      ],\n      \"learn_first\": [],\n      \"activities\": [\n        {\n          \"type\": \"course\",\n          \"description\": \"Complete a course on LangChain to understand its architecture and how to build chains for RAG workflows.\"\n        },\n        {\n          \"type\": \"practice\",\n          \"description\": \"Implement a simple LangChain application that retrieves documents and generates responses using a prompt template.\"\n        }\n      ],\n      \"estimated_hours\": 30,\n      \"evidence_of_mastery\": \"Build and deploy a LangChain application that retrieves documents and generates responses using a prompt template.\"\n    }\n  ],\n  \"unmapped_skills\": [],\n  \"notes\": \"The user has strong foundational skills in Python and machine learning, which support learning the required RAG skills. All prerequisites are covered, and the roadmap prioritizes skills based on their importance and ease of acquisition.\"\n}"
+       },
+       "finish_reason": "stop"
+      }
+     ],
+     "usage": {
+      "prompt_tokens": 3562,
+      "prompt_tokens_details": {
+       "cached_tokens": 3284
+      },
+      "completion_tokens": 599,
+      "total_tokens": 4161
+     }
+    }
+   },
+   {
+    "hash": "386105737ade2b58",
+    "response": {
+     "id": "chatcmpl-179",
+     "object": "chat.completion",
+     "created": 1793161770,
+     "model": "qwen3-4b",
+     "system_fingerprint": "fp_ollama",
+     "choices": [
+      {
+       "index": 0,
+       "message": {
+        "role": "assistant",
+        "content": "",
+        "tool_calls": [
+         {
+          "id": "xTFNmlX4uOwRyMw2gFa0qMELOzYwBfzg",
+          "index": 0,
+          "type": "function",
+          "function": {
+           "name": "get_skill_prerequisites",
+           "arguments": "{\"skill\":\"Retrieval-Augmented Generation\"}"
+          }
+         }
+        ]
+       },
+       "finish_reason": "tool_calls"
+      }
+     ],
+     "usage": {
+      "prompt_tokens": 4221,
+      "prompt_tokens_details": {
+       "cached_tokens": 4160
+      },
+      "completion_tokens": 27,
+      "total_tokens": 4248
+     }
+    }
+   },
+   {
+    "hash": "e08ce34ce07ad424",
+    "response": {
+     "id": "chatcmpl-848",
+     "object": "chat.completion",
+     "created": 1793161870,
+     "model": "qwen3-4b",
+     "system_fingerprint": "fp_ollama",
+     "choices": [
+      {
+       "index": 0,
+       "message": {
+        "role": "assistant",
+        "content": "{\n  \"user_id\": \"eval-06-user\",\n  \"job_id\": \"eval-06-job\",\n  \"fit_score\": 0.265,\n  \"scoring_version\": \"1\",\n  \"modules\": [\n    {\n      \"order\": 1,\n      \"skill\": \"Vector Databases\",\n      \"priority\": \"medium\",\n      \"why\": \"Not in your profile but you own 2 prerequisite(s) \u2014 quick to learn\",\n      \"builds_on\": [\n        \"Elasticsearch\",\n        \"Python\"\n      ],\n      \"learn_first\": [],\n      \"activities\": [\n        {\n          \"type\": \"project\",\n          \"description\": \"Build a RAG system using a vector database to store and retrieve documents, then integrate it with a language model to generate responses.\"\n        }\n      ],\n      \"estimated_hours\": 40,\n      \"evidence_of_mastery\": \"Successfully implement a RAG pipeline with a vector database and retrieve relevant documents from a corpus.\"\n    },\n    {\n      \"order\": 2,\n      \"skill\": \"LangChain\",\n      \"priority\": \"medium\",\n      \"why\": \"Not in your profile but you own 1 prerequisite(s) \u2014 quick to learn\",\n      \"builds_on\": [\n        \"Python\"\n      ],\n      \"learn_first\": [],\n      \"activities\": [\n        {\n          \"type\": \"course\",\n          \"description\": \"Complete a course on LangChain to understand its architecture and how to build chains for RAG workflows.\"\n        },\n        {\n          \"type\": \"practice\",\n          \"description\": \"Implement a simple LangChain application that retrieves documents and generates responses using a prompt template.\"\n        }\n      ],\n      \"estimated_hours\": 30,\n      \"evidence_of_mastery\": \"Build and deploy a LangChain application that retrieves documents and generates responses using a prompt template.\"\n    },\n    {\n      \"order\": 3,\n      \"skill\": \"Retrieval-Augmented Generation\",\n      \"priority\": \"medium\",\n      \"why\": \"Not in your profile but you own 2 prerequisite(s) \u2014 quick to learn\",\n      \"builds_on\": [\n        \"Vector Databases\",\n        \"LangChain\"\n      ],\n      \"learn_first\": [],\n      \"activities\": [\n        {\n          \"type\": \"project\",\n          \"description\": \"Develop a retrieval-augmented generation system that retrieves relevant documents and uses them to generate human-like responses.\"\n        }\n      ],\n      \"estimated_hours\": 60,\n      \"evidence_of_mastery\": \"Demonstrate a RAG system that retrieves relevant documents and generates coherent, context-aware responses.\"\n    }\n  ],\n  \"unmapped_skills\": [],\n  \"notes\": \"The user has strong foundational skills in Python and machine learning, which support learning the required RAG skills. All prerequisites are covered, and the roadmap now correctly orders modules based on prerequisite dependencies.\"\n}"
+       },
+       "finish_reason": "stop"
+      }
+     ],
+     "usage": {
+      "prompt_tokens": 4397,
+      "prompt_tokens_details": {
+       "cached_tokens": 4247
+      },
+      "completion_tokens": 601,
+      "total_tokens": 4998
+     }
+    }
+   }
+  ]
+ },
+ "eval-07": {
+  "reasoner": [
+   {
+    "hash": "a5045e7e9389d94c",
+    "response": {
+     "id": "chatcmpl-363",
+     "object": "chat.completion",
+     "created": 1793161891,
+     "model": "qwen3-4b",
+     "system_fingerprint": "fp_ollama",
+     "choices": [
+      {
+       "index": 0,
+       "message": {
+        "role": "assistant",
+        "content": "",
+        "tool_calls": [
+         {
+          "id": "vSLM2a6nZ2dbfBlWgNDW4H1sM1XwnYDt",
+          "index": 0,
+          "type": "function",
+          "function": {
+           "name": "resolve_skills",
+           "arguments": "{\"names\":[\"R\",\"Statistics\",\"Probability\",\"Python\",\"scikit-learn\",\"Pandas\"]}"
+          }
+         }
+        ]
+       },
+       "finish_reason": "tool_calls"
+      }
+     ],
+     "usage": {
+      "prompt_tokens": 2216,
+      "prompt_tokens_details": {
+       "cached_tokens": 2006
+      },
+      "completion_tokens": 40,
+      "total_tokens": 2256
+     }
+    }
+   },
+   {
+    "hash": "94c74cbc7dc7fd9a",
+    "response": {
+     "id": "chatcmpl-769",
+     "object": "chat.completion",
+     "created": 1793161906,
+     "model": "qwen3-4b",
+     "system_fingerprint": "fp_ollama",
+     "choices": [
+      {
+       "index": 0,
+       "message": {
+        "role": "assistant",
+        "content": "",
+        "tool_calls": [
+         {
+          "id": "MnPsZX2qNQMXyEH56YrVmKavlFwjl4Lc",
+          "index": 0,
+          "type": "function",
+          "function": {
+           "name": "upsert_user_skills",
+           "arguments": "{\"user_id\":\"eval-07-user\",\"skills\":[{\"category\":\"language\",\"name\":\"R\",\"proficiency\":0.8},{\"category\":\"concept\",\"name\":\"Statistics\",\"proficiency\":0.95},{\"category\":\"concept\",\"name\":\"Probability\",\"proficiency\":0.8}]}"
+          }
+         }
+        ]
+       },
+       "finish_reason": "tool_calls"
+      }
+     ],
+     "usage": {
+      "prompt_tokens": 2530,
+      "prompt_tokens_details": {
+       "cached_tokens": 2255
+      },
+      "completion_tokens": 96,
+      "total_tokens": 2626
+     }
+    }
+   },
+   {
+    "hash": "8821356612e5de6b",
+    "response": {
+     "id": "chatcmpl-899",
+     "object": "chat.completion",
+     "created": 1793161925,
+     "model": "qwen3-4b",
+     "system_fingerprint": "fp_ollama",
+     "choices": [
+      {
+       "index": 0,
+       "message": {
+        "role": "assistant",
+        "content": "",
+        "tool_calls": [
+         {
+          "id": "sMd64RW3nrENbQUwsCY26tIsy6HUT3G4",
+          "index": 0,
+          "type": "function",
+          "function": {
+           "name": "upsert_job_posting",
+           "arguments": "{\"job_id\":\"eval-07-job\",\"title\":\"Data Scientist\",\"company\":\"Eval Co\",\"seniority\":\"mid\",\"core_skills\":[{\"name\":\"python\",\"weight\":0.6},{\"name\":\"scikit learn\",\"weight\":0.6}],\"preferred_skills\":[{\"name\":\"pandas\",\"weight\":0.6}],\"domains\":[]}"
+          }
+         }
+        ]
+       },
+       "finish_reason": "tool_calls"
+      }
+     ],
+     "usage": {
+      "prompt_tokens": 2684,
+      "prompt_tokens_details": {
+       "cached_tokens": 2559
+      },
+      "completion_tokens": 108,
+      "total_tokens": 2792
+     }
+    }
+   },
+   {
+    "hash": "c5fb33ddf5e09b5e",
+    "response": {
+     "id": "chatcmpl-31",
+     "object": "chat.completion",
+     "created": 1793161932,
+     "model": "qwen3-4b",
+     "system_fingerprint": "fp_ollama",
+     "choices": [
+      {
+       "index": 0,
+       "message": {
+        "role": "assistant",
+        "content": "",
+        "tool_calls": [
+         {
+          "id": "znZspHqdZ9pNz8NM9fvef8Jb8RdoPE8E",
+          "index": 0,
+          "type": "function",
+          "function": {
+           "name": "calculate_skill_gap",
+           "arguments": "{\"user_id\":\"eval-07-user\",\"job_id\":\"eval-07-job\"}"
+          }
+         }
+        ]
+       },
+       "finish_reason": "tool_calls"
+      }
+     ],
+     "usage": {
+      "prompt_tokens": 2862,
+      "prompt_tokens_details": {
+       "cached_tokens": 2791
+      },
+      "completion_tokens": 37,
+      "total_tokens": 2899
+     }
+    }
+   },
+   {
+    "hash": "ff3ae63f4fd01bad",
+    "response": {
+     "id": "chatcmpl-210",
+     "object": "chat.completion",
+     "created": 1793161949,
+     "model": "qwen3-4b",
+     "system_fingerprint": "fp_ollama",
+     "choices": [
+      {
+       "index": 0,
+       "message": {
+        "role": "assistant",
+        "content": "",
+        "tool_calls": [
+         {
+          "id": "E8RlRH207EleACiE9k2Vw78QnK0bRxjd",
+          "index": 0,
+          "type": "function",
+          "function": {
+           "name": "get_skill_prerequisites",
+           "arguments": "{\"skill\":\"Python\"}"
+          }
+         }
+        ]
+       },
+       "finish_reason": "tool_calls"
+      }
+     ],
+     "usage": {
+      "prompt_tokens": 3449,
+      "prompt_tokens_details": {
+       "cached_tokens": 2898
+      },
+      "completion_tokens": 22,
+      "total_tokens": 3471
+     }
+    }
+   },
+   {
+    "hash": "fdf8bb91db75959b",
+    "response": {
+     "id": "chatcmpl-400",
+     "object": "chat.completion",
+     "created": 1793161955,
+     "model": "qwen3-4b",
+     "system_fingerprint": "fp_ollama",
+     "choices": [
+      {
+       "index": 0,
+       "message": {
+        "role": "assistant",
+        "content": "",
+        "tool_calls": [
+         {
+          "id": "DGkIZqEKJaVrdbO5JAa40C1apnCdD1sb",
+          "index": 0,
+          "type": "function",
+          "function": {
+           "name": "get_skill_prerequisites",
+           "arguments": "{\"skill\":\"scikit-learn\"}"
+          }
+         }
+        ]
+       },
+       "finish_reason": "tool_calls"
+      }
+     ],
+     "usage": {
+      "prompt_tokens": 3498,
+      "prompt_tokens_details": {
+       "cached_tokens": 3470
+      },
+      "completion_tokens": 25,
+      "total_tokens": 3523
+     }
+    }
+   },
+   {
+    "hash": "679b993caa3cb4f6",
+    "response": {
+     "id": "chatcmpl-900",
+     "object": "chat.completion",
+     "created": 1793162043,
+     "model": "qwen3-4b",
+     "system_fingerprint": "fp_ollama",
+     "choices": [
+      {
+       "index": 0,
+       "message": {
+        "role": "assistant",
+        "content": "{\n  \"user_id\": \"eval-07-user\",\n  \"job_id\": \"eval-07-job\",\n  \"fit_score\": 0.0,\n  \"scoring_version\": \"1\",\n  \"modules\": [\n    {\n      \"order\": 1,\n      \"skill\": \"Python\",\n      \"priority\": \"high\",\n      \"why\": \"Core requirement \u2014 not in your profile, address first\",\n      \"builds_on\": [],\n      \"learn_first\": [],\n      \"activities\": [\n        {\n          \"type\": \"course\",\n          \"description\": \"Complete a beginner-level Python course covering syntax, data structures, and basic libraries.\"\n        },\n        {\n          \"type\": \"project\",\n          \"description\": \"Build a simple data analysis script that reads a CSV file and performs basic statistical operations.\"\n        }\n      ],\n      \"estimated_hours\": 40,\n      \"evidence_of_mastery\": \"A working script that performs data analysis with error-free execution and clear documentation.\"\n    },\n    {\n      \"order\": 2,\n      \"skill\": \"scikit-learn\",\n      \"priority\": \"high\",\n      \"why\": \"Core requirement \u2014 not in your profile, address first\",\n      \"builds_on\": [\n        \"Python\"\n      ],\n      \"learn_first\": [\n        \"NumPy\"\n      ],\n      \"activities\": [\n        {\n          \"type\": \"course\",\n          \"description\": \"Complete a scikit-learn course focusing on machine learning algorithms and model evaluation.\"\n        },\n        {\n          \"type\": \"project\",\n          \"description\": \"Implement a classification model using scikit-learn on a public dataset, including data preprocessing and evaluation.\"\n        }\n      ],\n      \"estimated_hours\": 60,\n      \"evidence_of_mastery\": \"A trained model with a performance report and code that includes proper data preprocessing and evaluation metrics.\"\n    },\n    {\n      \"order\": 3,\n      \"skill\": \"Pandas\",\n      \"priority\": \"medium\",\n      \"why\": \"Gap identified\",\n      \"builds_on\": [\n        \"Python\"\n      ],\n      \"learn_first\": [],\n      \"activities\": [\n        {\n          \"type\": \"course\",\n          \"description\": \"Complete a Pandas course covering data manipulation, filtering, and merging operations.\"\n        },\n        {\n          \"type\": \"project\",\n          \"description\": \"Build a data pipeline that loads, cleans, and transforms a dataset using Pandas, then exports it to a CSV.\"\n        }\n      ],\n      \"estimated_hours\": 30,\n      \"evidence_of_mastery\": \"A complete data pipeline with clean, well-documented code and a final dataset in CSV format.\"\n    }\n  ],\n  \"unmapped_skills\": [],\n  \"notes\": \"The user lacks core skills in Python and scikit-learn, which are essential for the Data Scientist role. Python is a prerequisite for scikit-learn, so it must be learned first. Pandas is a preferred skill and can be learned after Python.\"\n}\n"
+       },
+       "finish_reason": "stop"
+      }
+     ],
+     "usage": {
+      "prompt_tokens": 3610,
+      "prompt_tokens_details": {
+       "cached_tokens": 3522
+      },
+      "completion_tokens": 625,
+      "total_tokens": 4235
+     }
+    }
+   },
+   {
+    "hash": "846fada20bde81fe",
+    "response": {
+     "id": "chatcmpl-470",
+     "object": "chat.completion",
+     "created": 1793162057,
+     "model": "qwen3-4b",
+     "system_fingerprint": "fp_ollama",
+     "choices": [
+      {
+       "index": 0,
+       "message": {
+        "role": "assistant",
+        "content": "",
+        "tool_calls": [
+         {
+          "id": "nPXzMG92ETcc4UD76z3feRB3KjYi71xm",
+          "index": 0,
+          "type": "function",
+          "function": {
+           "name": "calculate_skill_gap",
+           "arguments": "{\"user_id\":\"eval-07-user\",\"job_id\":\"eval-07-job\"}"
+          }
+         }
+        ]
+       },
+       "finish_reason": "tool_calls"
+      }
+     ],
+     "usage": {
+      "prompt_tokens": 4290,
+      "prompt_tokens_details": {
+       "cached_tokens": 4233
+      },
+      "completion_tokens": 37,
+      "total_tokens": 4327
+     }
+    }
+   },
+   {
+    "hash": "a4bd42a0d1dac8c7",
+    "response": {
+     "id": "chatcmpl-632",
+     "object": "chat.completion",
+     "created": 1793162184,
+     "model": "qwen3-4b",
+     "system_fingerprint": "fp_ollama",
+     "choices": [
+      {
+       "index": 0,
+       "message": {
+        "role": "assistant",
+        "content": "{\n  \"user_id\": \"eval-07-user\",\n  \"job_id\": \"eval-07-job\",\n  \"fit_score\": 0.0,\n  \"scoring_version\": \"1\",\n  \"modules\": [\n    {\n      \"order\": 1,\n      \"skill\": \"Python\",\n      \"priority\": \"high\",\n      \"why\": \"Core requirement \u2014 not in your profile, address first\",\n      \"builds_on\": [],\n      \"learn_first\": [],\n      \"activities\": [\n        {\n          \"type\": \"course\",\n          \"description\": \"Complete a beginner-level Python course covering syntax, data structures, and basic libraries.\"\n        },\n        {\n          \"type\": \"project\",\n          \"description\": \"Build a simple data analysis script that reads a CSV file and performs basic statistical operations.\"\n        }\n      ],\n      \"estimated_hours\": 40,\n      \"evidence_of_mastery\": \"A working script that performs data analysis with error-free execution and clear documentation.\"\n    },\n    {\n      \"order\": 2,\n      \"skill\": \"scikit-learn\",\n      \"priority\": \"high\",\n      \"why\": \"Core requirement \u2014 not in your profile, address first\",\n      \"builds_on\": [\n        \"Python\"\n      ],\n      \"learn_first\": [\n        \"NumPy\"\n      ],\n      \"activities\": [\n        {\n          \"type\": \"course\",\n          \"description\": \"Complete a scikit-learn course focusing on machine learning algorithms and model evaluation.\"\n        },\n        {\n          \"type\": \"project\",\n          \"description\": \"Implement a classification model using scikit-learn on a public dataset, including data preprocessing and evaluation.\"\n        }\n      ],\n      \"estimated_hours\": 60,\n      \"evidence_of_mastery\": \"A trained model with a performance report and code that includes proper data preprocessing and evaluation metrics.\"\n    },\n    {\n      \"order\": 3,\n      \"skill\": \"Pandas\",\n      \"priority\": \"medium\",\n      \"why\": \"Gap identified\",\n      \"builds_on\": [\n        \"Python\"\n      ],\n      \"learn_first\": [],\n      \"activities\": [\n        {\n          \"type\": \"course\",\n          \"description\": \"Complete a Pandas course covering data manipulation, filtering, and merging operations.\"\n        },\n        {\n          \"type\": \"project\",\n          \"description\": \"Build a data pipeline that loads, cleans, and transforms a dataset using Pandas, then exports it to a CSV.\"\n        }\n      ],\n      \"estimated_hours\": 30,\n      \"evidence_of_mastery\": \"A complete data pipeline with clean, well-documented code and a final dataset in CSV format.\"\n    }\n  ],\n  \"unmapped_skills\": [],\n  \"notes\": \"The user lacks core skills in Python and scikit-learn, which are essential for the Data Scientist role. Python is a prerequisite for scikit-learn, so it must be learned first. Pandas is a preferred skill and can be learned after Python.\"\n}"
+       },
+       "finish_reason": "stop"
+      }
+     ],
+     "usage": {
+      "prompt_tokens": 4877,
+      "prompt_tokens_details": {
+       "cached_tokens": 4326
+      },
+      "completion_tokens": 625,
+      "total_tokens": 5502
+     }
+    }
+   }
+  ]
+ },
+ "eval-08": {
+  "reasoner": [
+   {
+    "hash": "bbb668f0e8f41fa1",
+    "response": {
+     "id": "chatcmpl-18",
+     "object": "chat.completion",
+     "created": 1793162218,
+     "model": "qwen3-4b",
+     "system_fingerprint": "fp_ollama",
+     "choices": [
+      {
+       "index": 0,
+       "message": {
+        "role": "assistant",
+        "content": "",
+        "tool_calls": [
+         {
+          "id": "aAco1aKf4XRM0oTN5fXZ8KbT4Z5h40K4",
+          "index": 0,
+          "type": "function",
+          "function": {
+           "name": "upsert_user_skills",
+           "arguments": "{\"user_id\":\"eval-08-user\",\"skills\":[{\"name\":\"AWS\",\"proficiency\":0.8},{\"name\":\"Kubernetes\",\"proficiency\":0.8},{\"name\":\"Docker\",\"proficiency\":0.8}]}"
+          }
+         },
+         {
+          "id": "6ybCcYheTqIXwadivJlXz4lkZnCOlHim",
+          "index": 1,
+          "type": "function",
+          "function": {
+           "name": "upsert_job_posting",
+           "arguments": "{\"job_id\":\"eval-08-job\",\"title\":\"ML Platform Engineer\",\"company\":\"Eval Co\",\"seniority\":\"senior\",\"core_skills\":[{\"name\":\"Kubernetes\",\"weight\":0.8},{\"name\":\"Ray\",\"weight\":0.8}],\"preferred_skills\":[{\"name\":\"MLOps\",\"weight\":0.8}],\"domains\":[\"ml_infrastructure\"]}"
+          }
+         }
+        ]
+       },
+       "finish_reason": "tool_calls"
+      }
+     ],
+     "usage": {
+      "prompt_tokens": 2225,
+      "prompt_tokens_details": {
+       "cached_tokens": 2006
+      },
+      "completion_tokens": 192,
+      "total_tokens": 2417
+     }
+    }
+   },
+   {
+    "hash": "5625d31ac23242ed",
+    "response": {
+     "id": "chatcmpl-426",
+     "object": "chat.completion",
+     "created": 1793162232,
+     "model": "qwen3-4b",
+     "system_fingerprint": "fp_ollama",
+     "choices": [
+      {
+       "index": 0,
+       "message": {
+        "role": "assistant",
+        "content": "",
+        "tool_calls": [
+         {
+          "id": "6m0yExTKHRCrdIVet58RPV4H5UPC32e5",
+          "index": 0,
+          "type": "function",
+          "function": {
+           "name": "calculate_skill_gap",
+           "arguments": "{\"user_id\":\"eval-08-user\",\"job_id\":\"eval-08-job\"}"
+          }
+         }
+        ]
+       },
+       "finish_reason": "tool_calls"
+      }
+     ],
+     "usage": {
+      "prompt_tokens": 2539,
+      "prompt_tokens_details": {
+       "cached_tokens": 2416
+      },
+      "completion_tokens": 37,
+      "total_tokens": 2576
+     }
+    }
+   },
+   {
+    "hash": "77c0581fc31410f3",
+    "response": {
+     "id": "chatcmpl-298",
+     "object": "chat.completion",
+     "created": 1793162248,
+     "model": "qwen3-4b",
+     "system_fingerprint": "fp_ollama",
+     "choices": [
+      {
+       "index": 0,
+       "message": {
+        "role": "assistant",
+        "content": "",
+        "tool_calls": [
+         {
+          "id": "5mv4Ic45A7FfLChNpgnF4vsCKoBa7zNU",
+          "index": 0,
+          "type": "function",
+          "function": {
+           "name": "get_skill_prerequisites",
+           "arguments": "{\"skill\":\"Ray\"}"
+          }
+         }
+        ]
+       },
+       "finish_reason": "tool_calls"
+      }
+     ],
+     "usage": {
+      "prompt_tokens": 3074,
+      "prompt_tokens_details": {
+       "cached_tokens": 2575
+      },
+      "completion_tokens": 22,
+      "total_tokens": 3096
+     }
+    }
+   },
+   {
+    "hash": "4387687c7cf6a43a",
+    "response": {
+     "id": "chatcmpl-318",
+     "object": "chat.completion",
+     "created": 1793162256,
+     "model": "qwen3-4b",
+     "system_fingerprint": "fp_ollama",
+     "choices": [
+      {
+       "index": 0,
+       "message": {
+        "role": "assistant",
+        "content": "",
+        "tool_calls": [
+         {
+          "id": "GDLYtmDWgi8XDhgCBVmZxfj2WuxnmYDP",
+          "index": 0,
+          "type": "function",
+          "function": {
+           "name": "get_skill_prerequisites",
+           "arguments": "{\"skill\":\"MLOps\"}"
+          }
+         }
+        ]
+       },
+       "finish_reason": "tool_calls"
+      }
+     ],
+     "usage": {
+      "prompt_tokens": 3152,
+      "prompt_tokens_details": {
+       "cached_tokens": 3095
+      },
+      "completion_tokens": 24,
+      "total_tokens": 3176
+     }
+    }
+   },
+   {
+    "hash": "f9961ed355453695",
+    "response": {
+     "id": "chatcmpl-820",
+     "object": "chat.completion",
+     "created": 1793162329,
+     "model": "qwen3-4b",
+     "system_fingerprint": "fp_ollama",
+     "choices": [
+      {
+       "index": 0,
+       "message": {
+        "role": "assistant",
+        "content": "{\n  \"user_id\": \"eval-08-user\",\n  \"job_id\": \"eval-08-job\",\n  \"fit_score\": 0.419,\n  \"scoring_version\": \"1\",\n  \"modules\": [\n    {\n      \"order\": 1,\n      \"skill\": \"Ray\",\n      \"priority\": \"high\",\n      \"why\": \"Core requirement \u2014 not in your profile, address first\",\n      \"builds_on\": [],\n      \"learn_first\": [\n        \"Python\"\n      ],\n      \"activities\": [\n        {\n          \"type\": \"project\",\n          \"description\": \"Build a distributed training pipeline using Ray with 50+ Python scripts and a vector store to manage model artifacts.\"\n        }\n      ],\n      \"estimated_hours\": 80,\n      \"evidence_of_mastery\": \"Successfully deploy a distributed training pipeline with Ray that runs 50+ Python scripts and manages model artifacts via a vector store.\"\n    },\n    {\n      \"order\": 2,\n      \"skill\": \"MLOps\",\n      \"priority\": \"medium\",\n      \"why\": \"Not in your profile but you own 1 prerequisite(s) \u2014 quick to learn\",\n      \"builds_on\": [\n        \"Docker\"\n      ],\n      \"learn_first\": [\n        \"Python\",\n        \"Statistics\",\n        \"Linear Algebra\",\n        \"Linux\"\n      ],\n      \"activities\": [\n        {\n          \"type\": \"course\",\n          \"description\": \"Complete a 5-part MLOps course covering CI/CD, model versioning, and deployment pipelines.\"\n        },\n        {\n          \"type\": \"reading\",\n          \"description\": \"Read key MLOps documentation on model lifecycle management and pipeline orchestration.\"\n        },\n        {\n          \"type\": \"practice\",\n          \"description\": \"Implement a CI/CD pipeline that automates model training and deployment using Docker and a version control system.\"\n        }\n      ],\n      \"estimated_hours\": 100,\n      \"evidence_of_mastery\": \"Successfully implement a CI/CD pipeline that automates model training and deployment using Docker and a version control system.\"\n    }\n  ],\n  \"unmapped_skills\": [],\n  \"notes\": \"The user already has strong proficiency in Kubernetes, AWS, and Docker. The main gaps are in Ray and MLOps. Ray is a core requirement and must be addressed first. MLOps is preferred but requires foundational skills in Python, statistics, and linear algebra, which are not yet in the user's profile.\"\n}"
+       },
+       "finish_reason": "stop"
+      }
+     ],
+     "usage": {
+      "prompt_tokens": 3405,
+      "prompt_tokens_details": {
+       "cached_tokens": 3175
+      },
+      "completion_tokens": 522,
+      "total_tokens": 3927
+     }
+    }
+   }
+  ]
+ },
+ "eval-09": {
+  "reasoner": [
+   {
+    "hash": "5438070076848bf6",
+    "response": {
+     "id": "chatcmpl-791",
+     "object": "chat.completion",
+     "created": 1793162361,
+     "model": "qwen3-4b",
+     "system_fingerprint": "fp_ollama",
+     "choices": [
+      {
+       "index": 0,
+       "message": {
+        "role": "assistant",
+        "content": "",
+        "tool_calls": [
+         {
+          "id": "QQ27guKXRnBfyBLLwM5q9JCviN6BYFWS",
+          "index": 0,
+          "type": "function",
+          "function": {
+           "name": "upsert_user_skills",
+           "arguments": "{\"user_id\":\"eval-09-user\",\"skills\":[{\"name\":\"Python\",\"proficiency\":0.5}],\"target_domain\":\"data_engineering\"}"
+          }
+         },
+         {
+          "id": "eWd2X8l3BETxchbCzOIxzngYrrVKvOHq",
+          "index": 1,
+          "type": "function",
+          "function": {
+           "name": "upsert_job_posting",
+           "arguments": "{\"job_id\":\"eval-09-job\",\"title\":\"Junior Data Engineer\",\"company\":\"Eval Co\",\"seniority\":\"junior\",\"core_skills\":[{\"name\":\"SQL\",\"weight\":0.4},{\"name\":\"Python\",\"weight\":0.4}],\"preferred_skills\":[{\"name\":\"PostgreSQL\",\"weight\":0.4}],\"domains\":[\"data_engineering\"]}"
+          }
+         },
+         {
+          "id": "5plLjD6YW6nDzWnNDyJX2NJrm62eyHnk",
+          "index": 2,
+          "type": "function",
+          "function": {
+           "name": "calculate_skill_gap",
+           "arguments": "{\"user_id\":\"eval-09-user\",\"job_id\":\"eval-09-job\"}"
+          }
+         }
+        ]
+       },
+       "finish_reason": "tool_calls"
+      }
+     ],
+     "usage": {
+      "prompt_tokens": 2178,
+      "prompt_tokens_details": {
+       "cached_tokens": 2006
+      },
+      "completion_tokens": 203,
+      "total_tokens": 2381
+     }
+    }
+   },
+   {
+    "hash": "b8c72f7d1e862b00",
+    "response": {
+     "id": "chatcmpl-594",
+     "object": "chat.completion",
+     "created": 1793162391,
+     "model": "qwen3-4b",
+     "system_fingerprint": "fp_ollama",
+     "choices": [
+      {
+       "index": 0,
+       "message": {
+        "role": "assistant",
+        "content": "",
+        "tool_calls": [
+         {
+          "id": "QzW7QNZCGMXM7ippOWlgIuAkEikt5OEC",
+          "index": 0,
+          "type": "function",
+          "function": {
+           "name": "get_skill_prerequisites",
+           "arguments": "{\"skill\":\"SQL\"}"
+          }
+         },
+         {
+          "id": "lJxDTmxXiBC6dkY0w2NqAAJe0posT8qV",
+          "index": 1,
+          "type": "function",
+          "function": {
+           "name": "get_skill_prerequisites",
+           "arguments": "{\"skill\":\"PostgreSQL\"}"
+          }
+         }
+        ]
+       },
+       "finish_reason": "tool_calls"
+      }
+     ],
+     "usage": {
+      "prompt_tokens": 2963,
+      "prompt_tokens_details": {
+       "cached_tokens": 2380
+      },
+      "completion_tokens": 45,
+      "total_tokens": 3008
+     }
+    }
+   },
+   {
+    "hash": "d2cda68e04ca7c66",
+    "response": {
+     "id": "chatcmpl-585",
+     "object": "chat.completion",
+     "created": 1793162449,
+     "model": "qwen3-4b",
+     "system_fingerprint": "fp_ollama",
+     "choices": [
+      {
+       "index": 0,
+       "message": {
+        "role": "assistant",
+        "content": "{\n  \"user_id\": \"eval-09-user\",\n  \"job_id\": \"eval-09-job\",\n  \"fit_score\": 0.41,\n  \"scoring_version\": \"1\",\n  \"modules\": [\n    {\n      \"order\": 1,\n      \"skill\": \"SQL\",\n      \"priority\": \"high\",\n      \"why\": \"Core requirement \u2014 not in your profile, address first\",\n      \"builds_on\": [],\n      \"learn_first\": [],\n      \"activities\": [\n        {\n          \"type\": \"course\",\n          \"description\": \"Complete a beginner-level SQL course covering SELECT, JOIN, GROUP BY, and subqueries with hands-on practice using a sample database.\"\n        },\n        {\n          \"type\": \"project\",\n          \"description\": \"Build a small data pipeline that extracts data from a CSV file, processes it with SQL queries, and saves the results to a new file.\"\n        }\n      ],\n      \"estimated_hours\": 30,\n      \"evidence_of_mastery\": \"Successfully write and execute complex SQL queries to extract, filter, and aggregate data from a database.\"\n    },\n    {\n      \"order\": 2,\n      \"skill\": \"PostgreSQL\",\n      \"priority\": \"medium\",\n      \"why\": \"Gap identified\",\n      \"builds_on\": [\n        \"SQL\"\n      ],\n      \"learn_first\": [],\n      \"activities\": [\n        {\n          \"type\": \"course\",\n          \"description\": \"Enroll in a PostgreSQL course that covers installation, basic commands, and creating tables with constraints and indexes.\"\n        },\n        {\n          \"type\": \"project\",\n          \"description\": \"Set up a PostgreSQL database, create tables for a sample data schema, and insert, query, and manage data using SQL.\"\n        }\n      ],\n      \"estimated_hours\": 40,\n      \"evidence_of_mastery\": \"Successfully manage a PostgreSQL database with tables, constraints, and queries using SQL.\"\n    }\n  ],\n  \"unmapped_skills\": [],\n  \"notes\": \"The user lacks core SQL skills required by the job. After mastering SQL, they can proceed to learn PostgreSQL, which builds on SQL knowledge.\"\n}"
+       },
+       "finish_reason": "stop"
+      }
+     ],
+     "usage": {
+      "prompt_tokens": 3084,
+      "prompt_tokens_details": {
+       "cached_tokens": 3007
+      },
+      "completion_tokens": 449,
+      "total_tokens": 3533
+     }
+    }
+   }
+  ]
+ },
+ "eval-10": {
+  "reasoner": [
+   {
+    "hash": "a0c5a7eb0037f5d4",
+    "response": {
+     "id": "chatcmpl-431",
+     "object": "chat.completion",
+     "created": 1793162479,
+     "model": "qwen3-4b",
+     "system_fingerprint": "fp_ollama",
+     "choices": [
+      {
+       "index": 0,
+       "message": {
+        "role": "assistant",
+        "content": "",
+        "tool_calls": [
+         {
+          "id": "5x8V8zMpHKNMGG0lqf7dsGu8xgMx0Qg2",
+          "index": 0,
+          "type": "function",
+          "function": {
+           "name": "upsert_user_skills",
+           "arguments": "{\"user_id\":\"eval-10-user\",\"skills\":[{\"name\":\"Java\",\"proficiency\":0.8},{\"name\":\"SQL\",\"proficiency\":0.8},{\"name\":\"Apache Spark\",\"proficiency\":0.6}],\"target_domain\":\"data_engineering\"}"
+          }
+         },
+         {
+          "id": "wZ2EJUR9EInHEQXwwLG5aHwiXMnuLdvd",
+          "index": 1,
+          "type": "function",
+          "function": {
+           "name": "upsert_job_posting",
+           "arguments": "{\"job_id\":\"eval-10-job\",\"title\":\"Streaming Data Engineer\",\"company\":\"Eval Co\",\"seniority\":\"mid\",\"core_skills\":[{\"name\":\"Apache Kafka\",\"weight\":0.6},{\"name\":\"Apache Spark\",\"weight\":0.6}],\"preferred_skills\":[{\"name\":\"Scala\",\"weight\":0.6}],\"domains\":[\"data_engineering\"]}"
+          }
+         },
+         {
+          "id": "Rm5OuslcTKbv6hWkZTKczsbeFxNfxq9N",
+          "index": 2,
+          "type": "function",
+          "function": {
+           "name": "calculate_skill_gap",
+           "arguments": "{\"user_id\":\"eval-10-user\",\"job_id\":\"eval-10-job\"}"
+          }
+         }
+        ]
+       },
+       "finish_reason": "tool_calls"
+      }
+     ],
+     "usage": {
+      "prompt_tokens": 2222,
+      "prompt_tokens_details": {
+       "cached_tokens": 2005
+      },
+      "completion_tokens": 234,
+      "total_tokens": 2456
+     }
+    }
+   },
+   {
+    "hash": "006eef8a17b03b59",
+    "response": {
+     "id": "chatcmpl-156",
+     "object": "chat.completion",
+     "created": 1793162507,
+     "model": "qwen3-4b",
+     "system_fingerprint": "fp_ollama",
+     "choices": [
+      {
+       "index": 0,
+       "message": {
+        "role": "assistant",
+        "content": "",
+        "tool_calls": [
+         {
+          "id": "53GcXjEAR1IoSUPp7l6XS7AjsK3QkxBO",
+          "index": 0,
+          "type": "function",
+          "function": {
+           "name": "get_skill_prerequisites",
+           "arguments": "{\"skill\":\"Apache Kafka\"}"
+          }
+         },
+         {
+          "id": "vzuFVVAcJn6h3C0qQvRiSoXPV5ucYus4",
+          "index": 1,
+          "type": "function",
+          "function": {
+           "name": "get_skill_prerequisites",
+           "arguments": "{\"skill\":\"Scala\"}"
+          }
+         }
+        ]
+       },
+       "finish_reason": "tool_calls"
+      }
+     ],
+     "usage": {
+      "prompt_tokens": 3066,
+      "prompt_tokens_details": {
+       "cached_tokens": 2455
+      },
+      "completion_tokens": 45,
+      "total_tokens": 3111
+     }
+    }
+   },
+   {
+    "hash": "47bab292ee7efc67",
+    "response": {
+     "id": "chatcmpl-796",
+     "object": "chat.completion",
+     "created": 1793162562,
+     "model": "qwen3-4b",
+     "system_fingerprint": "fp_ollama",
+     "choices": [
+      {
+       "index": 0,
+       "message": {
+        "role": "assistant",
+        "content": "{\n  \"user_id\": \"eval-10-user\",\n  \"job_id\": \"eval-10-job\",\n  \"fit_score\": 0.444,\n  \"scoring_version\": \"1\",\n  \"modules\": [\n    {\n      \"order\": 1,\n      \"skill\": \"Apache Kafka\",\n      \"priority\": \"high\",\n      \"why\": \"Core requirement \u2014 not in your profile, address first\",\n      \"builds_on\": [],\n      \"learn_first\": [],\n      \"activities\": [\n        {\n          \"type\": \"project\",\n          \"description\": \"Build a streaming data pipeline using Apache Kafka to ingest and process real-time events from a sensor network, storing results in a database.\"\n        }\n      ],\n      \"estimated_hours\": 60,\n      \"evidence_of_mastery\": \"Successfully deploy a Kafka-based streaming pipeline with at least 3 topics and 2 consumers.\"\n    },\n    {\n      \"order\": 2,\n      \"skill\": \"Scala\",\n      \"priority\": \"medium\",\n      \"why\": \"Not in your profile but you own 1 prerequisite(s) \u2014 quick to learn\",\n      \"builds_on\": [\n        \"Java\"\n      ],\n      \"learn_first\": [],\n      \"activities\": [\n        {\n          \"type\": \"course\",\n          \"description\": \"Complete a 5-day Scala programming course focusing on functional programming and data processing, with hands-on exercises.\"\n        },\n        {\n          \"type\": \"practice\",\n          \"description\": \"Write a data transformation script in Scala that processes a JSON stream and outputs a CSV file.\"\n        }\n      ],\n      \"estimated_hours\": 40,\n      \"evidence_of_mastery\": \"Successfully write and run a Scala script that transforms and processes a data stream with error handling.\"\n    }\n  ],\n  \"unmapped_skills\": [],\n  \"notes\": \"The user already has proficiency in Java and SQL, which supports learning Scala. Apache Kafka is a core requirement and must be mastered before advancing to other skills.\"\n}"
+       },
+       "finish_reason": "stop"
+      }
+     ],
+     "usage": {
+      "prompt_tokens": 3187,
+      "prompt_tokens_details": {
+       "cached_tokens": 3110
+      },
+      "completion_tokens": 418,
+      "total_tokens": 3605
+     }
+    }
+   }
+  ]
+ },
+ "eval-11": {
+  "parser": [
+   {
+    "hash": "114ec01781f62c2d",
+    "response": {
+     "id": "chatcmpl-787",
+     "object": "chat.completion",
+     "created": 1793162604,
+     "model": "qwen3-4b",
+     "system_fingerprint": "fp_ollama",
+     "choices": [
+      {
+       "index": 0,
+       "message": {
+        "role": "assistant",
+        "content": "{\n  \"kind\": \"resume\",\n  \"name\": \"Alex Rivera\",\n  \"target_domain\": \"data_engineering\",\n  \"skills\": [\n    {\n      \"name\": \"Python\",\n      \"evidence\": \"mentioned\",\n      \"proficiency\": 0.3\n    },\n    {\n      \"name\": \"SQL\",\n      \"evidence\": \"mentioned\",\n      \"proficiency\": 0.3\n    },\n    {\n      \"name\": \"Postgres\",\n      \"evidence\": \"mentioned\",\n      \"proficiency\": 0.3\n    },\n    {\n      \"name\": \"Airflow\",\n      \"evidence\": \"project\",\n      \"proficiency\": 0.6\n    },\n    {\n      \"name\": \"Docker\",\n      \"evidence\": \"mentioned\",\n      \"proficiency\":  0.3\n    },\n    {\n      \"name\": \"Git\",\n      \"evidence\": \"mentioned\",\n      \"proficiency\": 0.3\n    },\n    {\n      \"name\": \"linear algebra\",\n      \"evidence\": \"coursework\",\n      \"proficiency\": 0.5\n    },\n    {\n      \"name\": \"NumPy\",\n      \"evidence\": \"coursework\",\n      \"proficiency\": 0.5\n    },\n    {\n      \"name\": \"machine learning\",\n      \"evidence\": \"coursework\",\n      \"proficiency\": 0.5\n    },\n    {\n      \"name\": \"scikit-learn\",\n      \"evidence\": \"project\",\n      \"proficiency\": 0.6\n    }\n  ]\n}"
+       },
+       "finish_reason": "stop"
+      }
+     ],
+     "usage": {
+      "prompt_tokens": 637,
+      "prompt_tokens_details": {
+       "cached_tokens": 4
+      },
+      "completion_tokens": 338,
+      "total_tokens": 975
+     }
+    }
+   },
+   {
+    "hash": "dd71248fe447245a",
+    "response": {
+     "id": "chatcmpl-978",
+     "object": "chat.completion",
+     "created": 1793162624,
+     "model": "qwen3-4b",
+     "system_fingerprint": "fp_ollama",
+     "choices": [
+      {
+       "index": 0,
+       "message": {
+        "role": "assistant",
+        "content": "{\n  \"kind\": \"job\",\n  \"title\": \"Machine Learning Engineer\",\n  \"company\": \"Northwind Labs\",\n  \"seniority\": \"mid\",\n  \"domains\": [\n    \"nlp\"\n  ],\n  \"core_skills\": [\n    {\n      \"name\": \"Python\",\n      \"weight\": 0.6\n    },\n    {\n      \"name\": \"PyTorch\",\n      \"weight\": 0.6\n    },\n    {\n      \"name\": \"Hugging Face Transformers\",\n      \"weight\": 0.6\n    },\n    {\n      \"name\": \"Docker\",\n      \"weight\": 0.6\n    },\n    {\n      \"name\": \"deploying models behind an API\",\n      \"weight\": 0.6\n    }\n  ],\n  \"preferred_skills\": [\n    {\n      \"name\": \"Kubernetes\",\n      \"weight\": 0.6\n    },\n    {\n      \"name\": \"MLflow\",\n      \"weight\": 0.6\n    }\n  ],\n  \"nice_to_have_skills\": [\n    {\n      \"name\": \"vector databases\",\n      \"weight\": 0.4\n    },\n    {\n      \"name\": \"RAG\",\n      \"weight\": 0.4\n    }\n  ]\n}"
+       },
+       "finish_reason": "stop"
+      }
+     ],
+     "usage": {
+      "prompt_tokens": 613,
+      "prompt_tokens_details": {
+       "cached_tokens": 531
+      },
+      "completion_tokens": 270,
+      "total_tokens": 883
+     }
+    }
+   }
+  ],
+  "reasoner": [
+   {
+    "hash": "87731e08850fa722",
+    "response": {
+     "id": "chatcmpl-696",
+     "object": "chat.completion",
+     "created": 1793162641,
+     "model": "qwen3-4b",
+     "system_fingerprint": "fp_ollama",
+     "choices": [
+      {
+       "index": 0,
+       "message": {
+        "role": "assistant",
+        "content": "",
+        "tool_calls": [
+         {
+          "id": "9qVgHQTa0Wkolt1zO9LT2zFJLf0MCHVd",
+          "index": 0,
+          "type": "function",
+          "function": {
+           "name": "get_user_profile",
+           "arguments": "{\"user_id\":\"eval-11-user\"}"
+          }
+         },
+         {
+          "id": "E2cFYiLqNBDaSoNtgaEfBcXFWcaJtkCv",
+          "index": 1,
+          "type": "function",
+          "function": {
+           "name": "get_job_posting",
+           "arguments": "{\"job_id\":\"eval-11-job\"}"
+          }
+         }
+        ]
+       },
+       "finish_reason": "tool_calls"
+      }
+     ],
+     "usage": {
+      "prompt_tokens": 2481,
+      "prompt_tokens_details": {
+       "cached_tokens": 2006
+      },
+      "completion_tokens": 69,
+      "total_tokens": 2550
+     }
+    }
+   },
+   {
+    "hash": "7e96fcb910a34981",
+    "response": {
+     "id": "chatcmpl-486",
+     "object": "chat.completion",
+     "created": 1793162653,
+     "model": "qwen3-4b",
+     "system_fingerprint": "fp_ollama",
+     "choices": [
+      {
+       "index": 0,
+       "message": {
+        "role": "assistant",
+        "content": "{\"user_id\": \"eval-11-user\", \"job_id\": \"eval-11-job\", \"fit_score\": 0, \"scoring_version\": \"0\", \"modules\": [], \"unmapped_skills\": [], \"notes\": \"User and job not found in system. Cannot proceed without existing records.\"}"
+       },
+       "finish_reason": "stop"
+      }
+     ],
+     "usage": {
+      "prompt_tokens": 2609,
+      "prompt_tokens_details": {
+       "cached_tokens": 2483
+      },
+      "completion_tokens": 67,
+      "total_tokens": 2676
+     }
+    }
+   }
+  ]
+ },
+ "eval-12": {
+  "parser": [
+   {
+    "hash": "286f134536c63557",
+    "response": {
+     "id": "chatcmpl-697",
+     "object": "chat.completion",
+     "created": 1793162667,
+     "model": "qwen3-4b",
+     "system_fingerprint": "fp_ollama",
+     "choices": [
+      {
+       "index": 0,
+       "message": {
+        "role": "assistant",
+        "content": "{\n  \"kind\": \"resume\",\n  \"name\": \"Sam Lee\",\n  \"target_domain\": \"computer_vision\",\n  \"skills\": [\n    {\n      \"name\": \"Python\",\n      \"evidence\": \"mentioned\",\n      \"proficiency\": 0.3\n    },\n    {\n      \"name\": \"OpenCV\",\n      \"evidence\": \"project\",\n      \"proficiency\": 0.6\n    },\n    {\n      \"name\": \"NumPy\",\n      \"evidence\": \"project\",\n      \"proficiency\":  0.6\n    },\n    {\n      \"name\": \"linear algebra\",\n      \"evidence\": \"coursework\",\n      \"proficiency\": 0.5\n    }\n  ]\n}"
+       },
+       "finish_reason": "stop"
+      }
+     ],
+     "usage": {
+      "prompt_tokens": 572,
+      "prompt_tokens_details": {
+       "cached_tokens": 531
+      },
+      "completion_tokens": 156,
+      "total_tokens": 728
+     }
+    }
+   },
+   {
+    "hash": "297952305125965b",
+    "response": {
+     "id": "chatcmpl-902",
+     "object": "chat.completion",
+     "created": 1793162678,
+     "model": "qwen3-4b",
+     "system_fingerprint": "fp_ollama",
+     "choices": [
+      {
+       "index": 0,
+       "message": {
+        "role": "assistant",
+        "content": "{\n  \"kind\": \"job\",\n  \"title\": \"Computer Vision Engineer\",\n  \"company\": null,\n  \"seniority\": \"junior\",\n  \"domains\": [\n    \"computer_vision\"\n  ],\n  \"core_skills\": [\n    {\n      \"name\": \"Python\",\n      \"weight\": 0.4\n    },\n    {\n      \"name\": \"OpenCV\",\n      \"weight\": 0.4\n    }\n  ],\n  \"preferred_skills\": [\n    {\n      \"name\": \"PyTorch\",\n      \"weight\": 0.6\n    }\n  ],\n  \"nice_to_have_skills\": [\n    {\n      \"name\": \"Docker\",\n      \"weight\": 0.4\n    }\n  ]\n}"
+       },
+       "finish_reason": "stop"
+      }
+     ],
+     "usage": {
+      "prompt_tokens": 564,
+      "prompt_tokens_details": {
+       "cached_tokens": 531
+      },
+      "completion_tokens": 158,
+      "total_tokens": 722
+     }
+    }
+   }
+  ],
+  "reasoner": [
+   {
+    "hash": "9dbf807b0d74312b",
+    "response": {
+     "id": "chatcmpl-789",
+     "object": "chat.completion",
+     "created": 1793162708,
+     "model": "qwen3-4b",
+     "system_fingerprint": "fp_ollama",
+     "choices": [
+      {
+       "index": 0,
+       "message": {
+        "role": "assistant",
+        "content": "",
+        "tool_calls": [
+         {
+          "id": "vliGWvx3I1dxfzYOvFbAXyfiilOYvq42",
+          "index": 0,
+          "type": "function",
+          "function": {
+           "name": "upsert_user_skills",
+           "arguments": "{\"user_id\":\"eval-12-user\",\"skills\":[{\"name\":\"Python\",\"proficiency\":0.3},{\"name\":\"OpenCV\",\"proficiency\":0.6},{\"name\":\"NumPy\",\"proficiency\":0.6},{\"name\":\"linear algebra\",\"proficiency\":0.5}]}"
+          }
+         },
+         {
+          "id": "XPx9TbSrBneyD88i5V4s2q2U3ASVvm7I",
+          "index": 1,
+          "type": "function",
+          "function": {
+           "name": "upsert_job_posting",
+           "arguments": "{\"job_id\":\"eval-12-job\",\"title\":\"Computer Vision Engineer\",\"core_skills\":[{\"name\":\"Python\",\"weight\":0.4},{\"name\":\"OpenCV\",\"weight\":0.4}],\"preferred_skills\":[{\"name\":\"PyTorch\",\"weight\":0.6}],\"nice_to_have_skills\":[{\"name\":\"Docker\",\"weight\":0.4}],\"domains\":[\"computer_vision\"]}"
+          }
+         },
+         {
+          "id": "WnOMPqISXseVoHaBKUmSFSjFFfNGiRDD",
+          "index": 2,
+          "type": "function",
+          "function": {
+           "name": "calculate_skill_gap",
+           "arguments": "{\"user_id\":\"eval-12-user\",\"job_id\":\"eval-12-job\"}"
+          }
+         }
+        ]
+       },
+       "finish_reason": "tool_calls"
+      }
+     ],
+     "usage": {
+      "prompt_tokens": 2259,
+      "prompt_tokens_details": {
+       "cached_tokens": 2006
+      },
+      "completion_tokens": 250,
+      "total_tokens": 2509
+     }
+    }
+   },
+   {
+    "hash": "0f669b08e786cf74",
+    "response": {
+     "id": "chatcmpl-348",
+     "object": "chat.completion",
+     "created": 1793162741,
+     "model": "qwen3-4b",
+     "system_fingerprint": "fp_ollama",
+     "choices": [
+      {
+       "index": 0,
+       "message": {
+        "role": "assistant",
+        "content": "",
+        "tool_calls": [
+         {
+          "id": "2fs7j0d0208IkmepyQaHOuDVQzodzHJO",
+          "index": 0,
+          "type": "function",
+          "function": {
+           "name": "get_skill_prerequisites",
+           "arguments": "{\"skill\":\"Python\"}"
+          }
+         },
+         {
+          "id": "UJ95pS9ipIK7ptXoE5BE4OWUPe1Sxrwa",
+          "index": 1,
+          "type": "function",
+          "function": {
+           "name": "get_skill_prerequisites",
+           "arguments": "{\"skill\":\"PyTorch\"}"
+          }
+         }
+        ]
+       },
+       "finish_reason": "tool_calls"
+      }
+     ],
+     "usage": {
+      "prompt_tokens": 3280,
+      "prompt_tokens_details": {
+       "cached_tokens": 2508
+      },
+      "completion_tokens": 46,
+      "total_tokens": 3326
+     }
+    }
+   },
+   {
+    "hash": "4b0562567b88929a",
+    "response": {
+     "id": "chatcmpl-448",
+     "object": "chat.completion",
+     "created": 1793162818,
+     "model": "qwen3-4b",
+     "system_fingerprint": "fp_ollama",
+     "choices": [
+      {
+       "index": 0,
+       "message": {
+        "role": "assistant",
+        "content": "{\n  \"user_id\": \"eval-12-user\",\n  \"job_id\": \"eval-12-job\",\n  \"fit_score\": 0.571,\n  \"scoring_version\": \"1\",\n  \"modules\": [\n    {\n      \"order\": 1,\n      \"skill\": \"Python\",\n      \"priority\": \"high\",\n      \"why\": \"You have this at 30% but 40% is expected\",\n      \"builds_on\": [],\n      \"learn_first\": [],\n      \"activities\": [\n        {\n          \"type\": \"course\",\n          \"description\": \"Complete a 5-hour course on Python programming for data science, focusing on syntax, data structures, and libraries like NumPy and Pandas.\"\n        }\n      ],\n      \"estimated_hours\": 5,\n      \"evidence_of_mastery\": \"Build a simple data processing pipeline using Python and NumPy to demonstrate proficiency.\"\n    },\n    {\n      \"order\": 2,\n      \"skill\": \"PyTorch\",\n      \"priority\": \"medium\",\n      \"why\": \"Not in your profile but you own 2 prerequisite(s) \u2014 quick to learn\",\n      \"builds_on\": [\n        \"NumPy\",\n        \"Python\"\n      ],\n      \"learn_first\": [],\n      \"activities\": [\n        {\n          \"type\": \"project\",\n          \"description\": \"Build a computer vision model using PyTorch to classify images from a dataset, leveraging NumPy and Python skills.\"\n        }\n      ],\n      \"estimated_hours\": 30,\n      \"evidence_of_mastery\": \"Train and evaluate a neural network model on a public image dataset using PyTorch.\"\n    },\n    {\n      \"order\": 3,\n      \"skill\": \"Docker\",\n      \"priority\": \"low\",\n      \"why\": \"Nice to have \u2014 low urgency\",\n      \"builds_on\": [],\n      \"learn_first\": [],\n      \"activities\": [\n        {\n          \"type\": \"reading\",\n          \"description\": \"Read a guide on Docker basics and containerization for machine learning workflows.\"\n        },\n        {\n          \"type\": \"practice\",\n          \"description\": \"Containerize a simple Python script that runs a computer vision model using Docker.\"\n        }\n      ],\n      \"estimated_hours\": 10,\n      \"evidence_of_mastery\": \"Successfully containerize a Python script that runs a computer vision model using Docker.\"\n    }\n  ],\n  \"unmapped_skills\": [],\n  \"notes\": \"The user has a solid foundation in Python and OpenCV but needs to build proficiency in PyTorch, a key preferred skill. Docker is a nice-to-have and can be learned at a lower priority.\"\n}"
+       },
+       "finish_reason": "stop"
+      }
+     ],
+     "usage": {
+      "prompt_tokens": 3431,
+      "prompt_tokens_details": {
+       "cached_tokens": 3325
+      },
+      "completion_tokens": 557,
+      "total_tokens": 3988
+     }
+    }
+   }
+  ]
+ },
+ "eval-13": {
+  "reasoner": [
+   {
+    "hash": "d7359cc8505d128b",
+    "response": {
+     "id": "chatcmpl-190",
+     "object": "chat.completion",
+     "created": 1793162843,
+     "model": "qwen3-4b",
+     "system_fingerprint": "fp_ollama",
+     "choices": [
+      {
+       "index": 0,
+       "message": {
+        "role": "assistant",
+        "content": "",
+        "tool_calls": [
+         {
+          "id": "aqC8HNeXoVK38CfHX3Hk8wW1A0Xru7p4",
+          "index": 0,
+          "type": "function",
+          "function": {
+           "name": "upsert_user_skills",
+           "arguments": "{\"user_id\":\"eval-13-user\",\"skills\":[{\"name\":\"Python\",\"proficiency\":0.8},{\"name\":\"Docker\",\"proficiency\":0.6}]}"
+          }
+         },
+         {
+          "id": "xW29l4VRHPGYnqqTT3r7ZWmEoLmJboRP",
+          "index": 1,
+          "type": "function",
+          "function": {
+           "name": "upsert_job_posting",
+           "arguments": "{\"job_id\":\"eval-13-job\",\"title\":\"MLOps Engineer\",\"company\":\"Eval Co\",\"seniority\":\"mid\",\"core_skills\":[{\"name\":\"Docker\",\"weight\":0.6},{\"name\":\"Kubernetes\",\"weight\":0.6}],\"domains\":[\"ml_infrastructure\"]}"
+          }
+         },
+         {
+          "id": "RiUUY4PtmY8cD2PmSgqcipcK0zWJxso8",
+          "index": 2,
+          "type": "function",
+          "function": {
+           "name": "calculate_skill_gap",
+           "arguments": "{\"user_id\":\"eval-13-user\",\"job_id\":\"eval-13-job\"}"
+          }
+         }
+        ]
+       },
+       "finish_reason": "tool_calls"
+      }
+     ],
+     "usage": {
+      "prompt_tokens": 2188,
+      "prompt_tokens_details": {
+       "cached_tokens": 2006
+      },
+      "completion_tokens": 194,
+      "total_tokens": 2382
+     }
+    }
+   },
+   {
+    "hash": "61869f7403e5882b",
+    "response": {
+     "id": "chatcmpl-617",
+     "object": "chat.completion",
+     "created": 1793162863,
+     "model": "qwen3-4b",
+     "system_fingerprint": "fp_ollama",
+     "choices": [
+      {
+       "index": 0,
+       "message": {
+        "role": "assistant",
+        "content": "",
+        "tool_calls": [
+         {
+          "id": "TQXWEgh8NS0Ij5wG3ubr4mP43ZT3cMLz",
+          "index": 0,
+          "type": "function",
+          "function": {
+           "name": "get_skill_prerequisites",
+           "arguments": "{\"skill\":\"Kubernetes\"}"
+          }
+         }
+        ]
+       },
+       "finish_reason": "tool_calls"
+      }
+     ],
+     "usage": {
+      "prompt_tokens": 2840,
+      "prompt_tokens_details": {
+       "cached_tokens": 2381
+      },
+      "completion_tokens": 23,
+      "total_tokens": 2863
+     }
+    }
+   },
+   {
+    "hash": "a2c7c31803d1cfe4",
+    "response": {
+     "id": "chatcmpl-67",
+     "object": "chat.completion",
+     "created": 1793162894,
+     "model": "qwen3-4b",
+     "system_fingerprint": "fp_ollama",
+     "choices": [
+      {
+       "index": 0,
+       "message": {
+        "role": "assistant",
+        "content": "{\n  \"user_id\": \"eval-13-user\",\n  \"job_id\": \"eval-13-job\",\n  \"fit_score\": 0.575,\n  \"scoring_version\": \"1\",\n  \"modules\": [\n    {\n      \"order\": 1,\n      \"skill\": \"Kubernetes\",\n      \"priority\": \"medium\",\n      \"why\": \"Not in your profile but you own 1 prerequisite(s) \u2014 quick to learn\",\n      \"builds_on\": [\"Docker\"],\n      \"learn_first\": [\"Linux\"],\n      \"activities\": [\n        {\n          \"type\": \"project\",\n          \"description\": \"Build a containerized application using Docker and deploy it to a Kubernetes cluster with Helm.\"\n        }\n      ],\n      \"estimated_hours\": 60,\n      \"evidence_of_mastery\": \"Successfully deploy a production-grade microservice on Kubernetes with automated scaling and health checks.\"\n    }\n  ],\n  \"unmapped_skills\": [],\n  \"notes\": \"The user has proficiency in Docker but lacks Kubernetes. Linux is a prerequisite for Kubernetes, so it should be learned before starting Kubernetes modules.\"\n}"
+       },
+       "finish_reason": "stop"
+      }
+     ],
+     "usage": {
+      "prompt_tokens": 2949,
+      "prompt_tokens_details": {
+       "cached_tokens": 2862
+      },
+      "completion_tokens": 234,
+      "total_tokens": 3183
+     }
+    }
+   }
+  ]
+ },
+ "eval-14": {
+  "reasoner": [
+   {
+    "hash": "9d41400d7ded9a4c",
+    "response": {
+     "id": "chatcmpl-971",
+     "object": "chat.completion",
+     "created": 1793162921,
+     "model": "qwen3-4b",
+     "system_fingerprint": "fp_ollama",
+     "choices": [
+      {
+       "index": 0,
+       "message": {
+        "role": "assistant",
+        "content": "",
+        "tool_calls": [
+         {
+          "id": "0eaa0apbPvLGYLpkDsKqW2mytCfRLAn2",
+          "index": 0,
+          "type": "function",
+          "function": {
+           "name": "upsert_user_skills",
+           "arguments": "{\"user_id\":\"eval-14-user\",\"skills\":[{\"name\":\"SQL\",\"proficiency\":0.8},{\"name\":\"Python\",\"proficiency\":0.8}]}"
+          }
+         },
+         {
+          "id": "Ncxy2e4T63LYSEGQXJaJ6tVRkkTFbMTc",
+          "index": 1,
+          "type": "function",
+          "function": {
+           "name": "upsert_job_posting",
+           "arguments": "{\"job_id\":\"eval-14-job\",\"title\":\"Data Engineer\",\"company\":\"Eval Co\",\"seniority\":\"mid\",\"core_skills\":[{\"name\":\"SQL\",\"weight\":0.6},{\"name\":\"Apache Airflow\",\"weight\":0.6}],\"domains\":[\"data_engineering\"]}"
+          }
+         }
+        ]
+       },
+       "finish_reason": "tool_calls"
+      }
+     ],
+     "usage": {
+      "prompt_tokens": 2185,
+      "prompt_tokens_details": {
+       "cached_tokens": 2006
+      },
+      "completion_tokens": 154,
+      "total_tokens": 2339
+     }
+    }
+   },
+   {
+    "hash": "2ccfe224f89fe2e4",
+    "response": {
+     "id": "chatcmpl-310",
+     "object": "chat.completion",
+     "created": 1793162936,
+     "model": "qwen3-4b",
+     "system_fingerprint": "fp_ollama",
+     "choices": [
+      {
+       "index": 0,
+       "message": {
+        "role": "assistant",
+        "content": "",
+        "tool_calls": [
+         {
+          "id": "s6L7D2w9EKQ76PjaN398aitS4o7GCaRq",
+          "index": 0,
+          "type": "function",
+          "function": {
+           "name": "calculate_skill_gap",
+           "arguments": "{\"user_id\":\"eval-14-user\",\"job_id\":\"eval-14-job\"}"
+          }
+         }
+        ]
+       },
+       "finish_reason": "tool_calls"
+      }
+     ],
+     "usage": {
+      "prompt_tokens": 2450,
+      "prompt_tokens_details": {
+       "cached_tokens": 2338
+      },
+      "completion_tokens": 37,
+      "total_tokens": 2487
+     }
+    }
+   },
+   {
+    "hash": "89230aea8ebc14ed",
+    "response": {
+     "id": "chatcmpl-124",
+     "object": "chat.completion",
+     "created": 1793162951,
+     "model": "qwen3-4b",
+     "system_fingerprint": "fp_ollama",
+     "choices": [
+      {
+       "index": 0,
+       "message": {
+        "role": "assistant",
+        "content": "",
+        "tool_calls": [
+         {
+          "id": "oLi978SSwDkmT6tULXU5BauSzoPopRx5",
+          "index": 0,
+          "type": "function",
+          "function": {
+           "name": "get_skill_prerequisites",
+           "arguments": "{\"skill\":\"Apache Airflow\"}"
+          }
+         }
+        ]
+       },
+       "finish_reason": "tool_calls"
+      }
+     ],
+     "usage": {
+      "prompt_tokens": 2840,
+      "prompt_tokens_details": {
+       "cached_tokens": 2486
+      },
+      "completion_tokens": 24,
+      "total_tokens": 2864
+     }
+    }
+   },
+   {
+    "hash": "20e34104c1aa4145",
+    "response": {
+     "id": "chatcmpl-346",
+     "object": "chat.completion",
+     "created": 1793162982,
+     "model": "qwen3-4b",
+     "system_fingerprint": "fp_ollama",
+     "choices": [
+      {
+       "index": 0,
+       "message": {
+        "role": "assistant",
+        "content": "{\n  \"user_id\": \"eval-14-user\",\n  \"job_id\": \"eval-14-job\",\n  \"fit_score\": 0.575,\n  \"scoring_version\": \"1\",\n  \"modules\": [\n    {\n      \"order\": 1,\n      \"skill\": \"Apache Airflow\",\n      \"priority\": \"medium\",\n      \"why\": \"Not in your profile but you own 1 prerequisite(s) \u2014 quick to learn\",\n      \"builds_on\": [\"Python\"],\n      \"learn_first\": [],\n      \"activities\": [\n        {\n          \"type\": \"project\",\n          \"description\": \"Build a data pipeline using Apache Airflow to orchestrate ETL jobs with Python scripts\"\n        }\n      ],\n      \"estimated_hours\": 40,\n      \"evidence_of_mastery\": \"Successfully deploy and run a pipeline with at least 3 tasks using Airflow\"\n    }\n  ],\n  \"unmapped_skills\": [],\n  \"notes\": \"The user has strong SQL and Python skills but lacks Apache Airflow. The roadmap focuses on learning Apache Airflow with Python as a foundation.\"\n}"
+       },
+       "finish_reason": "stop"
+      }
+     ],
+     "usage": {
+      "prompt_tokens": 2922,
+      "prompt_tokens_details": {
+       "cached_tokens": 2863
+      },
+      "completion_tokens": 234,
+      "total_tokens": 3156
+     }
+    }
+   }
+  ]
+ },
+ "eval-16": {
+  "reasoner": [
+   {
+    "hash": "5e3ca3567bdf4474",
+    "response": {
+     "id": "chatcmpl-503",
+     "object": "chat.completion",
+     "created": 1793163054,
+     "model": "qwen3-4b",
+     "system_fingerprint": "fp_ollama",
+     "choices": [
+      {
+       "index": 0,
+       "message": {
+        "role": "assistant",
+        "content": "",
+        "tool_calls": [
+         {
+          "id": "EpF5nUf2Q62Xc7ZDwzDiAIVOpazwBloP",
+          "index": 0,
+          "type": "function",
+          "function": {
+           "name": "upsert_user_skills",
+           "arguments": "{\"user_id\":\"eval-16-user\",\"skills\":[{\"name\":\"Python\",\"proficiency\":0.8},{\"name\":\"Linux\",\"proficiency\":0.8}]}"
+          }
+         },
+         {
+          "id": "aAxnGQbqk0jjaGwYXFlKBVL8E9zktcqB",
+          "index": 1,
+          "type": "function",
+          "function": {
+           "name": "upsert_job_posting",
+           "arguments": "{\"job_id\":\"eval-16-job\",\"title\":\"ML Infrastructure Engineer\",\"company\":\"Eval Co\",\"seniority\":\"mid\",\"core_skills\":[{\"name\":\"Docker\",\"weight\":0.6}],\"preferred_skills\":[{\"name\":\"Kubernetes\",\"weight\":0.6}],\"domains\":[\"ml_infrastructure\"]}"
+          }
+         },
+         {
+          "id": "dIqzcAUF4ZOjRKBtr97a1NsMxaqTVzhF",
+          "index": 2,
+          "type": "function",
+          "function": {
+           "name": "calculate_skill_gap",
+           "arguments": "{\"user_id\":\"eval-16-user\",\"job_id\":\"eval-16-job\"}"
+          }
+         }
+        ]
+       },
+       "finish_reason": "tool_calls"
+      }
+     ],
+     "usage": {
+      "prompt_tokens": 2185,
+      "prompt_tokens_details": {
+       "cached_tokens": 2006
+      },
+      "completion_tokens": 196,
+      "total_tokens": 2381
+     }
+    }
+   },
+   {
+    "hash": "2a2e1c7279bbff37",
+    "response": {
+     "id": "chatcmpl-19",
+     "object": "chat.completion",
+     "created": 1793163062,
+     "model": "qwen3-4b",
+     "system_fingerprint": "fp_ollama",
+     "choices": [
+      {
+       "index": 0,
+       "message": {
+        "role": "assistant",
+        "content": "",
+        "tool_calls": [
+         {
+          "id": "tces7k3hFnK1fTqXapMu18jkbA5afAYr",
+          "index": 0,
+          "type": "function",
+          "function": {
+           "name": "get_user_profile",
+           "arguments": "{\"user_id\":\"eval-16-user\"}"
+          }
+         },
+         {
+          "id": "y64cTarT4Jo553COfm2o4H6HYGQyyEU3",
+          "index": 1,
+          "type": "function",
+          "function": {
+           "name": "get_job_posting",
+           "arguments": "{\"job_id\":\"eval-16-job\"}"
+          }
+         }
+        ]
+       },
+       "finish_reason": "tool_calls"
+      }
+     ],
+     "usage": {
+      "prompt_tokens": 2242,
+      "prompt_tokens_details": {
+       "cached_tokens": 2185
+      },
+      "completion_tokens": 53,
+      "total_tokens": 2295
+     }
+    }
+   },
+   {
+    "hash": "47a71b675c7341a0",
+    "response": {
+     "id": "chatcmpl-578",
+     "object": "chat.completion",
+     "created": 1793163070,
+     "model": "qwen3-4b",
+     "system_fingerprint": "fp_ollama",
+     "choices": [
+      {
+       "index": 0,
+       "message": {
+        "role": "assistant",
+        "content": "{\"error\": \"User 'eval-16-user' not found\", \"message\": \"Could not retrieve user profile or job posting. Both user and job are not found in the system.\"}"
+       },
+       "finish_reason": "stop"
+      }
+     ],
+     "usage": {
+      "prompt_tokens": 2370,
+      "prompt_tokens_details": {
+       "cached_tokens": 2294
+      },
+      "completion_tokens": 41,
+      "total_tokens": 2411
+     }
+    }
+   }
+  ]
+ },
+ "eval-17": {
+  "reasoner": [
+   {
+    "hash": "0bd579b6d09f75ab",
+    "response": {
+     "id": "chatcmpl-790",
+     "object": "chat.completion",
+     "created": 1793163092,
+     "model": "qwen3-4b",
+     "system_fingerprint": "fp_ollama",
+     "choices": [
+      {
+       "index": 0,
+       "message": {
+        "role": "assistant",
+        "content": "",
+        "tool_calls": [
+         {
+          "id": "iKDZ9CMvvIRDWAQtEPmUkw5ZXezIK9T6",
+          "index": 0,
+          "type": "function",
+          "function": {
+           "name": "upsert_user_skills",
+           "arguments": "{\"user_id\":\"eval-17-user\",\"skills\":[{\"category\":\"programming\",\"level\":\"intermediate\",\"name\":\"Python\",\"proficiency\":0.8}]}"
+          }
+         },
+         {
+          "id": "3EVkUf7tzJNa6jp2giDi8BSg1Yd1iZgu",
+          "index": 1,
+          "type": "function",
+          "function": {
+           "name": "upsert_job_posting",
+           "arguments": "{\"job_id\":\"eval-17-job\",\"title\":\"NLP Engineer\",\"company\":\"Eval Co\",\"seniority\":\"mid\",\"core_skills\":[{\"category\":\"nlp\",\"level\":\"intermediate\",\"name\":\"Natural Language Processing\",\"weight\":0.6}],\"domains\":[\"nlp\"]}"
+          }
+         },
+         {
+          "id": "HzSVhJ5ZAJY3sKaGZOp9qaYOQG663IXt",
+          "index": 2,
+          "type": "function",
+          "function": {
+           "name": "calculate_skill_gap",
+           "arguments": "{\"user_id\":\"eval-17-user\",\"job_id\":\"eval-17-job\"}"
+          }
+         }
+        ]
+       },
+       "finish_reason": "tool_calls"
+      }
+     ],
+     "usage": {
+      "prompt_tokens": 2148,
+      "prompt_tokens_details": {
+       "cached_tokens": 2006
+      },
+      "completion_tokens": 191,
+      "total_tokens": 2339
+     }
+    }
+   },
+   {
+    "hash": "9baa116b2420a368",
+    "response": {
+     "id": "chatcmpl-903",
+     "object": "chat.completion",
+     "created": 1793163100,
+     "model": "qwen3-4b",
+     "system_fingerprint": "fp_ollama",
+     "choices": [
+      {
+       "index": 0,
+       "message": {
+        "role": "assistant",
+        "content": "",
+        "tool_calls": [
+         {
+          "id": "Vti87tdInI9PhAJIPzlsPuVoyxzXoOIq",
+          "index": 0,
+          "type": "function",
+          "function": {
+           "name": "get_user_profile",
+           "arguments": "{\"user_id\":\"eval-17-user\"}"
+          }
+         },
+         {
+          "id": "yGGJlGXaVFNejQDvqOMF0eyyVaBvubVz",
+          "index": 1,
+          "type": "function",
+          "function": {
+           "name": "get_job_posting",
+           "arguments": "{\"job_id\":\"eval-17-job\"}"
+          }
+         }
+        ]
+       },
+       "finish_reason": "tool_calls"
+      }
+     ],
+     "usage": {
+      "prompt_tokens": 2205,
+      "prompt_tokens_details": {
+       "cached_tokens": 2148
+      },
+      "completion_tokens": 53,
+      "total_tokens": 2258
+     }
+    }
+   }
+  ]
+ },
+ "eval-19": {},
+ "eval-20": {
+  "reasoner": [
+   {
+    "hash": "af307084f85eacdb",
+    "response": {
+     "id": "chatcmpl-428",
+     "object": "chat.completion",
+     "created": 1793163400,
+     "model": "qwen3-4b",
+     "system_fingerprint": "fp_ollama",
+     "choices": [
+      {
+       "index": 0,
+       "message": {
+        "role": "assistant",
+        "content": "",
+        "tool_calls": [
+         {
+          "id": "QoupBNXDyJHOxfIcIJrI9fMZK7QdRGe8",
+          "index": 0,
+          "type": "function",
+          "function": {
+           "name": "upsert_user_skills",
+           "arguments": "{\"user_id\":\"eval-20-user\",\"skills\":[{\"name\":\"Python\",\"proficiency\":0.8},{\"name\":\"Basket Weaving\",\"proficiency\":0.95},{\"name\":\"Quantum Knitting\",\"proficiency\":0.6},{\"name\":\"Underwater Welding\",\"proficiency\":0.8}]}"
+          }
+         },
+         {
+          "id": "4gmGx20A7xhiempEqOUIja4e4wFma0dY",
+          "index": 1,
+          "type": "function",
+          "function": {
+           "name": "upsert_job_posting",
+           "arguments": "{\"job_id\":\"eval-20-job\",\"title\":\"Data Scientist\",\"company\":\"Eval Co\",\"seniority\":\"mid\",\"core_skills\":[{\"name\":\"Python\",\"weight\":0.6},{\"name\":\"scikit-learn\",\"weight\":0.6}],\"domains\":[]}"
+          }
+         },
+         {
+          "id": "yyB3Dfv8EL8RI3H4TxJHfpb4CV81OWGA",
+          "index": 2,
+          "type": "function",
+          "function": {
+           "name": "calculate_skill_gap",
+           "arguments": "{\"user_id\":\"eval-20-user\",\"job_id\":\"eval-20-job\"}"
+          }
+         }
+        ]
+       },
+       "finish_reason": "tool_calls"
+      }
+     ],
+     "usage": {
+      "prompt_tokens": 2232,
+      "prompt_tokens_details": {
+       "cached_tokens": 2005
+      },
+      "completion_tokens": 227,
+      "total_tokens": 2459
+     }
+    }
+   },
+   {
+    "hash": "89a63a61fba8c33f",
+    "response": {
+     "id": "chatcmpl-542",
+     "object": "chat.completion",
+     "created": 1793163420,
+     "model": "qwen3-4b",
+     "system_fingerprint": "fp_ollama",
+     "choices": [
+      {
+       "index": 0,
+       "message": {
+        "role": "assistant",
+        "content": "",
+        "tool_calls": [
+         {
+          "id": "OJHgiJ3BGWydaqDOYHOZCz9HnYkBhfl5",
+          "index": 0,
+          "type": "function",
+          "function": {
+           "name": "get_skill_prerequisites",
+           "arguments": "{\"skill\":\"scikit-learn\"}"
+          }
+         }
+        ]
+       },
+       "finish_reason": "tool_calls"
+      }
+     ],
+     "usage": {
+      "prompt_tokens": 2937,
+      "prompt_tokens_details": {
+       "cached_tokens": 2458
+      },
+      "completion_tokens": 25,
+      "total_tokens": 2962
+     }
+    }
+   },
+   {
+    "hash": "5cc2db8bbafaa464",
+    "response": {
+     "id": "chatcmpl-946",
+     "object": "chat.completion",
+     "created": 1793163466,
+     "model": "qwen3-4b",
+     "system_fingerprint": "fp_ollama",
+     "choices": [
+      {
+       "index": 0,
+       "message": {
+        "role": "assistant",
+        "content": "{\n  \"user_id\": \"eval-20-user\",\n  \"job_id\": \"eval-20-job\",\n  \"fit_score\": 0.575,\n  \"scoring_version\": \"1\",\n  \"modules\": [\n    {\n      \"order\": 1,\n      \"skill\": \"scikit-learn\",\n      \"priority\": \"medium\",\n      \"why\": \"Not in your profile but you own 1 prerequisite(s) \u2014 quick to learn\",\n      \"builds_on\": [\n        \"Python\"\n      ],\n      \"learn_first\": [\n        \"NumPy\"\n      ],\n      \"activities\": [\n        {\n          \"type\": \"course\",\n          \"description\": \"Complete a hands-on course on scikit-learn for data science, focusing on machine learning algorithms and model evaluation.\"\n        },\n        {\n          \"type\": \"project\",\n          \"description\": \"Build a predictive model using scikit-learn on a real-world dataset, such as housing prices or customer churn.\"\n        }\n      ],\n      \"estimated_hours\": 40,\n      \"evidence_of_mastery\": \"Successfully build and evaluate a machine learning model using scikit-learn on a real dataset with at least 80% accuracy.\"\n    }\n  ],\n  \"unmapped_skills\": [\n    \"Basket Weaving\",\n    \"Quantum Knitting\",\n    \"Underwater Welding\"\n  ],\n  \"notes\": \"The user has proficiency in Python, which is a core requirement for the job. The main gap is in scikit-learn, a core machine learning framework. The roadmap starts with scikit-learn, which builds on Python and requires NumPy as a prerequisite. The user's other skills are not relevant to the job domain.\"\n}"
+       },
+       "finish_reason": "stop"
+      }
+     ],
+     "usage": {
+      "prompt_tokens": 3049,
+      "prompt_tokens_details": {
+       "cached_tokens": 2961
+      },
+      "completion_tokens": 360,
+      "total_tokens": 3409
+     }
+    }
+   }
+  ]
+ }
+}
