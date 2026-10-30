@@ -237,3 +237,4 @@ Only numbers measured in this repo or on my laptop; nothing estimated.
 
 Phases 1–3 built and tested; Phase 4 (self-hosted inference) rehearsed locally, cloud
 deployment pending.
+Next: a public, safe, live app, then pilots; see [docs/ROADMAP.md](docs/ROADMAP.md).
