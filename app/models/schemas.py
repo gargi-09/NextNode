@@ -85,3 +85,13 @@ class JobCreate(BaseModel):
 class JobFromDescription(BaseModel):
     id: Optional[str] = None
     text: str = Field(min_length=1)
+
+PUBLIC_MAX_TEXT = 12_000   # characters: a long resume or job description, not a document dump
+
+
+class PublicAnalyzeRequest(BaseModel):
+    """One visitor analysis: a resume plus either job text or one of the sample jobs."""
+    resume_text: str = Field(min_length=20, max_length=PUBLIC_MAX_TEXT)
+    job_text: Optional[str] = Field(default=None, min_length=20, max_length=PUBLIC_MAX_TEXT)
+    sample_job: Optional[str] = Field(default=None, description="id from GET /public/sample-jobs")
+    explain: bool = False   # a second Gemini call for the narrative; off by default to save quota

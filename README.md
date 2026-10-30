@@ -134,6 +134,14 @@ the API at http://localhost:8000/demo/.
 
 Interactive API docs: http://localhost:8000/docs
 
+**Public mode** (for a hosted instance strangers can use): `PUBLIC_MODE=1` serves only
+`POST /api/v1/public/analyze` (a resume plus job text or a sample job), the sample-job list, the
+read-only ontology and health; every other route answers 404. Each analysis writes the parsed
+skills under fresh `pub-` ids, scores them and deletes them before replying, so nothing a visitor
+sends is kept, and no raw resume text is ever stored. Per-IP rate limit (`PUBLIC_RATE_PER_MINUTE`,
+`PUBLIC_RATE_PER_DAY`, defaults 3 / 20), text capped at 12,000 characters, CORS limited to
+`PUBLIC_ORIGINS`. Run a single instance: the limiters are per process.
+
 ### API overview (`/api/v1`)
 
 | Method | Path | LLM | Purpose |
@@ -207,7 +215,7 @@ Only numbers measured in this repo or on my laptop; nothing estimated.
 
 | What | Result |
 |---|---|
-| Automated tests | 218 passing (run on every push by GitHub Actions) |
+| Automated tests | 243 passing (run on every push by GitHub Actions) |
 | Ontology | 60 skills, 107 aliases, 46 prerequisite edges, 4 domains |
 | Pages demo vs. Python engine | Scores match exactly (parity test runs the JavaScript port under Node) |
 | vLLM on a local Kubernetes cluster (CPU, Qwen3-0.6B) | Smoke test 5/5: key enforced, model name, chat, structured tool call |

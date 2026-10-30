@@ -285,6 +285,32 @@
       delete store.jobs[m[1]]; save(); return res(204, "");
     }],
     ["GET", /^\/api\/v1\/analyze\/([^/]+)\/([^/]+)$/, (m, q) => analyze(m[1], m[2], String(q.explain ?? "true") !== "false")],
+    // public mode (app/services/public.py): sample jobs, and an analysis that keeps nothing
+    ["GET", /^\/api\/v1\/public\/sample-jobs$/, () => res(200, D.scenarios.map(s => ({ id: s.id, title: s.job.title,
+      company: s.job.company, skills: [...s.job.core, ...s.job.preferred, ...s.job.nice].map(([n]) => n) })))],
+    ["POST", /^\/api\/v1\/public\/analyze$/, (m, q, b) => {
+      const text = (v, field) => typeof v === "string" && v.length >= 20 && v.length <= 12000 ? null
+        : invalid(["body", field], "String should have between 20 and 12000 characters");
+      const bad = text(b?.resume_text, "resume_text") || (b?.job_text != null ? text(b.job_text, "job_text") : null);
+      if (bad) return bad;
+      if ((b.job_text == null) === (b.sample_job == null)) return res(422, { detail: "Send exactly one of job_text or sample_job" });
+      const sample = b.sample_job != null ? D.scenarios.find(s => s.id === b.sample_job) : null;
+      if (b.sample_job != null && !sample) return res(422, { detail: `Unknown sample_job '${b.sample_job}'; see GET /api/v1/public/sample-jobs` });
+      const session = "pub-" + uuid().replace(/-/g, "").slice(0, 16), userId = `${session}-user`, jobId = `${session}-job`;
+      try {
+        const resume = writeResume(userId, parseResume(b.resume_text), hash(b.resume_text));
+        const toTier = list => list.map(([name, weight]) => ({ name, weight }));
+        const job = sample
+          ? writeJob(jobId, sample.job, { core: toTier(sample.job.core), preferred: toTier(sample.job.preferred),
+                                          nice_to_have: toTier(sample.job.nice) }, sample.job.domains)
+          : (() => { const e = parseJob(b.job_text); return writeJob(jobId, e, { core: e.core_skills,
+              preferred: e.preferred_skills, nice_to_have: e.nice_to_have_skills }, e.domains, hash(b.job_text)); })();
+        const analysis = analyze(userId, jobId, Boolean(b.explain));
+        return res(200, { analysis: analysis.data, unmapped_skills: { resume: resume.unmapped, job: job.unmapped }, stored: false });
+      } finally {
+        delete store.users[userId]; delete store.jobs[jobId]; save();
+      }
+    }],
     ["POST", /^\/api\/v1\/pivot$/, (m, q, b) => {
       if (!b?.user_id) return invalid(["body", "user_id"], "Field required");
       if (!b?.target_role) return invalid(["body", "target_role"], "Field required");

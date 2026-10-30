@@ -98,6 +98,8 @@ the MCP server froze after about 50 calls because its log filled a pipe nothing 
   in the browser (an in-browser API and a JavaScript port of the scoring engine, tested for exact
   parity with Python).
 - **No real traffic.** Single user, local runs only; no load testing.
-- **No multi-tenancy or auth on the REST API.** It is meant for local use; only the MCP server
-  requires a token.
+- **No multi-tenancy or auth on the REST API.** Locally every route is open. Public mode
+  (`PUBLIC_MODE=1`) exposes only a stateless analyze flow: visitor data is written under random
+  ids, deleted before the response, and swept if a request dies; per-IP rate limits; CORS to
+  the demo site. Accounts and per-organization data are not built. The MCP server requires a token.
 - **No shared state** for the rate limiter, cache or agent runs across processes; the approval queue and checkpoints are local files.

@@ -209,3 +209,22 @@ def _delete_tx(tx, label: str, node_id: str, kind: str):
     """, id=node_id).single()["found"]
     if not found:
         raise NotFoundError(f"{kind} '{node_id}' not found")
+
+
+def sweep_ephemeral(prefix: str, older_than_s: int) -> int:
+    """Delete visitor users and jobs (ids starting with `prefix`) not touched for `older_than_s`
+    seconds: what a public request leaves behind if it dies before its own cleanup."""
+    return neo4j_client.write(_sweep_tx, prefix, older_than_s)
+
+
+def _sweep_tx(tx, prefix: str, older_than_s: int) -> int:
+    if not prefix:
+        raise ValueError("sweep needs a prefix")      # never an unscoped delete
+    return tx.run("""
+        MATCH (n)
+        WHERE (n:User OR n:JobPosting) AND n.id STARTS WITH $prefix
+          AND (n.updated_at IS NULL OR n.updated_at < datetime() - duration({seconds: $age}))
+        WITH n LIMIT 1000
+        DETACH DELETE n
+        RETURN count(*) AS removed
+    """, prefix=prefix, age=older_than_s).single()["removed"]

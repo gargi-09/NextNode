@@ -30,6 +30,16 @@ class Settings(BaseSettings):
     breaker_window_s: float = 60.0
     breaker_cooldown_s: float = 30.0
 
+    # ── Public mode (a hosted instance strangers can use) ──
+    # Off: every route works, for local use. On: only the public analyze flow, the read-only
+    # ontology and health are served; nothing a visitor sends is kept past their request.
+    public_mode: bool = False
+    public_origins: str = "https://gargi-09.github.io"  # comma-separated CORS origins
+    public_rate_per_minute: int = 3                       # analyses per client IP
+    public_rate_per_day: int = 20
+    public_sweep_age_s: int = 3600       # visitor nodes left by a crashed request are deleted after this
+    public_trust_forwarded_for: bool = True  # behind Cloud Run: client IP = last X-Forwarded-For hop
+
     # Aura's downloaded credentials file also carries AURA_INSTANCEID / AURA_INSTANCENAME,
     # which the app doesn't use — ignore unknown keys instead of failing at startup.
     model_config = SettingsConfigDict(env_file=".env", extra="ignore")
