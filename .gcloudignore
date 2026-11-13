@@ -1,0 +1,14 @@
+# What `gcloud run deploy --source .` uploads to Cloud Build: only what the Dockerfile needs.
+# Everything is excluded, then the image inputs are allowed back in. .env never leaves the machine.
+*
+!Dockerfile
+!.dockerignore
+!requirements.txt
+!app/
+!app/**
+!ontology/
+!ontology/**
+**/__pycache__/
+**/*.pyc
+.env
+.env.*

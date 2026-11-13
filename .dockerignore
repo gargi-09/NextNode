@@ -1,0 +1,22 @@
+# Only app/, ontology/ and requirements.txt go into the image (see Dockerfile).
+.env
+.env.*
+.git
+.github
+.claude
+.omnigent
+.omnigent-logs
+venv
+**/__pycache__
+**/*.pyc
+frontend
+docs
+tests
+eval
+harness
+scripts
+deploy
+omnigent
+cypher
+*.md
+*.prof

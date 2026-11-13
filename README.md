@@ -215,7 +215,7 @@ Only numbers measured in this repo or on my laptop; nothing estimated.
 
 | What | Result |
 |---|---|
-| Automated tests | 243 passing (run on every push by GitHub Actions) |
+| Automated tests | 247 passing (run on every push by GitHub Actions) |
 | Ontology | 60 skills, 107 aliases, 46 prerequisite edges, 4 domains |
 | Pages demo vs. Python engine | Scores match exactly (parity test runs the JavaScript port under Node) |
 | vLLM on a local Kubernetes cluster (CPU, Qwen3-0.6B) | Smoke test 5/5: key enforced, model name, chat, structured tool call |
@@ -233,8 +233,9 @@ Only numbers measured in this repo or on my laptop; nothing estimated.
 - **The public demo runs in your browser.** It uses an in-browser copy of the API and the
   scoring engine with sample data; it does not touch Neo4j or any model. The live path (FastAPI,
   Neo4j, Gemini, agents) runs locally.
-- **Not deployed to the cloud.** The EKS config is written but no cluster exists, and Cloud Run is
-  not set up.
+- **Not deployed to the cloud yet.** The EKS config is written but no cluster exists. The public
+  API is packaged for Cloud Run (scale to zero, one instance; [deploy/cloudrun](deploy/cloudrun/README.md))
+  but not deployed.
 - **Not tested under real traffic.** Single user, local runs only.
 - **No auth or multi-tenancy on the REST API**; it is meant for local use. Only the MCP server
   requires a token.

@@ -42,4 +42,6 @@ class Settings(BaseSettings):
 
     # Aura's downloaded credentials file also carries AURA_INSTANCEID / AURA_INSTANCENAME,
     # which the app doesn't use — ignore unknown keys instead of failing at startup.
-    model_config = SettingsConfigDict(env_file=".env", extra="ignore")
+    # Values are stripped: a secret stored with a trailing newline (common when piped into
+    # Secret Manager from a shell) must not break the Neo4j URI or the API key.
+    model_config = SettingsConfigDict(env_file=".env", extra="ignore", str_strip_whitespace=True)

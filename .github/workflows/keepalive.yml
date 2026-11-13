@@ -1,0 +1,31 @@
+# Neo4j Aura Free pauses after about 3 days without queries. Once a day this asks the hosted
+# API for /health/graph (one tiny read), which keeps the graph awake and shows if it is down.
+# Set the repository variable NEXTNODE_API_URL (Settings > Variables) to the Cloud Run URL;
+# without it the job does nothing.
+name: keep-graph-awake
+
+on:
+  schedule:
+    - cron: "17 13 * * *"     # daily, 13:17 UTC
+  workflow_dispatch:
+
+permissions: {}
+
+jobs:
+  ping:
+    runs-on: ubuntu-latest
+    timeout-minutes: 5
+    steps:
+      - name: Ping the graph through the API
+        env:
+          API: ${{ vars.NEXTNODE_API_URL }}
+        run: |
+          if [ -z "$API" ]; then echo "NEXTNODE_API_URL not set; nothing to ping"; exit 0; fi
+          for attempt in 1 2 3; do
+            code=$(curl -s -o body.json -w "%{http_code}" --max-time 60 "$API/health/graph")
+            echo "attempt $attempt: HTTP $code"; cat body.json; echo
+            [ "$code" = "200" ] && exit 0
+            sleep 20
+          done
+          echo "::error::graph health check failed (Aura may be paused: resume it in the Aura console)"
+          exit 1
