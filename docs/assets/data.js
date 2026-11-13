@@ -1862,7 +1862,7 @@ window.NEXTNODE = {
    "id": "cloud-run-deploy",
    "title": "Cloud Run hosting (public API)",
    "category": "Data & tooling",
-   "status": "built",
+   "status": "live",
    "llm": false,
    "writes": false,
    "summary": "Packages the public-mode API as a container and deploys it to Google Cloud Run: scales to zero so an idle demo costs nothing, never more than one instance, secrets from Secret Manager. A daily GitHub Actions ping keeps Neo4j Aura Free from pausing.",
@@ -1871,7 +1871,8 @@ window.NEXTNODE = {
     "deploy/cloudrun/deploy.ps1 enables the APIs, creates a service account that can read only its 4 secrets, asks for each secret with hidden input, and runs gcloud run deploy (min 0 / max 1 instance, 512 MiB, 60 s timeout).",
     ".gcloudignore uploads only the Dockerfile, requirements, app/ and ontology/ (38 files): .env never leaves the machine.",
     "keep-graph-awake workflow: once a day, GET /health/graph on the hosted API (needs only the repository variable NEXTNODE_API_URL).",
-    "Costs and steps, including the budget alert, are in deploy/cloudrun/README.md."
+    "Costs and steps, including the budget alert, are in deploy/cloudrun/README.md.",
+    "Live since 2026-11-13 at https://nextnode-api-4kn24fwg2a-ue.a.run.app (us-east1). First checks: health ok, private routes 404, CORS only for the Pages site, one analysis 200 in 7.5 s with 0 visitor nodes left."
    ],
    "files": [
     "Dockerfile",
@@ -2340,6 +2341,13 @@ window.NEXTNODE = {
    "features": [
     "cloud-run-deploy",
     "test-suite"
+   ]
+  },
+  {
+   "date": "2026-11-13",
+   "task": "Public API deployed to Cloud Run and checked end to end",
+   "features": [
+    "cloud-run-deploy"
    ]
   }
  ],

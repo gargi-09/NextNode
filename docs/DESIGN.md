@@ -93,8 +93,9 @@ the MCP server froze after about 50 calls because its log filled a pipe nothing 
 
 ## What I did not build
 
-- **No cloud deployment.** The vLLM Kubernetes manifests were validated on a local cluster, and
-  the EKS config is written and dry-run checked but not deployed. The public demo runs entirely
+- **Only the public API is deployed** (Cloud Run, public mode, scale to zero, one instance). The
+  vLLM Kubernetes manifests were validated on a local cluster, and the EKS config is written and
+  dry-run checked but not deployed. The public demo runs entirely
   in the browser (an in-browser API and a JavaScript port of the scoring engine, tested for exact
   parity with Python).
 - **No real traffic.** Single user, local runs only; no load testing.

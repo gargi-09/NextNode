@@ -16,8 +16,10 @@ it never runs more than one instance, so the in-process rate limits hold.
 | Gemini | one parse per new resume or job text; repeats come from the cache | Free tier, or a fraction of a cent per parse on the paid tier |
 
 Free allowances change: check the Cloud Run, Cloud Build and Artifact Registry pricing pages
-before you start. Spending caps do not exist on Google Cloud, so **set a budget alert first**, and
-keep `--max-instances 1` and the per-IP limits (3 analyses a minute, 20 a day).
+before you start. **Set a budget first** (Billing > Budgets & caps), with alerts and, where the
+console offers it, a spend cap that pauses services at the cap (enforcement can lag by hours, so
+overages are still billed). Keep `--max-instances 1` and the per-IP limits (3 analyses a minute,
+20 a day) as well.
 
 **Resumes are personal data.** On Gemini's free tier, Google may use inputs to improve its
 products; on the paid tier it does not. For real visitors, enable billing on the Gemini API key's

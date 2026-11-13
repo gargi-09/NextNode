@@ -233,9 +233,9 @@ Only numbers measured in this repo or on my laptop; nothing estimated.
 - **The public demo runs in your browser.** It uses an in-browser copy of the API and the
   scoring engine with sample data; it does not touch Neo4j or any model. The live path (FastAPI,
   Neo4j, Gemini, agents) runs locally.
-- **Not deployed to the cloud yet.** The EKS config is written but no cluster exists. The public
-  API is packaged for Cloud Run (scale to zero, one instance; [deploy/cloudrun](deploy/cloudrun/README.md))
-  but not deployed.
+- **Only the public API is in the cloud.** It runs on Cloud Run in public mode (scale to zero, one
+  instance; [deploy/cloudrun](deploy/cloudrun/README.md)). The agents and self-hosted inference run
+  locally; the EKS config is written but no cluster exists.
 - **Not tested under real traffic.** Single user, local runs only.
 - **No auth or multi-tenancy on the REST API**; it is meant for local use. Only the MCP server
   requires a token.
