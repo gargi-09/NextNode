@@ -186,3 +186,21 @@ def test_the_client_ip_is_the_hop_cloud_run_appended():
         headers = {"x-forwarded-for": "6.6.6.6, 203.0.113.7"}      # first hop is whatever the client sent
         client = type("C", (), {"host": "169.254.1.1"})()
     assert public_api.client_ip(Req()) == "203.0.113.7"
+
+
+def test_the_resume_and_job_parse_together_and_a_failure_still_cleans_up(fake_engine, monkeypatch):
+    order = []
+
+    async def slow_resume(text, user_id):
+        order.append("resume start"); await asyncio.sleep(0.05); order.append("resume end")
+        return {"user_id": user_id, "unmapped_skills": []}
+
+    async def failing_job(text, job_id, create_only=False):
+        order.append("job start"); raise RuntimeError("Gemini unavailable")
+
+    monkeypatch.setattr(public, "ingest_resume", slow_resume)
+    monkeypatch.setattr(public, "ingest_job_description", failing_job)
+    with pytest.raises(RuntimeError):
+        asyncio.run(public.analyze_public(RESUME, job_text=JOB))
+    assert order == ["resume start", "job start", "resume end"]       # concurrent; resume finished first
+    assert len(fake_engine["deleted"]) == 2                            # cleanup ran after both settled

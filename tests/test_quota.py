@@ -174,3 +174,17 @@ def test_identical_text_is_served_from_cache(fake_gemini, monkeypatch):
     assert (source1, source2) == ("llm", "cache")
     assert first == second
     assert models.calls == 1
+
+
+def test_extraction_calls_turn_thinking_off(fake_gemini, monkeypatch):
+    # 2.5 Flash thinks by default; on a long resume that overran the deadline (Gemini 504)
+    models, _ = fake_gemini(['{"ok": true}'])
+    seen = {}
+    original = models.generate_content
+    models.generate_content = lambda **kw: (seen.update(kw), original(**kw))[1]
+    asyncio.run(llm.generate_text("p", json_mode=True))
+    assert seen["config"].thinking_config.thinking_budget == 0
+    monkeypatch.setattr(llm.settings, "gemini_thinking_budget", None)
+    models.outcomes.append('{"ok": true}')
+    asyncio.run(llm.generate_text("p", json_mode=True))
+    assert seen["config"].thinking_config is None        # models that cannot disable thinking

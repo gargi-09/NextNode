@@ -67,14 +67,17 @@ async def analyze_public(resume_text: str, job_text: str | None = None, sample_j
 
     session = PREFIX + uuid.uuid4().hex[:16]
     user_id, job_id = f"{session}-user", f"{session}-job"
+    job_step = (jobs.create_job(SAMPLE_JOBS[sample_job].model_copy(update={"id": job_id}))
+                if sample_job is not None else ingest_job_description(job_text, job_id, create_only=True))
     try:
-        resume = await ingest_resume(resume_text, user_id)
-        if sample_job is not None:
-            job = await jobs.create_job(SAMPLE_JOBS[sample_job].model_copy(update={"id": job_id}))
-            job_unmapped = job.get("unmapped_skills") or []
-        else:
-            job = await ingest_job_description(job_text, job_id, create_only=True)
-            job_unmapped = job["unmapped_skills"] or []
+        # the two parses are independent: run them together (half the wait on two Gemini calls),
+        # and let both finish before cleanup so neither writes after its node was deleted
+        resume, job = await asyncio.gather(ingest_resume(resume_text, user_id), job_step,
+                                           return_exceptions=True)
+        for result in (resume, job):
+            if isinstance(result, BaseException):
+                raise result
+        job_unmapped = job.get("unmapped_skills") or []
         analysis = await analyze_gap(user_id, job_id, explain)
     finally:
         await _forget(user_id, job_id)

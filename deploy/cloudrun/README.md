@@ -8,7 +8,7 @@ it never runs more than one instance, so the in-process rate limits hold.
 
 | Piece | Setting | Cost at demo traffic |
 |---|---|---|
-| Cloud Run | min 0 / max 1 instance, 1 vCPU, 512 MiB, billed only while handling requests | Inside the always-free monthly allowance for a low-traffic demo |
+| Cloud Run | min 0 / max 1 instance, 1 vCPU, 512 MiB, 120 s request timeout, billed only while handling requests | Inside the always-free monthly allowance for a low-traffic demo |
 | Cloud Build | one build per deploy | Inside the free monthly build minutes for a few deploys |
 | Artifact Registry | one image of about 275 MB (old images can be deleted) | Inside the free storage allowance |
 | Secret Manager | 4 secrets | Inside the free allowance |

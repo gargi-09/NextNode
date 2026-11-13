@@ -141,7 +141,6 @@ const API = (() => {                                   // ?api=http://localhost:
   const q = new URLSearchParams(location.search).get("api");
   return q && /^https?:\/\/[\w.:-]+$/.test(q) ? q : DEFAULT_API;
 })();
-const PLACEHOLDER_NAME = /^(candidate( name)?|name|unknown|n\/?a|null|unnamed)$/i;
 const state = { resume: null, jobMode: "sample", samples: [] };
 
 function setStatus(text, kind = "") { const s = $("status"); s.textContent = text; s.className = `status ${kind}`; }
@@ -250,8 +249,8 @@ async function analyze() {
 function render(out, isOffline, why) {
   const a = out.analysis;
   $("results").hidden = false;
-  const name = a.user_name && !PLACEHOLDER_NAME.test(a.user_name.trim()) ? a.user_name : null;
-  $("res-title").textContent = name ? `${name}'s fit` : "Your fit";
+  // the name and contact lines are never sent, so there is no real name to show
+  $("res-title").textContent = "Your fit";
   $("res-banner").hidden = !isOffline;
   $("res-banner").textContent = isOffline
     ? `Offline demo${why ? ` (live service: ${why.toLowerCase().replace(/_/g, " ")})` : ""}: skills were found by a simple keyword matcher in your browser instead of the LLM, so this is rougher than the real thing. The scoring rules are the same.`

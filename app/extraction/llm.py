@@ -64,6 +64,8 @@ async def generate_text(prompt: str, kind: str = "parse", *,
     config = types.GenerateContentConfig(
         temperature=temperature,
         response_mime_type="application/json" if json_mode else None,
+        thinking_config=(types.ThinkingConfig(thinking_budget=settings.gemini_thinking_budget)
+                         if settings.gemini_thinking_budget is not None else None),
     )
 
     for attempt in range(2):

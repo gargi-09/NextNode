@@ -8,7 +8,7 @@ What it creates (see deploy/cloudrun/README.md for costs):
   - APIs: Cloud Run, Cloud Build, Artifact Registry, Secret Manager
   - a service account "nextnode-api" that can read only its 4 secrets
   - secrets neo4j-uri, neo4j-username, neo4j-password, gemini-api-key (values typed by you, never echoed)
-  - the Cloud Run service "nextnode-api": PUBLIC_MODE=1, min 0 / max 1 instance, 512 MiB, 60 s timeout
+  - the Cloud Run service "nextnode-api": PUBLIC_MODE=1, min 0 / max 1 instance, 512 MiB, 120 s timeout
 Nothing here reads .env: you paste each secret value when asked.
 #>
 param(
@@ -70,7 +70,7 @@ try {
     Run "Build and deploy $Service" {
         gcloud run deploy $Service --source . --region $Region --service-account $Sa `
             --allow-unauthenticated --min-instances 0 --max-instances 1 --concurrency 20 `
-            --cpu 1 --memory 512Mi --timeout 60 `
+            --cpu 1 --memory 512Mi --timeout 120 `
             --set-env-vars "PUBLIC_MODE=1,PUBLIC_ORIGINS=$Origins,GEMINI_RPD=$GeminiRpd" `
             --set-secrets $secretArgs --quiet
     }

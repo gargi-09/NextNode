@@ -16,7 +16,11 @@ class Settings(BaseSettings):
     gemini_rpm: int = 8
     gemini_rpd: int = 200
     gemini_explain_ceiling: float = 0.8  # explanations stop at 80% of the daily budget
-    gemini_timeout_s: int = 20
+    gemini_timeout_s: int = 30
+    # Extraction copies skills out of text: no reasoning needed, and 2.5 Flash's default thinking
+    # made long resumes miss the deadline (504). 0 turns it off; None leaves the model default
+    # (needed for models that cannot disable thinking).
+    gemini_thinking_budget: int | None = 0
     llm_cache_max_entries: int = 512
 
     # ── Neo4j Aura Free resilience ──
