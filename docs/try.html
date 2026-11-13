@@ -1,0 +1,304 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Try NextNode</title>
+<meta name="description" content="Upload your resume and a job description: NextNode maps your skills to a strict ontology and computes your fit score and learning roadmap from a knowledge graph.">
+<link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'><circle cx='9' cy='16' r='5' fill='%237C3AED'/><circle cx='23' cy='8' r='4' fill='%230D9488'/><circle cx='23' cy='24' r='4' fill='%23F59E0B'/><path d='M13 14 L19 9 M13 18 L19 23' stroke='%239CA3AF' stroke-width='2'/></svg>">
+<link rel="stylesheet" href="assets/site.css">
+<style>
+  .drop{display:block;border:2px dashed var(--line);border-radius:12px;padding:16px;text-align:center;color:var(--muted);font-size:14px;cursor:pointer;transition:border-color .2s}
+  .drop.over,.drop:hover,.drop:focus-visible{border-color:var(--violet);outline:none}
+  .drop input{display:none}
+  textarea.big{width:100%;min-height:150px;resize:vertical;background:var(--panel2);color:var(--text);border:1px solid var(--line);border-radius:10px;padding:10px;font:13px/1.5 inherit;margin-top:10px}
+  .or{display:flex;align-items:center;gap:10px;color:var(--faint);font-size:12px;margin:10px 0 0}
+  .or::before,.or::after{content:"";flex:1;border-top:1px solid var(--line)}
+  .parsed{margin-top:10px;font-size:13px}
+  .parsed .chips{margin-top:6px}
+  details.preview summary{cursor:pointer;color:var(--muted);font-size:12px;margin-top:8px}
+  details.preview pre{white-space:pre-wrap;max-height:220px;overflow:auto;background:var(--panel2);border-radius:10px;padding:10px;font:12px/1.5 var(--mono);margin:8px 0 0}
+  .status{min-height:22px;font-size:14px;margin:14px 0 0}
+  .status.err{color:var(--red)}.status.warn{color:var(--amber)}.status.ok{color:var(--green)}
+  .actions{display:flex;flex-wrap:wrap;gap:10px;align-items:center;margin-top:18px}
+  .privacy{font-size:12px;color:var(--faint);max-width:760px}
+  table.bd{width:100%;border-collapse:collapse;font-size:13px}
+  table.bd th,table.bd td{text-align:left;padding:6px 8px;border-bottom:1px solid var(--line)}
+  table.bd th{color:var(--muted);font-weight:600}
+  .bar{height:6px;border-radius:3px;background:var(--line);position:relative;min-width:60px}
+  .bar i{position:absolute;inset:0 auto 0 0;border-radius:3px;background:var(--teal)}
+  .bar b{position:absolute;top:-3px;width:2px;height:12px;background:var(--text)}
+  .banner{border-radius:10px;padding:10px 12px;font-size:13px;margin-top:14px;background:var(--amber-soft);color:var(--amber)}
+  [hidden]{display:none!important}
+</style>
+</head>
+<body>
+
+<nav class="top"><div class="wrap">
+  <a class="brand" href="index.html" style="text-decoration:none;color:var(--text)">next<b>node</b></a>
+  <a class="link" href="index.html">Demo</a>
+  <a class="link" href="sandbox.html">Sandbox</a>
+  <span class="spacer"></span>
+  <a class="btn" href="https://github.com/gargi-09/NextNode">GitHub</a>
+</div></nav>
+
+<section><div class="wrap">
+  <h2>Try it with your resume</h2>
+  <p class="sub">Upload your resume and pick a job. An LLM reads the skills, a strict ontology maps every one of them
+    (or says it doesn't know it), and a knowledge graph computes your fit and an ordered learning roadmap.
+    The model never sets the score.</p>
+
+  <div class="grid g2">
+    <div class="card">
+      <h3>1. Your resume</h3>
+      <label class="drop" id="r-drop" tabindex="0">
+        <input type="file" id="r-file" accept=".pdf,.docx,.txt,.md">
+        <b>Drop a PDF, DOCX or TXT here</b>, or click to choose a file (2 MB max)
+      </label>
+      <div class="or">or paste the text</div>
+      <textarea class="big" id="r-text" placeholder="Paste your resume here" spellcheck="false"></textarea>
+      <div class="parsed" id="r-parsed" hidden></div>
+    </div>
+
+    <div class="card">
+      <h3>2. The job</h3>
+      <div class="seg" role="radiogroup" aria-label="Job source">
+        <button id="j-mode-sample" role="radio" class="on" aria-checked="true">Sample job</button>
+        <button id="j-mode-own" role="radio" aria-checked="false">Your job description</button>
+      </div>
+      <div id="j-sample" style="margin-top:12px">
+        <select id="j-select" aria-label="Sample job"></select>
+        <div class="chips" id="j-skills" style="margin-top:10px"></div>
+      </div>
+      <div id="j-own" hidden>
+        <label class="drop" id="j-drop" tabindex="0" style="margin-top:12px">
+          <input type="file" id="j-file" accept=".pdf,.docx,.txt,.md">
+          <b>Drop the job description</b>, or click to choose a file
+        </label>
+        <div class="or">or paste the text</div>
+        <textarea class="big" id="j-text" placeholder="Paste the job description here" spellcheck="false"></textarea>
+      </div>
+    </div>
+  </div>
+
+  <div class="actions">
+    <button class="btn primary" id="go">Analyze my fit</button>
+    <span class="chip" id="source">…</span>
+  </div>
+  <div class="status" id="status" role="status" aria-live="polite"></div>
+  <p class="privacy">Privacy: files are read on your device. Only the text of the skill-related sections is sent,
+    with emails, phone numbers and links removed, and nothing is stored: the analysis is deleted from the graph
+    before the answer comes back. Up to 3 analyses a minute and 20 a day per visitor.</p>
+</div></section>
+
+<section id="results" hidden><div class="wrap">
+  <h2 id="res-title">Your fit</h2>
+  <div id="res-banner" class="banner" hidden></div>
+  <div class="results">
+    <div class="card ring"><div><div id="ring"></div><div class="big" id="fit">–</div><div class="note">fit score</div></div></div>
+    <div class="card">
+      <div class="kv"><span>Job</span><span id="kv-job"></span></div>
+      <div class="kv"><span>Skills the job asks for</span><span id="kv-req"></span></div>
+      <div class="kv"><span>Met / partial / missing</span><span id="kv-status"></span></div>
+      <div class="kv"><span>Domain match bonus</span><span id="kv-domain"></span></div>
+      <div class="kv"><span>Scoring</span><span>deterministic rules, version <span id="kv-ver"></span></span></div>
+      <div id="unmapped" class="note"></div>
+    </div>
+  </div>
+
+  <div class="card" style="margin-top:16px">
+    <h3>Learning roadmap</h3>
+    <p class="note" style="margin-top:0">In order: each step comes after the prerequisites it needs. Dashed lines show what you already have that helps.</p>
+    <div class="flow-wrap" id="flow"></div>
+  </div>
+
+  <div class="card" style="margin-top:16px">
+    <h3>Skill by skill</h3>
+    <table class="bd"><thead><tr><th>Skill</th><th>Tier</th><th>You</th><th>Needed</th><th>Status</th></tr></thead><tbody id="bd"></tbody></table>
+  </div>
+
+  <div class="card" style="margin-top:16px">
+    <h3>Your skills graph</h3>
+    <svg class="viz" id="graph" role="img" aria-label="Graph of you, the job, the required skills and their prerequisites"></svg>
+    <div class="legend"><span><i style="background:var(--green)"></i>met</span><span><i style="background:var(--amber)"></i>partial</span>
+      <span><i style="background:var(--red)"></i>missing</span><span><i style="background:var(--slate)"></i>prerequisite</span></div>
+  </div>
+</div></section>
+
+<footer><div class="wrap">NextNode · <a href="https://github.com/gargi-09/NextNode">source</a> · scores come from graph rules, not from the model.</div></footer>
+
+<script src="assets/data.js"></script>
+<script src="assets/nextnode-core.js"></script>
+<script src="assets/mock-api.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/d3/7.9.0/d3.min.js" integrity="sha512-vc58qvvBdrDR4etbxMdlTt4GBQk1qjvyORR2nrsPsFPyrs+/u5c3+1Ct6upOgdZoIl7eq6k3a1UPDSNAQi/32A==" crossorigin="anonymous" referrerpolicy="no-referrer"></script>
+<script src="assets/viz.js"></script>
+<script src="assets/resume-reader.js"></script>
+<script>
+"use strict";
+const $ = id => document.getElementById(id);
+const DEFAULT_API = "https://nextnode-api-4kn24fwg2a-ue.a.run.app";
+const API = (() => {                                   // ?api=http://localhost:8000 to try a local backend
+  const q = new URLSearchParams(location.search).get("api");
+  return q && /^https?:\/\/[\w.:-]+$/.test(q) ? q : DEFAULT_API;
+})();
+const PLACEHOLDER_NAME = /^(candidate( name)?|name|unknown|n\/?a|null|unnamed)$/i;
+const state = { resume: null, jobMode: "sample", samples: [] };
+
+function setStatus(text, kind = "") { const s = $("status"); s.textContent = text; s.className = `status ${kind}`; }
+
+/* ── API, with the in-browser demo as a fallback ── */
+async function api(method, path, body) {
+  const r = await fetch(API + path, { method, headers: body ? { "Content-Type": "application/json" } : {},
+                                      body: body ? JSON.stringify(body) : undefined });
+  let data = null; try { data = await r.json(); } catch { /* empty body */ }
+  return { status: r.status, data, retryAfter: r.headers.get("Retry-After") };
+}
+async function offline(body) {
+  const r = await NNMock.request("POST", "/api/v1/public/analyze", { body });
+  return { ...r, offline: true };
+}
+
+/* ── sample jobs ── */
+async function loadSamples() {
+  try {
+    const r = await api("GET", "/api/v1/public/sample-jobs");
+    if (r.status !== 200) throw new Error();
+    state.samples = r.data;
+    $("source").textContent = "live API"; $("source").className = "chip g";
+  } catch {
+    state.samples = NEXTNODE.scenarios.map(s => ({ id: s.id, title: s.job.title, company: s.job.company,
+      skills: [...s.job.core, ...s.job.preferred, ...s.job.nice].map(([n]) => n) }));
+    $("source").textContent = "offline demo"; $("source").className = "chip a";
+  }
+  $("j-select").innerHTML = "";
+  for (const j of state.samples) $("j-select").append(new Option(`${j.title} · ${j.company}`, j.id));
+  showSampleSkills();
+}
+function showSampleSkills() {
+  const j = state.samples.find(s => s.id === $("j-select").value);
+  $("j-skills").innerHTML = "";
+  for (const s of j?.skills || []) { const c = document.createElement("span"); c.className = "chip"; c.textContent = s; $("j-skills").append(c); }
+}
+
+/* ── files ── */
+function wireDrop(dropId, inputId, onFile) {
+  const drop = $(dropId), input = $(inputId);
+  drop.addEventListener("keydown", e => { if (e.key === "Enter" || e.key === " ") { e.preventDefault(); input.click(); } });
+  drop.addEventListener("dragover", e => { e.preventDefault(); drop.classList.add("over"); });
+  drop.addEventListener("dragleave", () => drop.classList.remove("over"));
+  drop.addEventListener("drop", e => { e.preventDefault(); drop.classList.remove("over"); if (e.dataTransfer.files[0]) onFile(e.dataTransfer.files[0]); });
+  input.addEventListener("change", () => { if (input.files[0]) onFile(input.files[0]); input.value = ""; });
+}
+async function readInto(file, textarea) {
+  setStatus(`Reading ${file.name} on your device…`);
+  try {
+    const out = await NNResume.readFile(file);
+    textarea.value = out.text;
+    setStatus(`Read ${file.name}${out.pages ? ` (${out.pages} page${out.pages > 1 ? "s" : ""})` : ""}. Check the text, then analyze.`, "ok");
+    return true;
+  } catch (e) { setStatus(e.message, "err"); return false; }
+}
+
+function showParsed() {
+  const raw = $("r-text").value;
+  const box = $("r-parsed");
+  if (raw.trim().length < 20) { box.hidden = true; state.resume = null; return; }
+  const p = state.resume = NNResume.prepare(raw);
+  const chip = (t, cls = "") => `<span class="chip ${cls}">${t}</span>`;
+  const removed = Object.entries(p.removed).filter(([, n]) => n).map(([k, n]) => `${n} ${n === 1 ? k.replace(/s$/, "") : k}`);
+  box.hidden = false;
+  box.innerHTML = `<b>Read in your browser</b><div class="chips">${
+    (p.sections.length ? p.sections.map(s => chip(s, "v")).join("") : chip("no section headings found: the whole text is used"))}${
+    p.roles ? chip(`${p.roles} dated role${p.roles > 1 ? "s" : ""}`, "t") + chip(`about ${p.years} years, ${p.span[0]}–${p.span[1]}`, "t") : ""}${
+    removed.length ? chip(`not sent: ${removed.join(", ")}`, "g") : ""}${
+    p.truncated ? chip("trimmed to 12,000 characters", "a") : ""}</div>
+    <details class="preview"><summary>See exactly what will be sent (${p.text.length.toLocaleString()} characters)</summary><pre></pre></details>`;
+  box.querySelector("pre").textContent = p.text;
+}
+
+/* ── analyze ── */
+async function analyze() {
+  showParsed();
+  if (!state.resume) return setStatus("Add your resume first (upload a file or paste at least a few lines).", "err");
+  const body = { resume_text: state.resume.text };
+  if (state.jobMode === "sample") body.sample_job = $("j-select").value;
+  else {
+    const jt = NNResume.redact($("j-text").value).text.trim().slice(0, NNResume.MAX_CHARS);
+    if (jt.length < 20) return setStatus("Paste or upload the job description, or switch to a sample job.", "err");
+    body.job_text = jt;
+  }
+  $("go").disabled = true;
+  const slow = setTimeout(() => setStatus("Waking up the server (the first visit after a quiet spell takes 10 to 20 seconds)…", "warn"), 2500);
+  setStatus("Reading your skills and scoring them against the graph…");
+  let r;
+  try {
+    r = $("source").textContent === "offline demo" ? await offline(body) : await api("POST", "/api/v1/public/analyze", body);
+  } catch {
+    r = await offline(body);
+  } finally { clearTimeout(slow); $("go").disabled = false; }
+
+  if (r.status === 200) { render(r.data, r.offline); return setStatus(r.offline ? "Done (offline demo)." : "Done.", "ok"); }
+  const d = r.data?.detail, code = d?.code;
+  if (code === "RATE_LIMITED") return setStatus(`That's the limit for now: try again in ${r.retryAfter || d.retry_after} seconds.`, "warn");
+  if (code === "LLM_QUOTA" || code === "LLM_UNAVAILABLE" || code === "GRAPH_UNAVAILABLE" || r.status >= 500) {
+    const alt = await offline(body);
+    if (alt.status === 200) { render(alt.data, true, code); return setStatus("The live service is busy, so this is the offline demo.", "warn"); }
+  }
+  setStatus(typeof d === "string" ? d : Array.isArray(d) ? d.map(e => e.msg).join("; ") : `Something went wrong (HTTP ${r.status}).`, "err");
+}
+
+function render(out, isOffline, why) {
+  const a = out.analysis;
+  $("results").hidden = false;
+  const name = a.user_name && !PLACEHOLDER_NAME.test(a.user_name.trim()) ? a.user_name : null;
+  $("res-title").textContent = name ? `${name}'s fit` : "Your fit";
+  $("res-banner").hidden = !isOffline;
+  $("res-banner").textContent = isOffline
+    ? `Offline demo${why ? ` (live service: ${why.toLowerCase().replace(/_/g, " ")})` : ""}: skills were found by a simple keyword matcher in your browser instead of the LLM, so this is rougher than the real thing. The scoring rules are the same.`
+    : "";
+  const pct = Math.round(a.fit_score * 100), C = 2 * Math.PI * 52, color = pct >= 70 ? "var(--green)" : pct >= 40 ? "var(--amber)" : "var(--red)";
+  $("ring").innerHTML = `<svg width="140" height="140" viewBox="0 0 140 140" aria-hidden="true"><circle cx="70" cy="70" r="52" fill="none" stroke="var(--line)" stroke-width="12"/><circle cx="70" cy="70" r="52" fill="none" stroke="${color}" stroke-width="12" stroke-linecap="round" stroke-dasharray="${C * a.fit_score} ${C}" transform="rotate(-90 70 70)"/></svg>`;
+  $("fit").textContent = `${pct}%`;
+  $("kv-job").textContent = [a.job_title, a.company].filter(Boolean).join(" · ");
+  const counts = { met: 0, partial: 0, missing: 0 };
+  for (const s of a.skill_breakdown) counts[s.status] = (counts[s.status] || 0) + 1;
+  $("kv-req").textContent = a.skill_breakdown.length;
+  $("kv-status").textContent = `${counts.met} / ${counts.partial} / ${counts.missing}`;
+  $("kv-domain").textContent = a.domain_bonus ? `+${Math.round(a.domain_bonus * 100)}%` : "none";
+  $("kv-ver").textContent = a.scoring_version;
+  const um = [...(out.unmapped_skills?.resume || []), ...(out.unmapped_skills?.job || [])];
+  $("unmapped").textContent = um.length ? `Not in the skill ontology yet, so not scored: ${um.join(", ")}.` : "";
+
+  NNViz.roadmapFlow($("flow"), a.roadmap_flow);
+  const tb = $("bd"); tb.innerHTML = "";
+  for (const s of a.skill_breakdown) {
+    const tr = document.createElement("tr");
+    const st = { met: "g", partial: "a", missing: "r" }[s.status] || "";
+    tr.innerHTML = `<td></td><td></td><td><div class="bar"><i></i><b></b></div></td><td></td><td><span class="chip ${st}"></span></td>`;
+    tr.cells[0].textContent = s.skill; tr.cells[1].textContent = s.importance.replace(/_/g, " ");
+    tr.querySelector(".bar i").style.width = `${Math.round(s.your_proficiency * 100)}%`;
+    tr.querySelector(".bar b").style.left = `${Math.round(s.required_weight * 100)}%`;
+    tr.cells[3].textContent = `${Math.round(s.required_weight * 100)}%`;
+    tr.querySelector(".chip").textContent = s.status;
+    tb.append(tr);
+  }
+  NNViz.careerGraph($("graph"), a.graph);          // the section is visible now, so the svg has its size
+  $("results").scrollIntoView({ behavior: "smooth" });
+}
+
+/* ── wiring ── */
+wireDrop("r-drop", "r-file", async f => { if (await readInto(f, $("r-text"))) showParsed(); });
+wireDrop("j-drop", "j-file", f => readInto(f, $("j-text")));
+let typing; $("r-text").addEventListener("input", () => { clearTimeout(typing); typing = setTimeout(showParsed, 400); });
+for (const [id, mode] of [["j-mode-sample", "sample"], ["j-mode-own", "own"]]) $(id).addEventListener("click", () => {
+  state.jobMode = mode;
+  $("j-mode-sample").classList.toggle("on", mode === "sample"); $("j-mode-sample").setAttribute("aria-checked", mode === "sample");
+  $("j-mode-own").classList.toggle("on", mode === "own"); $("j-mode-own").setAttribute("aria-checked", mode === "own");
+  $("j-sample").hidden = mode !== "sample"; $("j-own").hidden = mode !== "own";
+});
+$("j-select").addEventListener("change", showSampleSkills);
+$("go").addEventListener("click", analyze);
+loadSamples();
+</script>
+</body>
+</html>

@@ -1,6 +1,6 @@
 # Nextnode
 
-**[▶ Live interactive demo](https://gargi-09.github.io/NextNode/)** · **[🧪 Feature sandbox](https://gargi-09.github.io/NextNode/sandbox.html)**: run the agent simulation, explore the career graph, and try every API feature in your browser, with nothing to install. Running the backend locally? The same pages are at `http://localhost:8000/demo/`, where the sandbox's Live mode calls your API.
+**[📄 Try it with your resume](https://gargi-09.github.io/NextNode/try.html)** (upload a PDF or DOCX; runs on the hosted API, nothing stored) · **[▶ Live interactive demo](https://gargi-09.github.io/NextNode/)** · **[🧪 Feature sandbox](https://gargi-09.github.io/NextNode/sandbox.html)**: run the agent simulation, explore the career graph, and try every API feature in your browser, with nothing to install. Running the backend locally? The same pages are at `http://localhost:8000/demo/`, where the sandbox's Live mode calls your API.
 
 AI-powered career intelligence tool that thinks in graphs. Paste your resume and a job description, get back a personalized fit score, skill gap breakdown, learning roadmap, and career pivot analysis — all powered by a neurosymbolic reasoning engine built on a knowledge graph.
 
@@ -215,7 +215,7 @@ Only numbers measured in this repo or on my laptop; nothing estimated.
 
 | What | Result |
 |---|---|
-| Automated tests | 247 passing (run on every push by GitHub Actions) |
+| Automated tests | 253 passing (run on every push by GitHub Actions) |
 | Ontology | 60 skills, 107 aliases, 46 prerequisite edges, 4 domains |
 | Pages demo vs. Python engine | Scores match exactly (parity test runs the JavaScript port under Node) |
 | vLLM on a local Kubernetes cluster (CPU, Qwen3-0.6B) | Smoke test 5/5: key enforced, model name, chat, structured tool call |

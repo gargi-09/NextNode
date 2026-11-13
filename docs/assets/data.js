@@ -1620,7 +1620,7 @@ window.NEXTNODE = {
    "status": "live",
    "llm": false,
    "writes": false,
-   "summary": "247 tests that need no database, no API key and no network: golden scores, Cypher contracts, the breaker, the limiter, payloads, MCP tools, Omnigent configs, the agent runner and harness, Kubernetes manifests and demo parity. GitHub Actions runs them, plus frontend lint and build, on every push.",
+   "summary": "253 tests that need no database, no API key and no network: golden scores, Cypher contracts, the breaker, the limiter, payloads, MCP tools, Omnigent configs, the agent runner and harness, Kubernetes manifests and demo parity. GitHub Actions runs them, plus frontend lint and build, on every push.",
    "how": [
     "Run: python -m pytest   (frontend: npm --prefix frontend run lint)",
     ".github/workflows/ci.yml: Python tests (with Node, for the demo parity test) and frontend lint + build. No secrets needed.",
@@ -1882,6 +1882,28 @@ window.NEXTNODE = {
     "deploy/cloudrun/README.md",
     ".github/workflows/keepalive.yml",
     "tests/test_cloudrun_deploy.py"
+   ],
+   "endpoints": []
+  },
+  {
+   "id": "try-page",
+   "title": "Try it page (resume upload)",
+   "category": "Analysis",
+   "status": "live",
+   "llm": true,
+   "writes": false,
+   "summary": "A page anyone can use: upload a resume (PDF, DOCX or TXT) or paste it, pick a sample job or add your own job description, and get the fit score, a skill-by-skill breakdown, the ordered roadmap and the skills graph from the hosted API.",
+   "how": [
+    "The file is read on the visitor's device (pdf.js and mammoth.js from pinned cdnjs URLs, checked against SHA-384 hashes); the file itself is never uploaded.",
+    "The resume is split into sections by their headings; only skill-related sections are sent, with emails, phone numbers and links removed. Date ranges give the number of roles and years of experience, added as a note for the parser.",
+    "The visitor can see exactly what will be sent before analyzing.",
+    "Calls POST /api/v1/public/analyze on the Cloud Run service; if it is unreachable, busy or out of model quota, the same request runs on the in-browser demo API, clearly labelled.",
+    "Handles cold starts, the per-visitor rate limit and scanned PDFs with plain messages."
+   ],
+   "files": [
+    "docs/try.html",
+    "docs/assets/resume-reader.js",
+    "tests/test_resume_reader.py"
    ],
    "endpoints": []
   }
@@ -2348,6 +2370,14 @@ window.NEXTNODE = {
    "task": "Public API deployed to Cloud Run and checked end to end",
    "features": [
     "cloud-run-deploy"
+   ]
+  },
+  {
+   "date": "2026-11-13",
+   "task": "Try it page: resume upload read in the browser (sections, dates, contact details removed), live API with offline fallback",
+   "features": [
+    "try-page",
+    "test-suite"
    ]
   }
  ],
