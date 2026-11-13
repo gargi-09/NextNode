@@ -1,5 +1,5 @@
 # Bump whenever a prompt changes: it is part of the LLM cache key.
-PROMPT_VERSION = "2"
+PROMPT_VERSION = "3"
 
 JD_EXTRACTION_PROMPT = """
 You are an expert technical recruiter. Extract structured information from the job description below.
@@ -10,7 +10,7 @@ Return ONLY valid JSON matching this exact structure — no markdown, no explana
   "company": "company name",
   "seniority": "junior|mid|senior|staff",
   "core_skills": [
-    {{"name": "skill name", "category": "language|ml_framework|platform|concept|tool", "level": "foundational|intermediate|advanced", "proficiency": 0.0}}
+    {{"name": "skill name", "category": "language|ml_framework|platform|concept|tool", "level": "foundational|intermediate|advanced", "proficiency": 0.0, "alternatives": []}}
   ],
   "preferred_skills": [...],
   "nice_to_have_skills": [...],
@@ -22,6 +22,9 @@ Rules:
 - preferred_skills: strongly preferred but not blocking
 - nice_to_have_skills: mentioned as a bonus
 - proficiency: 0.7–1.0 for senior-level expectations, 0.4–0.6 for mid, 0.2–0.4 for junior
+- alternatives: when the posting accepts ANY ONE of several skills ("a language such as Python, Java, or C++",
+  "Java or Kotlin", "one of AWS, GCP or Azure"), output ONE skill: the first one listed as `name` and the
+  others in `alternatives`. Never list each alternative as its own required skill. Otherwise use [].
 - Use canonical skill names. When a skill matches one of these, use exactly this spelling: {skill_vocabulary}
 - domains: only include from the allowed list above
 

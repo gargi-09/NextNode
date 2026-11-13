@@ -1,6 +1,6 @@
 from app.db.neo4j import neo4j_client
 from app.core.errors import NotFoundError
-from app.graph.scoring import score_gap
+from app.graph.scoring import collapse_alternatives, score_gap
 
 
 def fetch_gap_inputs(user_id: str, job_id: str) -> dict:
@@ -41,6 +41,8 @@ def _fetch_gap_inputs_tx(tx, user_id: str, job_id: str) -> dict:
             s.category        AS category,
             req.importance    AS importance,
             req.weight        AS required_weight,
+            req.group         AS group,
+            req.alt_rank      AS alt_rank,
             COALESCE(has.proficiency, 0.0) AS your_proficiency,
             CASE
                 WHEN has.proficiency IS NULL THEN 'missing'
@@ -77,6 +79,11 @@ def _fetch_gap_inputs_tx(tx, user_id: str, job_id: str) -> dict:
         for r in prereq_result
     }
 
+    # an any-of group ("Python, Java, or C++") counts as one requirement: its best member
+    listed = {r["skill"] for r in rows}
+    rows = collapse_alternatives(rows, prereq_coverage)
+    folded = listed - {r["skill"] for r in rows}      # alternatives not chosen: drop their paths too
+
     # ── Step 4: graph state for the frontend (actual edges, not derived) ──
     # paths from skills the user owns to required skills they are missing
     path_result = tx.run("""
@@ -91,7 +98,7 @@ def _fetch_gap_inputs_tx(tx, user_id: str, job_id: str) -> dict:
                    source: startNode(r).name, target: endNode(r).name, strength: r.strength
                }] AS edges
     """, user_id=user_id, job_id=job_id)
-    prereq_paths = [dict(r) for r in path_result]
+    prereq_paths = [dict(r) for r in path_result if r["target"] not in folded]
 
     # prerequisite edges between two skills the job itself requires
     required_edges = tx.run("""
@@ -99,7 +106,8 @@ def _fetch_gap_inputs_tx(tx, user_id: str, job_id: str) -> dict:
               -[r:PREREQUISITE_OF]->(b:Skill)<-[:REQUIRES_SKILL]-(j)
         RETURN a.name AS source, b.name AS target, r.strength AS strength
     """, job_id=job_id)
-    required_prereq_edges = [dict(r) for r in required_edges]
+    required_prereq_edges = [dict(r) for r in required_edges
+                             if r["source"] not in folded and r["target"] not in folded]
 
     domain_record = tx.run("""
         OPTIONAL MATCH (:User {id: $user_id})-[:TARGETS]->(ud:Domain)

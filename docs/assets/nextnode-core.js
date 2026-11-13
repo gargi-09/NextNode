@@ -64,6 +64,10 @@
   NN.pct = pct; NN.round3 = round3; NN.TIER = TIER;
 
   function reasonFor(g) {
+    const r = baseReason(g);
+    return g.alternatives?.length ? `${r} (or ${g.alternatives.join(", ")}: any one counts)` : r;
+  }
+  function baseReason(g) {
     if (g.status === "missing" && g.prereqs_owned > 0) return `Not in your profile but you own ${g.prereqs_owned} prerequisite(s) — quick to learn`;
     if (g.status === "missing" && g.importance === "core") return "Core requirement — not in your profile, address first";
     if (g.status === "missing" && g.importance === "nice_to_have") return "Nice to have — low urgency";
@@ -81,7 +85,7 @@
       gap += wg; max += r.required_weight * mult;
       return { skill: r.skill, category: r.category ?? null, importance: r.importance, status: r.status,
                your_proficiency: r.your_proficiency, required_weight: r.required_weight,
-               prereqs_owned: owned, gap_contribution: round3(wg) };
+               prereqs_owned: owned, gap_contribution: round3(wg), alternatives: r.alternatives || [] };
     });
     const bonus = Math.min(sharedDomains * 0.025, 0.05);
     const fit = Math.min((max > 0 ? 1 - gap / max : 1) + bonus, 1);
@@ -91,23 +95,46 @@
         rank: i + 1, skill: g.skill,
         priority: g.importance === "core" ? (g.prereqs_owned === 0 ? "high" : "medium") : g.importance === "preferred" ? "medium" : "low",
         status: g.status, importance: g.importance, prereqs_owned: g.prereqs_owned, reason: reasonFor(g),
+        alternatives: g.alternatives,
       }));
     return { fit_score: round3(fit), gap_score: round3(gap), domain_bonus: bonus, skill_breakdown: breakdown, roadmap };
   };
 
-  /** owned: {canonicalName: proficiency}; requirements: [{skill, importance, weight}] (canonical, deduped). */
+  /* app/graph/scoring.collapse_alternatives: an any-of group counts once, as its best member */
+  const STATUS = { met: 0, partial: 1, missing: 2 };
+  NN.collapseAlternatives = (rows, prereq) => {
+    const out = [], groups = {};
+    for (const r of rows) {
+      if (!r.group) { out.push(r); continue; }
+      if (!groups[r.group]) { groups[r.group] = []; out.push(r.group); }
+      groups[r.group].push(r);
+    }
+    const plain = ({ group, alt_rank, ...rest }) => rest;
+    return out.map(item => {
+      if (typeof item !== "string") return { ...plain(item), alternatives: [] };
+      const members = [...groups[item]].sort((a, b) => (a.alt_rank || 0) - (b.alt_rank || 0));
+      const key = r => [STATUS[r.status], -r.your_proficiency, -(prereq[r.skill] || 0), r.alt_rank || 0];
+      const best = members.reduce((a, b) => { const ka = key(a), kb = key(b); for (let i = 0; i < 4; i++) if (ka[i] !== kb[i]) return kb[i] < ka[i] ? b : a; return a; });
+      return { ...plain(best), alternatives: members.filter(m => m !== best).map(m => m.skill) };
+    });
+  };
+
+  /** owned: {canonicalName: proficiency}; requirements: [{skill, importance, weight, group?, alt_rank?}] (canonical, deduped). */
   NN.analyzeProfile = (owned, requirements, targetDomain, jobDomains) => {
-    const rows = requirements.map(q => {
+    const listed = requirements.map(q => {
       const p = owned[q.skill];
       return { skill: q.skill, category: BY_NAME[q.skill]?.category ?? null, importance: q.importance,
                required_weight: q.weight, your_proficiency: p ?? 0,
-               status: p === undefined ? "missing" : p >= q.weight ? "met" : "partial" };
+               status: p === undefined ? "missing" : p >= q.weight ? "met" : "partial",
+               group: q.group ?? null, alt_rank: q.alt_rank ?? null };
     });
     const prereq = {}, unlocks = {};
-    for (const r of rows.filter(r => r.status === "missing")) {
+    for (const r of listed.filter(r => r.status === "missing")) {
       unlocks[r.skill] = Object.keys(owned).filter(o => NN.reach(o).has(r.skill));
       prereq[r.skill] = unlocks[r.skill].length;
     }
+    const rows = NN.collapseAlternatives(listed, prereq);
+    for (const s of listed) if (!rows.some(r => r.skill === s.skill)) delete unlocks[s.skill];   // folded alternatives
     const shared = targetDomain && jobDomains.includes(targetDomain) ? 1 : 0;
     return { owned, rows, unlocks, shared, result: NN.scoreGap(rows, shared, prereq) };
   };

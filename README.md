@@ -215,7 +215,7 @@ Only numbers measured in this repo or on my laptop; nothing estimated.
 
 | What | Result |
 |---|---|
-| Automated tests | 253 passing (run on every push by GitHub Actions) |
+| Automated tests | 264 passing (run on every push by GitHub Actions) |
 | Ontology | 60 skills, 107 aliases, 46 prerequisite edges, 4 domains |
 | Pages demo vs. Python engine | Scores match exactly (parity test runs the JavaScript port under Node) |
 | vLLM on a local Kubernetes cluster (CPU, Qwen3-0.6B) | Smoke test 5/5: key enforced, model name, chat, structured tool call |
@@ -223,7 +223,7 @@ Only numbers measured in this repo or on my laptop; nothing estimated.
 | Full agent run on a laptop CPU (Qwen3-4B + Llama 3.1) | 1,238–1,246 s for the two complete runs with a revision |
 | Omnigent orchestrator on Qwen3-4B | Stalled after dispatching in 2 of 2 runs, which is why orchestration moved into code |
 | Llama 3.1 8B as reviewer | Reported all 7 checks failing on a curriculum the graph checks passed, so its findings are advisory |
-| Harness eval, 20 tasks (12 normal, 8 with injected faults), live Qwen3-4B on Ollama | **18/20** outcomes as expected; all 8 fault tasks handled (2 recovered retries, 1 breaker open, 1 rollback, 3 runs queued for approval, 3 failed safely with nothing shipped) |
+| Harness eval, 20 tasks (12 normal, 8 with injected faults), live Qwen3-4B on Ollama, 2026-10-28 (scoring v1) | **18/20** outcomes as expected; all 8 fault tasks handled (2 recovered retries, 1 breaker open, 1 rollback, 3 runs queued for approval, 3 failed safely with nothing shipped) |
 | The 2 misses | Both model errors caught by the graph checks and queued instead of shipped: a fit score not copied exactly (eval-07), `builds_on` listing skills the user lacks (eval-08) |
 | Harness eval latency, laptop CPU | Live: p50 106 s, p95 248 s per task. Replay (recorded model answers, real MCP + Neo4j): p50 3.6 s, p95 7.7 s, same 18/20, 0 drift |
 | Harness eval cost | 10,739 tokens per task (mean), 278 tool calls in total |

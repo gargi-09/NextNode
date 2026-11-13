@@ -6,6 +6,7 @@ class ExtractedSkill(BaseModel):
     category: Optional[str] = None  # language | ml_framework | platform | concept | tool
     level: Optional[str] = None     # foundational | intermediate | advanced
     proficiency: float              # 0.0–1.0, inferred from context
+    alternatives: list[str] = []    # job requirements only: any one of these also satisfies it
 
 class ExtractedJD(BaseModel):
     title: str
@@ -58,6 +59,8 @@ class SkillInput(BaseModel):
 class RequiredSkillInput(BaseModel):
     name: str = Field(min_length=1)
     weight: float = Field(ge=0.0, le=1.0, description="proficiency the job expects")
+    alternatives: list[str] = Field(default_factory=list, max_length=10,
+                                    description="other skills that each satisfy this requirement (\"Python or Java\")")
     category: Optional[str] = None
     level: Optional[str] = None
 

@@ -163,8 +163,9 @@ async def upsert_job_posting(
     domains: list[str] = Field(default_factory=list, max_length=10),
 ) -> dict:
     """Create the job or fully REPLACE its fields and requirements. Each skill is
-    {name, weight 0-1 = the proficiency the role expects}. Unknown skills are returned
-    in `unmapped_skills`, unknown domains in `unmapped_domains`."""
+    {name, weight 0-1 = the proficiency the role expects, alternatives: [other skills that
+    each satisfy it, e.g. "Python or Java"]}. Unknown skills are returned in
+    `unmapped_skills`, unknown domains in `unmapped_domains`."""
     async def write():
         request = JobCreate(id=job_id, title=title, company=company, seniority=seniority,
                             core_skills=core_skills, preferred_skills=preferred_skills,

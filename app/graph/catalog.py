@@ -55,7 +55,8 @@ def _get_job_tx(tx, job_id: str) -> dict:
         OPTIONAL MATCH (j)-[r:REQUIRES_SKILL]->(s:Skill)
         WITH j, collect(s {
             .name, .key, .category,
-            importance: r.importance, weight: r.weight, level: r.level
+            importance: r.importance, weight: r.weight, level: r.level,
+            group: r.group, alt_rank: r.alt_rank
         }) AS skills
         OPTIONAL MATCH (j)-[:IN_DOMAIN]->(d:Domain)
         RETURN j.id AS id, j.title AS title, j.company AS company,

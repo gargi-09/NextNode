@@ -5,7 +5,8 @@ plain data, so it can be unit-tested and reused by API routes or MCP tools alike
 """
 
 # Bump when any rule below changes, so clients can tell scores apart.
-SCORING_VERSION = "1"
+# "2": any-of requirement groups ("Python, Java, or C++") count once (collapse_alternatives).
+SCORING_VERSION = "2"
 
 GAP_IMPORTANCE_WEIGHTS = {
     "core":         1.0,
@@ -17,8 +18,44 @@ PIVOT_IMPORTANCE_WEIGHTS = {"core": 1.0, "preferred": 0.6}
 
 TIER_ORDER = {"core": 0, "preferred": 1, "nice_to_have": 2}
 
+STATUS_ORDER = {"met": 0, "partial": 1, "missing": 2}
+
 
 # ─────────────────────────── job fit ───────────────────────────
+
+def collapse_alternatives(rows: list[dict], prereq_coverage: dict[str, int]) -> list[dict]:
+    """One row per requirement: the rows of an any-of group (same `group`) become the member
+    the user is best placed on (met, then partial, then missing; then higher proficiency; then
+    more prerequisites owned; then the order the job listed them). The other members are kept
+    in `alternatives`. Plain rows pass through with `alternatives` = []. Row order is kept
+    (a group sits where its first member was)."""
+    out: list = []
+    groups: dict[str, list[dict]] = {}
+    for row in rows:
+        group = row.get("group")
+        if not group:
+            out.append(row)
+            continue
+        if group not in groups:
+            groups[group] = []
+            out.append(group)
+        groups[group].append(row)
+
+    collapsed = []
+    for item in out:
+        if isinstance(item, dict):
+            collapsed.append({**_plain(item), "alternatives": []})
+            continue
+        members = sorted(groups[item], key=lambda r: r.get("alt_rank") or 0)
+        best = min(members, key=lambda r: (STATUS_ORDER[r["status"]], -r["your_proficiency"],
+                                           -prereq_coverage.get(r["skill"], 0), r.get("alt_rank") or 0))
+        collapsed.append({**_plain(best), "alternatives": [m["skill"] for m in members if m is not best]})
+    return collapsed
+
+
+def _plain(row: dict) -> dict:
+    return {k: v for k, v in row.items() if k not in ("group", "alt_rank")}
+
 
 def score_gap(
     user_id: str,
@@ -67,7 +104,8 @@ def score_gap(
             "your_proficiency": your_p,
             "required_weight": req_w,
             "prereqs_owned":   prereqs,
-            "gap_contribution": round(weighted_gap, 3)
+            "gap_contribution": round(weighted_gap, 3),
+            "alternatives":    row.get("alternatives") or [],
         })
 
     fit_score = (
@@ -119,13 +157,21 @@ def build_roadmap(skill_details: list[dict]) -> list[dict]:
             "status":        gap["status"],
             "importance":    gap["importance"],
             "prereqs_owned": gap["prereqs_owned"],
-            "reason":        _reason(gap)
+            "reason":        _reason(gap),
+            "alternatives":  gap.get("alternatives") or [],
         })
 
     return roadmap
 
 
 def _reason(gap: dict) -> str:
+    reason = _base_reason(gap)
+    if gap.get("alternatives"):
+        reason += f" (or {', '.join(gap['alternatives'])}: any one counts)"
+    return reason
+
+
+def _base_reason(gap: dict) -> str:
     if gap["status"] == "missing" and gap["prereqs_owned"] > 0:
         return (
             f"Not in your profile but you own "

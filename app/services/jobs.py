@@ -9,7 +9,8 @@ from app.services.ingestion import ingest_job_description
 
 def _to_extracted(skills: list[RequiredSkillInput]) -> list[ExtractedSkill]:
     return [
-        ExtractedSkill(name=s.name, category=s.category, level=s.level, proficiency=s.weight)
+        ExtractedSkill(name=s.name, category=s.category, level=s.level, proficiency=s.weight,
+                       alternatives=s.alternatives)
         for s in skills
     ]
 

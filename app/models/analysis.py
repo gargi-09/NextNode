@@ -22,6 +22,7 @@ class SkillGap(BaseModel):
     required_weight: float
     prereqs_owned: int
     gap_contribution: float
+    alternatives: list[str] = []   # other skills that would satisfy this requirement
 
 
 class RoadmapStep(BaseModel):
@@ -32,6 +33,7 @@ class RoadmapStep(BaseModel):
     importance: str
     prereqs_owned: int
     reason: str
+    alternatives: list[str] = []
 
 
 # ── react-force-graph ──

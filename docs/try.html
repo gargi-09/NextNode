@@ -275,7 +275,8 @@ function render(out, isOffline, why) {
     const tr = document.createElement("tr");
     const st = { met: "g", partial: "a", missing: "r" }[s.status] || "";
     tr.innerHTML = `<td></td><td></td><td><div class="bar"><i></i><b></b></div></td><td></td><td><span class="chip ${st}"></span></td>`;
-    tr.cells[0].textContent = s.skill; tr.cells[1].textContent = s.importance.replace(/_/g, " ");
+    tr.cells[0].textContent = s.alternatives?.length ? `${s.skill} (or ${s.alternatives.join(", ")})` : s.skill;
+    tr.cells[1].textContent = s.importance.replace(/_/g, " ");
     tr.querySelector(".bar i").style.width = `${Math.round(s.your_proficiency * 100)}%`;
     tr.querySelector(".bar b").style.left = `${Math.round(s.required_weight * 100)}%`;
     tr.cells[3].textContent = `${Math.round(s.required_weight * 100)}%`;

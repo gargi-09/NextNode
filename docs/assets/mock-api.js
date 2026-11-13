@@ -43,15 +43,30 @@
     }
     return { rows: Object.values(rows), unmapped };
   }
-  function requiredRows(tiers) { // app/graph/normalize.required_skill_rows (tier precedence)
+  function requiredRows(tiers) { // app/graph/normalize.required_skill_rows (tier precedence, any-of groups)
     const rows = {}, unmapped = [];
-    for (const importance of ["core", "preferred", "nice_to_have"]) for (const s of tiers[importance] || []) {
-      const name = String(s.name || "").trim(); if (!name) continue;
-      const r = NN.resolve(name);
-      if (!r) { if (!unmapped.includes(name) && unmapped.length < MAX_UNMAPPED) unmapped.push(name); continue; }
-      const cur = rows[r.skill.name];
-      if (!cur) rows[r.skill.name] = { name: r.skill.name, importance, weight: s.weight };
-      else if (cur.importance === importance && s.weight > cur.weight) cur.weight = s.weight;
+    let groups = 0;
+    for (const importance of ["core", "preferred", "nice_to_have"]) {
+      const list = [...(tiers[importance] || [])].sort((a, b) => (a.alternatives?.length ? 1 : 0) - (b.alternatives?.length ? 1 : 0));
+      for (const s of list) {
+        const members = [];
+        for (const raw of [s.name, ...(s.alternatives || [])]) {
+          const name = String(raw || "").trim(); if (!name) continue;
+          const r = NN.resolve(name);
+          if (!r) { if (!unmapped.includes(name) && unmapped.length < MAX_UNMAPPED) unmapped.push(name); continue; }
+          if (!members.includes(r.skill.name)) members.push(r.skill.name);
+        }
+        if (!members.length) continue;
+        if (members.length > 1) {
+          if (members.some(m => rows[m])) continue;     // one of them is required on its own: that covers it
+          groups += 1;
+          members.forEach((m, rank) => { rows[m] = { name: m, importance, weight: s.weight, group: `g${groups}`, alt_rank: rank }; });
+          continue;
+        }
+        const cur = rows[members[0]];
+        if (!cur) rows[members[0]] = { name: members[0], importance, weight: s.weight };
+        else if (cur.importance === importance && !cur.group && s.weight > cur.weight) cur.weight = s.weight;
+      }
     }
     return { rows: Object.values(rows), unmapped };
   }
@@ -82,7 +97,8 @@
   }
   function jobView(j) {
     const skills = Object.entries(j.skills).map(([name, e]) => ({ name, key: NN.BY_NAME[name].key,
-      category: NN.BY_NAME[name].category, importance: e.importance, weight: e.weight, level: null }))
+      category: NN.BY_NAME[name].category, importance: e.importance, weight: e.weight, level: null,
+      group: e.group ?? null, alt_rank: e.alt_rank ?? null }))
       .sort((a, b) => (NN.TIER[a.importance] - NN.TIER[b.importance]) || (b.weight - a.weight));
     return { id: j.id, title: j.title, company: j.company, seniority: j.seniority, skills, domains: j.domains,
              unmapped_skills: j.unmapped_skills };
@@ -110,7 +126,13 @@
       if (["required", "must have", "requirements"].includes(m)) { tier = "core"; continue; }
       if (["preferred", "plus"].includes(m)) { tier = "preferred"; continue; }
       if (["nice to have", "bonus"].includes(m)) { tier = "nice_to_have"; continue; }
-      for (const f of NN.lexicalSkills(part)) tiers[tier].push({ name: f.as, weight: tier === "core" ? weight : Math.round(weight * 0.8 * 100) / 100 });
+      const w = tier === "core" ? weight : Math.round(weight * 0.8 * 100) / 100;
+      for (const sentence of part.split(/[.;\n]+/)) {
+        const found = NN.lexicalSkills(sentence);
+        if (found.length > 1 && /\bor\b/i.test(sentence)) {   // "such as Python, Java, or C++": any one counts
+          tiers[tier].push({ name: found[0].as, weight: w, alternatives: found.slice(1).map(f => f.as) });
+        } else for (const f of found) tiers[tier].push({ name: f.as, weight: w });
+      }
     }
     const title = String(text).split(/[.\n]/)[0].replace(/\s+at\s+.*/i, "").trim().slice(0, 80) || "Untitled job";
     const company = (String(text).match(/\bat\s+([A-Z][\w&.-]*(?:\s[A-Z][\w&.-]*)?)/) || [])[1] || null;
@@ -139,7 +161,8 @@
     const { rows, unmapped } = requiredRows(tiers);
     const d = resolveDomains(domains);
     store.jobs[jobId] = { id: jobId, title: meta.title, company: meta.company ?? null, seniority: meta.seniority ?? null,
-      skills: Object.fromEntries(rows.map(r => [r.name, { importance: r.importance, weight: r.weight }])),
+      skills: Object.fromEntries(rows.map(r => [r.name, { importance: r.importance, weight: r.weight,
+        group: r.group ?? null, alt_rank: r.alt_rank ?? null }])),
       domains: d.keys, unmapped_skills: unmapped, source_hash: sourceHash ?? null };
     save();
     return { created, rows, unmapped, unknownDomains: d.unknown };
@@ -151,7 +174,8 @@
     if (!u) return notFound(`User '${userId}' not found`);
     if (!j) return notFound(`Job '${jobId}' not found`);
     const owned = Object.fromEntries(Object.entries(u.skills).map(([n, e]) => [n, e.proficiency]));
-    const reqs = Object.entries(j.skills).map(([n, e]) => ({ skill: n, importance: e.importance, weight: e.weight }));
+    const reqs = Object.entries(j.skills).map(([n, e]) => ({ skill: n, importance: e.importance, weight: e.weight,
+      group: e.group ?? null, alt_rank: e.alt_rank ?? null }));
     const a = NN.analyzeProfile(owned, reqs, u.target_domain, j.domains);
     const userDomains = u.target_domain ? [u.target_domain] : [];
     const r = a.result;

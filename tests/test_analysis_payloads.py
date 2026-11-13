@@ -59,7 +59,7 @@ def test_scores_match_the_manual_test_plan(monkeypatch):
     assert body["fit_score"] == 0.58
     assert body["gap_score"] == 1.06
     assert body["explanation_status"] == "not_requested"
-    assert body["scoring_version"] == "1"
+    assert body["scoring_version"] == "2"
     assert [s["skill"] for s in body["roadmap"]] == [
         "LLM fine-tuning", "PyTorch", "Vector Databases", "Docker"]
 

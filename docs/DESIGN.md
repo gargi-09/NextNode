@@ -29,7 +29,7 @@ flowchart LR
 |---|---|---|
 | LLM (Gemini, Qwen3) | Turns resumes and job descriptions into structured skills with an evidence label | Compute a score, create a skill, decide a verdict |
 | Ontology guardrail | Maps every name to a canonical skill by exact name or alias; unknown names go to a review queue | Fuzzy-match (a wrong match silently corrupts scores) |
-| Graph + rules | Fit score (core/preferred/nice-to-have weights, domain bonus), prerequisite chains up to 3 hops, ordered roadmap | Call an LLM |
+| Graph + rules | Fit score (core/preferred/nice-to-have weights, domain bonus; an any-of requirement such as "Python, Java, or C++" counts once, as the candidate's best option), prerequisite chains up to 3 hops, ordered roadmap | Call an LLM |
 
 So the same input always gives the same score (`scoring_version` "1"), and analysis keeps working
 when the LLM is down: only parsing new text needs it.

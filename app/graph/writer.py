@@ -68,7 +68,9 @@ def _write_job_tx(tx, job_id: str, meta: dict, rows: list[dict], domains: list[s
         MERGE (j)-[r:REQUIRES_SKILL]->(s)
         SET r.importance = row.importance,
             r.weight     = row.weight,
-            r.level      = row.level
+            r.level      = row.level,
+            r.group      = row.group,      // any-of group id, null for a plain requirement
+            r.alt_rank   = row.alt_rank    // order the job listed the group's skills in
     """, job_id=job_id, rows=rows)
 
     tx.run("""
