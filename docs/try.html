@@ -282,7 +282,9 @@ function render(out, isOffline, why) {
     tr.querySelector(".chip").textContent = s.status;
     tb.append(tr);
   }
-  NNViz.careerGraph($("graph"), a.graph);          // the section is visible now, so the svg has its size
+  // the name is never sent, so the user node would show the parser's placeholder: call it "You"
+  const graph = { ...a.graph, nodes: a.graph.nodes.map(n => (n.type === "user" ? { ...n, label: "You" } : n)) };
+  NNViz.careerGraph($("graph"), graph);            // the section is visible now, so the svg has its size
   $("results").scrollIntoView({ behavior: "smooth" });
 }
 
